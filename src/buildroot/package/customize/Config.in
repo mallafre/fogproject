@@ -1,0 +1,12 @@
+menu "FOG Custom Components"
+source "package/customize/clamav/Config.in"
+source "package/customize/parted/Config.in"
+source "package/customize/dmidecode/Config.in"
+source "package/customize/chntpw/Config.in"
+source "package/customize/selectcore/Config.in"
+source "package/customize/testdisk/Config.in"
+source "package/customize/fog/Config.in"
+source "package/customize/pigz/Config.in"
+source "package/customize/gdisk/Config.in"
+source "package/customize/ntfsprogsfog/Config.in"
+endmenu

@@ -1,0 +1,5 @@
+config BR2_PACKAGE_SELECTCORE
+	bool "Select Core Utilites"
+	depends on BR2_USE_WCHAR 
+	help
+	  base64 and shred binaries

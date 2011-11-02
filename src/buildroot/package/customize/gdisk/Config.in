@@ -1,0 +1,9 @@
+config BR2_PACKAGE_GDISK
+	bool "GPT fdisk"
+	select BR2_PACKAGE_POPT
+	help
+           GPT fdisk (consisting of the gdisk and sgdisk programs) is 
+           a text-mode partitioning tool for Linux, FreeBSD, Mac OS X, 
+           and Windows that works on Globally Unique Identifier (GUID) 
+           Partition Table (GPT) disks, rather than on the more common 
+           (through 2009) Master Boot Record (MBR) partition tables.

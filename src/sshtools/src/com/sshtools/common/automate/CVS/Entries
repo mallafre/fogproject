@@ -1,0 +1,15 @@
+/AuthorizedKeys.java/1.1.1.1/Fri Dec 23 14:24:44 2005//
+/AuthorizedKeysFileLoader.java/1.1.1.1/Fri Dec 23 14:24:44 2005//
+/AuthorizedKeysFileSaver.java/1.1.1.1/Fri Dec 23 14:24:44 2005//
+/AuthorizedKeysFormat.java/1.1.1.1/Fri Dec 23 14:24:44 2005//
+/AutomationConfiguration.java/1.1.1.1/Fri Dec 23 14:24:44 2005//
+/OpenSSHAuthorizedKeysFormat.java/1.1.1.1/Fri Dec 23 14:24:44 2005//
+/RemoteIdentification.java/1.1.1.1/Fri Dec 23 14:24:44 2005//
+/RemoteIdentificationException.java/1.1.1.1/Fri Dec 23 14:24:44 2005//
+/RemoteIdentificationFactory.java/1.1.1.1/Fri Dec 23 14:24:44 2005//
+/RemoteIdentificationRule.java/1.1.1.1/Fri Dec 23 14:24:44 2005//
+/SSH2AuthorizedKeysFormat.java/1.1.1.1/Fri Dec 23 14:24:44 2005//
+/SshtoolsAuthorizedKeysFormat.java/1.1.1.1/Fri Dec 23 14:24:44 2005//
+/SystemVerification.java/1.1.1.1/Fri Dec 23 14:24:44 2005//
+/UnsupportedRuleException.java/1.1.1.1/Fri Dec 23 14:24:44 2005//
+D

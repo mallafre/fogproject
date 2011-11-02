@@ -1,0 +1,49 @@
+--- chntpw-110511.orig/Makefile	2011-06-15 10:40:44.941913965 -0500
++++ chntpw-110511.new/Makefile	2011-06-15 10:40:32.062106854 -0500
+@@ -6,42 +6,17 @@
+ # See INSTALL for more info.
+ #
+ 
+-#SSLPATH=/usr/local/ssl
+-OSSLPATH=/usr
+-OSSLINC=$(OSSLPATH)/include
+-
+-CC=gcc
+-
+-# Force 32 bit
+-CFLAGS= -DUSEOPENSSL -g -I. -I$(OSSLINC) -Wall -m32 
+-OSSLLIB=$(OSSLPATH)/lib
+-
+-# 64 bit if default for compiler setup
+-#CFLAGS= -DUSEOPENSSL -g -I. -I$(OSSLINC) -Wall
+-#OSSLLIB=$(OSSLPATH)/lib64
+-
+-
+-# This is to link with whatever we have, SSL crypto lib we put in static
+-LIBS=-L$(OSSLLIB) $(OSSLLIB)/libcrypto.a
+-
+-all: chntpw chntpw.static cpnt reged reged.static
++all: chntpw cpnt reged
+ 
+ chntpw: chntpw.o ntreg.o edlib.o
+-	$(CC) $(CFLAGS) -o chntpw chntpw.o ntreg.o edlib.o $(LIBS)
+-
+-chntpw.static: chntpw.o ntreg.o edlib.o
+-	$(CC) -static $(CFLAGS) -o chntpw.static chntpw.o ntreg.o edlib.o $(LIBS)
+-
++	$(CC) $(CFLAGS) -o chntpw chntpw.o ntreg.o edlib.o -lssl
++	
+ cpnt: cpnt.o
+-	$(CC) $(CFLAGS) -o cpnt cpnt.o $(LIBS)
++	$(CC) $(CFLAGS) -o cpnt cpnt.o -lssl
+ 
+ reged: reged.o ntreg.o edlib.o
+ 	$(CC) $(CFLAGS) -o reged reged.o ntreg.o edlib.o
+ 
+-reged.static: reged.o ntreg.o edlib.o
+-	$(CC) -static $(CFLAGS) -o reged.static reged.o ntreg.o edlib.o
+-
+-
+ #ts: ts.o ntreg.o
+ #	$(CC) $(CFLAGS) -nostdlib -o ts ts.o ntreg.o $(LIBS)
+ 

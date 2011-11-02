@@ -1,0 +1,266 @@
+#!/usr/bin/php -q
+<?php
+
+/*
+ *  FOG is a computer imaging solution.
+ *  Copyright (C) 2009  Chuck Syperski & Jian Zhang
+ *
+ *   This program is free software: you can redistribute it and/or modify
+ *   it under the terms of the GNU General Public License as published by
+ *   the Free Software Foundation, either version 3 of the License, or
+ *   any later version.
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU General Public License for more details.
+ *
+ *   You should have received a copy of the GNU General Public License
+ *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *
+ */
+ 
+@error_reporting( 0 );
+
+require_once( dirname(realpath(__FILE__)) . "/../etc/config.php" );
+require_once( dirname(realpath(__FILE__)) . "/../common/functions.php" );
+
+
+function outall( $string )
+{
+	out( $string, SCHEDULERDEVICEOUTPUT );
+	wlog( $string, SCHEDULERLOGPATH );
+}
+
+out( getBanner(), SCHEDULERDEVICEOUTPUT);
+
+outall( " * Starting FOG Task Scheduler Service" );
+
+//sleep( 5 );
+
+outall( " * [" . getDateTime() . "] Checking for new tasks every " . SCHEDULERSLEEPTIME . " seconds." );
+outall( " * [" . getDateTime() . "] Starting service loop." );
+
+outall( " * [" . getDateTime() . "] Looking for shared library information..." );
+$strFuncs = SCHEDULERWEBROOT . "/commons/functions.include.php";
+if ( ! file_exists( $strFuncs ) || ! is_readable( $strFuncs ) )
+{
+	outall( " * [" . getDateTime() . "] shared library not found in " . SCHEDULERWEBROOT );
+	die( "Unable to load: " . $strFuncs );
+}
+else
+{
+	outall( " * [" . getDateTime() . "] shared library found." );
+}
+
+require_once( $strFuncs );
+require_once( SCHEDULERWEBROOT . "/management/lib/Imageable.interface.php" );
+require_once( SCHEDULERWEBROOT . "/management/lib/FOGCore.class.php" );
+require_once( SCHEDULERWEBROOT . "/management/lib/MACAddress.class.php");
+require_once( SCHEDULERWEBROOT . "/management/lib/Host.class.php");
+require_once( SCHEDULERWEBROOT . "/management/lib/Group.class.php");
+require_once( SCHEDULERWEBROOT . "/management/lib/Image.class.php" );
+require_once( SCHEDULERWEBROOT . "/management/lib/ScheduledTask.class.php" );
+require_once( SCHEDULERWEBROOT . "/management/lib/StorageGroup.class.php" );
+require_once( SCHEDULERWEBROOT . "/management/lib/StorageNode.class.php" );
+require_once( SCHEDULERWEBROOT . "/management/lib/Timer.class.php" );
+
+while( true )
+{
+	out( " ", SCHEDULERDEVICEOUTPUT );
+	out( " +---------------------------------------------------------", SCHEDULERDEVICEOUTPUT );
+	$conn = mysql_connect(MYSQL_HOST, MYSQL_USERNAME, MYSQL_PASSWORD);
+	
+	if ( $conn )
+	{
+		if( mysql_select_db( MYSQL_DATABASE, $conn ) )
+		{
+			outall( " * [" . getDateTime() . "] Checking if I am the group manager." );
+			if ( amITheGroupMananger( $conn ) )
+			{
+				outall( " * [" . getDateTime() . "] I am the group manager." );
+				$groupid = getGroupID( $conn );
+				if ( is_numeric( $groupid ) && $groupid > 0 )
+				{
+					$nodeid = getMyNodeID( $conn );
+					$myroot = getMyImageStoreRoot( $conn, $nodeid );
+					
+					$core = new FOGCore( $conn );
+
+					$tasks = $core->getScheduledTasksByStorageGroupID( $groupid );
+
+					if ( count( $tasks ) > 0 )
+					{
+						outall( " * " . count( $tasks ) . " task(s) found." );
+						
+						for( $i = 0; $i < count( $tasks ); $i++ )
+						{
+							$task = $tasks[$i];
+							if ( $task != null )
+							{
+								$timer = $task->getTimer();
+								if ( $timer != null )
+								{
+									outall( " *  Task run time: " . $timer->toString() );
+									if ( $timer->shouldRunNow() )
+									{
+
+										outall( " *  Found a task that should run..." );
+										if ( $task->isGroupBased() )
+										{
+											outall( "\t\t - Is a group based task." );
+											$group = $task->getGroup();
+											if ( $group != null )
+											{
+
+												if ( strtoupper($task->getTaskType()) == strtoupper(FOGCore::TASK_MULTICAST) )
+												{
+
+													outall( "\t\t - Multicast Task Found");
+													outall( "\t\t - Group: " . $group->getName() );
+													$reason;
+													if ( $group->startTask($conn, $task->getTaskType(), $task->getShutdownAfterTask(), $task->getOther1(), $task->getOther2(), $task->getOther3(), $task->getOther4(), $task->getOther5(), $reason) )
+													{
+														outall( "\t\t - Task Started!" );
+														if ( $timer->isSingleRun() )
+														{
+															if ( $core->stopScheduledTask( $task ) )
+															{
+																outall( "\t\t - Scheduled task cleaned." );
+															}
+															else
+															{
+																outall( "\t\t - Failed to clean task!" );
+															}
+												
+											
+														}
+														else
+															outall( "\t\t - Cron style - No cleaning!" );
+													}
+													else
+													{
+														outall( "\t\t - Failed to start task!" );
+														outall( "\t\t - Response: $reason" );
+													}													
+												}
+												else
+												{
+													$hosts = $group->getMembers();
+													if ( $hosts != null && count( $hosts ) > 0 )
+													{
+														for( $z = 0; $z < count( $hosts ); $z++ )
+														{
+															$h = $hosts[$z];
+															if ( $h != null )
+															{	
+																$reason;
+																outall( "\t\t - Host: " . $h->getHostName() );
+																if ( $h->startTask($conn, $task->getTaskType(), $task->getShutdownAfterTask(), $task->getOther1(), $task->getOther2(), $task->getOther3(), $task->getOther4(), $task->getOther5(), $reason) )
+																{
+																	outall( "\t\t - Task Started!" );
+																	if ( $timer->isSingleRun() )
+																	{
+																		if ( $core->stopScheduledTask( $task ) )
+																		{
+																			outall( "\t\t - Scheduled task cleaned." );
+																		}
+																		else
+																		{
+																			outall( "\t\t - Failed to clean task!" );
+																		}
+															
+														
+																	}
+																	else
+																		outall( "\t\t - Cron style - No cleaning!" );
+																}
+																else
+																{
+																	outall( "\t\t - Failed to start task!" );
+																	outall( "\t\t - Response: $reason" );
+																}
+																											
+															}
+														}
+													}	
+													else
+													{
+														outall( "\t\t - No valid hosts." );
+													}
+												}
+											}
+											else
+											{
+												outall( "\t\t - group is null." );
+											}
+										}
+										else
+										{
+											outall( "\t\t - Is a host based task." );
+											$host = $task->getHost();
+											if ( $host != null )
+											{
+												$reason;
+												if ( $host->startTask($conn, $task->getTaskType(), $task->getShutdownAfterTask(), $task->getOther1(), $task->getOther2(), $task->getOther3(), $task->getOther4(), $task->getOther5(), $reason) )
+												{
+													outall( "\t\t - Task Started!" );
+													if ( $timer->isSingleRun() )
+													{
+														if ( $core->stopScheduledTask( $task ) )
+														{
+															outall( "\t\t - Scheduled task cleaned." );
+														}
+														else
+														{
+															outall( "\t\t - Failed to clean task!" );
+														}
+													}
+													else
+														outall( "\t\t - Cron style - No cleaning!" );
+												}
+												else
+												{
+													outall( "\t\t - Failed to start task!" );
+													outall( "\t\t - Response: $reason" );
+												}
+											}
+											else
+											{
+												outall( "\t\t - Host is null." );
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+					else
+					{
+						outall( " * [" . getDateTime() . "] No tasks found." );
+					}
+				}
+				else
+					outall( " * [" . getDateTime() . "] Invalid group ID." );
+			}
+			else
+			{
+				outall( " * [" . getDateTime() . "] I don't appear to be the group manager, I will check back later." );
+			}
+		}
+		else
+			outall( " | [" . getDateTime() . "] Failed to use database: " . MYSQL_DATABASE );
+			
+		@mysql_close($conn);
+	}
+	else
+		outall( " | [" . getDateTime() . "] Failed to connect to database server, will try again in next iteration." );
+		
+		
+	
+	out( " +---------------------------------------------------------", SCHEDULERDEVICEOUTPUT );
+	sleep( SCHEDULERSLEEPTIME );
+}
+outall( " * [" . getDateTime() . "] Service has ended." );
+?>

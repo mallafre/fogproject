@@ -1,0 +1,7 @@
+config BR2_PACKAGE_PARTED
+	bool "GNU Parted"
+	select BR2_PACKAGE_E2FSPROGS_LIBUUID
+	help
+	  GNU Parted is an industrial-strength package for manipulating partition tables. 
+	  This is useful for creating space for new operating systems, reorganising disk usage, 
+	  copying data on hard disks and disk imaging.

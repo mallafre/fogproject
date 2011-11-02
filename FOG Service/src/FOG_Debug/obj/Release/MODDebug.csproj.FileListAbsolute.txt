@@ -1,0 +1,5 @@
+C:\Users\admin\Desktop\src\FOG_Debug\bin\Release\MODDebug.dll
+C:\Users\admin\Desktop\src\FOG_Debug\bin\Release\AbstractFOGService.dll
+C:\Users\admin\Desktop\src\FOG_Debug\bin\Release\IniReaderObj.dll
+C:\Users\admin\Desktop\src\FOG_Debug\obj\Release\ResolveAssemblyReference.cache
+C:\Users\admin\Desktop\src\FOG_Debug\obj\Release\MODDebug.dll

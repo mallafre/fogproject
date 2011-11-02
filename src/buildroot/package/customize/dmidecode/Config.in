@@ -1,0 +1,9 @@
+config BR2_PACKAGE_DMIDECODE
+	bool "DMI Decode"
+	select BR2_PACKAGE_E2FSPROGS_LIBUUID
+	help
+	  Dmidecode reports information about your system's hardware as described 
+	  in your system BIOS according to the SMBIOS/DMI standard. This information 
+	  typically includes system manufacturer, model name, serial number, BIOS 
+	  version, asset tag as well as a lot of other details of varying level of 
+	  interest and reliability depending on the manufacturer. 

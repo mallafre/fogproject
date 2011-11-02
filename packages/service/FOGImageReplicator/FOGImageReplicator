@@ -1,0 +1,140 @@
+#!/usr/bin/php -q
+<?php
+
+/*
+ *  FOG is a computer imaging solution.
+ *  Copyright (C) 2007  Chuck Syperski & Jian Zhang
+ *
+ *   This program is free software: you can redistribute it and/or modify
+ *   it under the terms of the GNU General Public License as published by
+ *   the Free Software Foundation, either version 3 of the License, or
+ *   any later version.
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU General Public License for more details.
+ *
+ *   You should have received a copy of the GNU General Public License
+ *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *
+ */
+ 
+@error_reporting( 0 );
+
+require_once( dirname(realpath(__FILE__)) . "/../etc/config.php" );
+require_once( dirname(realpath(__FILE__)) . "/../common/functions.php" );
+
+function outall( $string )
+{
+	out( $string, REPLICATORDEVICEOUTPUT );
+	wlog( $string, REPLICATORLOGPATH );
+}
+
+out( getBanner(), REPLICATORDEVICEOUTPUT);
+
+outall( " * Starting FOG Image Replicator Service" );
+
+sleep( 5 );
+
+outall( " * [" . getDateTime() . "] Checking for new tasks every " . REPLICATORSLEEPTIME . " seconds." );
+outall( " * [" . getDateTime() . "] Starting service loop." );
+
+while( true )
+{
+	out( " ", REPLICATORDEVICEOUTPUT );
+	out( " +---------------------------------------------------------", REPLICATORDEVICEOUTPUT );
+	$conn = mysql_connect(MYSQL_HOST, MYSQL_USERNAME, MYSQL_PASSWORD);
+	if ( $conn )
+	{
+		if( mysql_select_db( MYSQL_DATABASE, $conn ) )
+		{
+			outall( " * [" . getDateTime() . "] Checking if I am the group manager." );
+			if ( amITheGroupMananger( $conn ) )
+			{
+				outall( " * [" . getDateTime() . "] I am the group manager." );
+				outall( " * [" . getDateTime() . "] Starting Image replication." );
+				outall( " * [" . getDateTime() . "] Determining my group ID number." );
+				$groupid = getGroupID( $conn );
+				if ( is_numeric( $groupid ) && $groupid > 0 )
+				{
+					outall( " * [" . getDateTime() . "] Looking up my node ID number" );
+					$nodeid = getMyNodeID( $conn );
+					if ( is_numeric( $nodeid ) && $nodeid > 0 )
+					{
+						outall( " * [" . getDateTime() . "] NODE ID# " . $nodeid );
+						outall( " * [" . getDateTime() . "] We are group ID: #" . $groupid );	
+					
+						outall( " * [" . getDateTime() . "] Finding group members." );	
+						$arNodeIDS = getGroupMembersIDs( $conn, $groupid, $nodeid );
+						if ( count( $arNodeIDS ) > 0 )
+						{
+							outall( " * [" . getDateTime() . "] Found: " . count( $arNodeIDS ) . " other member(s)." );	
+							outall( "" );	
+							outall( " * [" . getDateTime() . "] Getting my image root." );																
+							$myRoot = getMyImageStoreRoot( $conn, $nodeid );
+
+							$myRoot = rtrim( $myRoot, '/' );
+							
+							outall( " * [" . getDateTime() . "] My Root: " . $myRoot );																
+							outall("");
+							outall( " * [" . getDateTime() . "] Starting Sync." );								
+							for( $i = 0; $i < count( $arNodeIDS ); $i++ )
+							{
+								$currentNode = $arNodeIDS[$i];
+								$sql = "SELECT * FROM nfsGroupMembers WHERE ngmID = '$currentNode'";
+								$res = mysql_query( $sql, $conn ) or die( mysql_error() );
+								while( $ar = mysql_fetch_array( $res ) )
+								{
+									outall( " * [" . getDateTime() . "] Syncing: " . $ar["ngmMemberName"] );	
+									$username = $ar["ngmUser"];
+									$password = $ar["ngmPass"];
+								
+									$remRoot = rtrim( $ar["ngmRootPath"], '/' );
+
+									$process = popen( "lftp -e \"set ftp:list-options -a;set net:max-retries 1;set net:timeout 30;mirror -R -vvv --exclude 'dev/' --delete " . $myRoot . " " . $remRoot  . ";exit\" -u $username,$password " . $ar["ngmHostname"] . " 2>&1", "r" );
+									while( ! feof( $process ) && $process != null )
+									{
+										$output = fgets( $process, 256 );
+										outall(" * [" . getDateTime() . "] SubProcess -> " . $output);
+										//usleep( 200 );											
+									}
+									pclose( $process );
+									outall(" * [" . getDateTime() . "] SubProcess -> Complete" );
+								}
+							}
+
+						}
+						else
+							outall( " * [" . getDateTime() . "] I am the only member, no need to copy anything!." );	
+					}
+					else
+					{
+						outall( " * [" . getDateTime() . "] I couldn't find my node's ID number?!?." );	
+					}							
+				}
+				else
+					outall( " * [" . getDateTime() . "] Invalid group ID." );
+			}
+			else
+			{
+				outall( " * [" . getDateTime() . "] I don't appear to be the group manager, I will check back later." );
+			}
+		}
+		else
+			outall( "   [" . getDateTime() . "] Failed to use database: " . MYSQL_DATABASE );
+			
+		@mysql_close($conn);
+	}
+	else
+	{
+		outall( "   [" . getDateTime() . "] Failed to connect to database server, will try again in next iteration." );
+	}
+
+	out( " +---------------------------------------------------------", REPLICATORDEVICEOUTPUT );
+	sleep( REPLICATORSLEEPTIME );
+}
+
+outall( " * [" . getDateTime() . "] Service has ended." );
+?>

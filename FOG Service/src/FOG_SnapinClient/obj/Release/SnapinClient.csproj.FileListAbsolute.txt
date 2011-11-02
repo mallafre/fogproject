@@ -1,0 +1,5 @@
+C:\Users\admin\Desktop\src\FOG_SnapinClient\bin\Release\SnapinClient.dll
+C:\Users\admin\Desktop\src\FOG_SnapinClient\bin\Release\AbstractFOGService.dll
+C:\Users\admin\Desktop\src\FOG_SnapinClient\bin\Release\IniReaderObj.dll
+C:\Users\admin\Desktop\src\FOG_SnapinClient\obj\Release\ResolveAssemblyReference.cache
+C:\Users\admin\Desktop\src\FOG_SnapinClient\obj\Release\SnapinClient.dll
