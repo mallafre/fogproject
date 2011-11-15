@@ -3,6 +3,9 @@
 // Blackout - 3:10 PM 25/09/2011
 class GroupManager extends FOGManagerController
 {
+	// Table
+	protected $databaseTable = 'groups';
+	
 	// Search query
 	protected $searchQuery = 'SELECT * FROM groups WHERE groupName LIKE "%${keyword}%"';
 

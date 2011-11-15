@@ -24,6 +24,9 @@ class Group extends FOGController
 		'hosts'
 	);
 	
+	// Custom Variables
+	private $hostsLoaded = false;
+	
 	// Legacy - remove when fully converted
 	private $id, $name, $description, $createTime, $createdBy, $building, $hosts, $kernel, $kernelArgs, $primaryDisk;
 	public $lastError;
@@ -57,13 +60,15 @@ class Group extends FOGController
 	
 	public function get($key)
 	{
-		if ($this->key($key) == 'hosts')
+		if ($this->key($key) == 'hosts' && !$this->hostsLoaded)
 		{
 			$this->updateHosts();
+			
+			$hostsLoaded = true;
 		}
 		
 		// Get
-		return $this->get($key);
+		return parent::get($key);
 	}
 	
 	// Host related functions
@@ -100,7 +105,7 @@ class Group extends FOGController
 		// Query group members
 		//var_dump($this->db);exit;
 		
-		$this->db->query("SELECT * FROM groups INNER JOIN groupMembers ON ( groups.groupID = groupMembers.gmGroupID ) WHERE groupID='%s'", array($this->get('id')));
+		$this->db->query("SELECT * FROM groups INNER JOIN groupMembers ON ( groups.groupID = groupMembers.gmGroupID ) WHERE groupID='%s' ORDER BY groupName", array($this->get('id')));
 		while ($host = $this->db->fetch()->get())
 		{
 			$this->add('hosts', new Host($host['gmHostID']));

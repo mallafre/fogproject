@@ -16,7 +16,7 @@ abstract class FOGManagerController
 	protected $db;
 	
 	// FOG Core Class
-	protected $core;
+	protected $FOGCore;
 	
 	// Child class name
 	protected $childClass;
@@ -24,12 +24,12 @@ abstract class FOGManagerController
 	// Construct
 	public function __construct()
 	{
-		// Set child classes name
-		$this->childClass = preg_replace('#Manager$#', '', get_class($this));
-		
 		// Legacy
 		$this->db = $GLOBALS['db'];
-		$this->core = $GLOBALS['core'];
+		$this->FOGCore = $GLOBALS['FOGCore'];
+	
+		// Set child classes name
+		$this->childClass = preg_replace('#Manager$#', '', get_class($this));
 	}
 	
 	// Search

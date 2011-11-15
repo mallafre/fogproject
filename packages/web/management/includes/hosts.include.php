@@ -33,6 +33,53 @@ if ($currentUser != null && $currentUser->isLoggedIn())
 
 	if ($_POST['frmSub'] == '1')
 	{
+		// Blackout - 11:04 AM 15/11/2011
+		// TODO: Finish
+		/*
+		try
+		{
+			// Error checking
+			if ($_POST['grp'] == '-1')
+			{
+				throw new Exception('Group is required');
+			}
+			if ($_POST['newgroup'] == null)
+			{
+				throw new Exception('New Group is required');
+			}
+		
+			// Define new object with data provided
+			$Group = new Group();
+			$Group->set('name', $_POST['newgroup']);
+			
+			// Save to database
+			if ($Group->save())
+			{
+				// Log History event
+				$FOGCore->logHistory(sprintf('Group added: ID: %s, Name: %s', $Group->get('id'), $Group->get('name')));
+			
+				// Set session message
+				$FOGCore->setMessage('Group added!');
+			
+				// Redirect to new entry
+				$FOGCore->redirect("$_SERVER[PHP_SELF]?node=$node&sub=edit&groupid=" . $Group->get('id'));
+			}
+			else
+			{
+				// Database save failed
+				throw new Exception('Database update failed');
+			}
+		}
+		catch (Exception $e)
+		{
+			// Log History event
+			$FOGCore->logHistory(sprintf('Group add failed: Name: %s, Error: %s', $_POST['name'], $e->getMessage()));
+		
+			// Set session message
+			$FOGCore->setMessage($e->getMessage());
+		}
+		*/
+	
 		if ($_POST['grp'] != '-1' || $_POST['newgroup'] != null)
 		{
 			$blGo = false;

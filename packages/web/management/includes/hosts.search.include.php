@@ -66,12 +66,10 @@ if ($currentUser != null && $currentUser->isLoggedIn())
 				<label for="grp"><?php print _('Add to group'); ?></label>
 				<select name="grp" id="grp"><option value="">- <?php print _('Select a group'); ?> -</option>
 				<?php
-				$groupMan = $core->getGroupManager();
-				$arGroups = $groupMan->find();
-				for ($i = 0; $i < count($arGroups); $i++)
+				
+				foreach ($FOGCore->getClass('GroupManager')->find() AS $Group)
 				{
-					$g = $arGroups[$i];
-					if ($g != null) printf('<option value="%s">%s</option>', $g->getName(), $g->getName());
+					printf('<option value="%s">%s</option>', $Group->get('id'), $Group->get('name'));
 				}
 				?>
 				</select>

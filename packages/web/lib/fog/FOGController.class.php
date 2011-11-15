@@ -50,6 +50,9 @@ abstract class FOGController
 				throw new Exception('No database fields defined for this class!');
 			}
 			
+			// Flip database fields and common name - used multiple times
+			$this->databaseFieldsFlipped = array_flip($this->databaseFields);
+			
 			// Database
 			$this->db = $GLOBALS['db'];
 			$this->core = $GLOBALS['core'];
@@ -112,16 +115,14 @@ abstract class FOGController
 	{
 		try
 		{
-			$databaseFieldsRev = array_flip($this->databaseFields);
-			
-			if (!array_key_exists($key, $this->databaseFields) && !in_array($key, $this->additionalFields) && !array_key_exists($key, $databaseFieldsRev))
+			if (!array_key_exists($key, $this->databaseFields) && !in_array($key, $this->additionalFields) && !array_key_exists($key, $this->databaseFieldsFlipped))
 			{
 				throw new Exception('Invalid data being set');
 			}
 			
-			if (array_key_exists($key, $databaseFieldsRev))
+			if (array_key_exists($key, $this->databaseFieldsFlipped))
 			{
-				$key = $databaseFieldsRev[$key];
+				$key = $this->databaseFieldsFlipped[$key];
 			}
 			
 			$this->data[$key] = $value;
@@ -145,16 +146,14 @@ abstract class FOGController
 	{
 		try
 		{
-			$databaseFieldsRev = array_flip($this->databaseFields);
-			
-			if (!array_key_exists($key, $this->databaseFields) && !in_array($key, $this->additionalFields) && !array_key_exists($key, $databaseFieldsRev))
+			if (!array_key_exists($key, $this->databaseFields) && !in_array($key, $this->additionalFields) && !array_key_exists($key, $this->databaseFieldsFlipped))
 			{
 				throw new Exception('Invalid data being set');
 			}
 			
-			if (array_key_exists($key, $databaseFieldsRev))
+			if (array_key_exists($key, $this->databaseFieldsFlipped))
 			{
-				$key = $databaseFieldsRev[$key];
+				$key = $this->databaseFieldsFlipped[$key];
 			}
 			
 			$this->data[$key][] = $value;
@@ -172,16 +171,14 @@ abstract class FOGController
 	{
 		try
 		{
-			$databaseFieldsRev = array_flip($this->databaseFields);
-			
-			if (!array_key_exists($key, $this->databaseFields) && !in_array($key, $this->additionalFields) && !array_key_exists($key, $databaseFieldsRev))
+			if (!array_key_exists($key, $this->databaseFields) && !in_array($key, $this->additionalFields) && !array_key_exists($key, $this->databaseFieldsFlipped))
 			{
 				throw new Exception('Invalid data being set');
 			}
 			
-			if (array_key_exists($key, $databaseFieldsRev))
+			if (array_key_exists($key, $this->databaseFieldsFlipped))
 			{
-				$key = $databaseFieldsRev[$key];
+				$key = $this->databaseFieldsFlipped[$key];
 			}
 			
 			foreach ((array)$this->data[$key] AS $i => $data)
@@ -390,11 +387,9 @@ abstract class FOGController
 	// Key
 	public function key($key)
 	{
-		$databaseFieldsFlipped = array_flip($this->databaseFields);
-
-		if (array_key_exists($key, $databaseFieldsFlipped))
+		if (array_key_exists($key, $this->databaseFieldsFlipped))
 		{
-			return $databaseFieldsFlipped[$key];
+			return $this->databaseFieldsFlipped[$key];
 		}
 		
 		return $key;
