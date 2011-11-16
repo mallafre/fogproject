@@ -7,8 +7,11 @@ class FOGPageManager
 	private $nodeVariable = 'node';
 	private $subVariable = 'sub';
 	
+	private $FOGCore;
+	
 	public function __construct()
 	{
+		$this->FOGCore = $GLOBALS['FOGCore'];
 	}
 	
 	// Load FOGPage classes
@@ -83,8 +86,14 @@ class FOGPageManager
 				$sub = 'index';
 			}
 			
+			// FOG - Default view
+			if ($sub == 'index' && $this->FOGCore->getSetting('FOG_VIEW_DEFAULT_SCREEN') != 'LIST')
+			{
+				$sub = 'search';
+			}
+			
 			// Arguments
-			$args = (isset($GLOBALS[$class->id]) ? array('id' => $GLOBALS[$class->id]) : array());
+			$args = (!empty($GLOBALS[$class->id]) ? array('id' => $GLOBALS[$class->id]) : array());
 		
 			// Render result to variable - we do this so we can send HTTP Headers in a class method
 			// TODO: Create a better solution
@@ -107,12 +116,12 @@ class FOGPageManager
 	// Error
 	protected function error($txt, $data = array())
 	{
-		$GLOBALS['FOGCore']->error('%s: %s', array(get_class($this), (count($data) ? vsprintf($txt, $data) : $txt)));
+		$this->FOGCore->error('%s: %s', array(get_class($this), (count($data) ? vsprintf($txt, $data) : $txt)));
 	}
 	
 	// Info
 	protected function info($txt, $data = array())
 	{
-		$GLOBALS['FOGCore']->info('%s: %s', array(get_class($this), (count($data) ? vsprintf($txt, $data) : $txt)));
+		$this->FOGCore->info('%s: %s', array(get_class($this), (count($data) ? vsprintf($txt, $data) : $txt)));
 	}
 }

@@ -86,6 +86,10 @@ class UserManagementPage extends FOGPage
 	
 	public function add()
 	{
+		// Hook
+		$this->HookManager->processEvent('USER_ADD');
+		
+		// POST ?
 		if ($this->post)
 		{
 			try
@@ -166,7 +170,11 @@ class UserManagementPage extends FOGPage
 	public function edit()
 	{
 		$User = new User($this->request['id']);
-	
+		
+		// Hook
+		$this->HookManager->processEvent('USER_ADD', array('User' => &$User));
+		
+		// POST ?
 		if ($this->post)
 		{
 			try
@@ -251,6 +259,11 @@ class UserManagementPage extends FOGPage
 	public function delete()
 	{
 		$User = new User($this->request['id']);
+		
+		// Hook
+		$this->HookManager->processEvent('USER_DELETE', array('User' => &$User));
+		
+		// POST ?
 	
 		if ($this->request['confirm'])
 		{
