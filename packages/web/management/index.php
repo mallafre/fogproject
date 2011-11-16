@@ -124,6 +124,8 @@ $pageTitle = (isset($pageTitles[$node]) ? $pageTitles[$node] : 'Dashboard');
 	<!-- Stylesheets -->
 	<link rel="stylesheet" type="text/css" href="css/fog.css" />
 	<link rel="stylesheet" type="text/css" media="all" href="css/calendar/calendar-win2k-1.css"  />
+	
+	<link rel="shortcut icon" href="../favicon.ico" type="image/x-icon" />
 <?php
 
 // Hook
