@@ -5,7 +5,7 @@ class User extends FOGController
 {
 	// Variables
 	public $inactivitySessionTimeout = 1;		// In hours
-	public $regenerateSessionTimeout = 0.5;	// In hours
+	public $regenerateSessionTimeout = 0.5;		// In hours
 
 	// Table
 	protected $databaseTable = 'users';
@@ -30,11 +30,14 @@ class User extends FOGController
 	// Overrides
 	public function __construct($data)
 	{
-		// Add password salt
-		$this->set('salt', uniqid());
-		
-		// Construct
+		// Construct - MUST contruct first
 		parent::__construct($data);
+		
+		// Add password salt
+		if (!$this->get('salt'))
+		{
+			$this->set('salt', uniqid());
+		}
 	}
 	
 	public function set($key, $value)

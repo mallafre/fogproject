@@ -100,7 +100,7 @@ $(function()
 		}
 	});
 	
-	// Task Confirm Date/time picker
+	// LEGACY - Task Confirm Date/time picker
 	$('#singlescheddatetime').dynDateTime({
 		'showsTime':	true,
 		'ifFormat':	'%Y/%m/%d %H:%M',
@@ -160,10 +160,20 @@ $(function()
 			//uncheckAll(document.hosts.elements);
 		}
 	});
+	
+	// User Search
+	$('#user-search').fogAjaxSearch({
+		'URL':		'ajax/user.search.php',
+		'Template':	function(data, i)
+		{
+			return '<tr><td><a href="?node=group&sub=edit&groupid=' + data['id'] + '" title="Edit">' + data['name'] + '</a></td><td>' + data['description'] + '</td><td class="c">' + data['count'] + '</td><td class="c"><a href="?node=group&sub=edit&groupid=' + data['id'] + '"><span class="icon icon-edit" title="Edit: ' + data['name'] + '"></span></a></td></tr>';
+		}
+	});
 });
 
 function HookTooltips()
 {
+	// TODO: Clean up - use LIVE - tipsy fails on IE with LIVE
 	setTimeout(function()
 	{
 		$('.tipsy').remove();

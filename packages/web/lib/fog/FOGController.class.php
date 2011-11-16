@@ -136,9 +136,9 @@ abstract class FOGController
 	}
 	
 	// Get
-	public function get($key)
+	public function get($key = '')
 	{
-		return (isset($this->data[$key]) ? $this->data[$key] : '');
+		return (!empty($key) && isset($this->data[$key]) ? $this->data[$key] : (empty($key) ? $this->data : ''));
 	}
 	
 	// Add
@@ -415,11 +415,24 @@ abstract class FOGController
 	// isValid
 	public function isValid()
 	{
-		// TODO: Add $this->databaseFieldsRequired checks
-		
-		if ($this->get('id') || $this->get('name'))
+		try
 		{
-			return true;
+			foreach ($this->databaseFieldsRequired AS $field)
+			{
+				if (!$this->get($field))
+				{
+					throw new Exception(_('Required database field is empty'));
+				}
+			}
+			
+			if ($this->get('id') || $this->get('name'))
+			{
+				return true;
+			}
+		}
+		catch (Exception $e)
+		{
+			$this->error('isValid Failed: Class: %s, Error: %s', array(get_class($this), $e->getMessage()));
 		}
 		
 		return false;
@@ -434,6 +447,6 @@ abstract class FOGController
 	// Name is returned if class is printed
 	public function __toString()
 	{
-		return ($this->get('name') ? $this->get('name') : $this->get('id'));
+		return ($this->get('name') ? $this->get('name') : sprintf('%s #%s', get_class($this), $this->get('id')));
 	}
 }

@@ -72,6 +72,18 @@ class UserManagementPage extends FOGPage
 		$this->render();
 	}
 	
+	public function search()
+	{
+		// Set title
+		$this->title = _('Search Current Users');
+		
+		// Set search form
+		$this->searchFormURL = 'ajax/users.search.php';
+
+		// Output
+		$this->render();
+	}
+	
 	public function add()
 	{
 		if ($this->post)

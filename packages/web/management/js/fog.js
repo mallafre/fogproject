@@ -10,8 +10,8 @@
 var _L = new Array();
 // Search
 _L['PERFORMING_SEARCH'] = 'Searching...';
-_L['ERROR_SEARCHING'] = 'Error searching, please try again...';
-_L['SEARCH_LENGTH_MIN'] = 'Search must be longer than %1 character';
+_L['ERROR_SEARCHING'] = 'Search failed';
+_L['SEARCH_LENGTH_MIN'] = 'Search query too short';
 _L['SEARCH_RESULTS_FOUND'] = '%1 result%2 found';
 
 // Active Tasks
@@ -253,14 +253,14 @@ var Loader;
 						
 						this.SearchAJAX = null;
 					},
-					'error':	function()
+					'error':	function(jqXHR, textStatus, errorThrown)
 					{
 						// Error - hide content boxes, show nice message
 						Container.hide();
 						ActionBox.hide();
 						
 						// Show nice error
-						Loader.fogStatusUpdate(_L['ERROR_SEARCHING'], { 'Class': 'error' });
+						Loader.fogStatusUpdate(_L['ERROR_SEARCHING'] + (errorThrown != '' ? ': ' + (errorThrown == 'Not Found' ? 'URL Not Found' : errorThrown) : ''), { 'Class': 'error' });
 						
 						// Reset
 						this.SearchAJAX = null;

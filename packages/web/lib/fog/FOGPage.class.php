@@ -13,11 +13,13 @@ abstract class FOGPage
 	public $id = '';
 	
 	// Menu Items
+	// TODO: Finish
 	public $menu = array(
 		
 	);
 	
 	// Sub Menu Items - when ID Variable is set
+	// TODO: Finish
 	public $subMenu = array(
 		
 	);
@@ -30,7 +32,7 @@ abstract class FOGPage
 	public $data = array();
 	public $templates = array();
 	public $attributes = array();
-	public $isSearchForm = false;
+	public $searchFormURL = '';	// If set, allows a search page using FOGAjaxSearch JQuery function
 	private $wrapper = 'td';
 	private $result;
 	
@@ -95,7 +97,7 @@ abstract class FOGPage
 	
 	function __toString()
 	{
-		$this->render();
+		$this->process();
 	}
 	
 	public function render()
@@ -129,16 +131,16 @@ abstract class FOGPage
 			else
 			{
 				// HTML output
-				if ($this->isSearchForm)
+				if ($this->searchFormURL)
 				{
-					$result = sprintf('<input id="%s-search" type="text" value="%s" class="search-input" />', $this->name, _('Search'));
+					$result = sprintf('<input id="%s-search" type="text" value="%s" class="search-input" />', (substr($this->node, -1) == 's' ? substr($this->node, 0, -1) : $this->node), _('Search'));
 				}
 			
 				// Table -> Header Row
 				$result .= sprintf('%s<table width="%s" cellpadding="0" cellspacing="0" border="0"%s>%s<thead>%s<tr class="header">%s</tr>%s<thead>%s<tbody>%s',
 					"\n\n",
 					'100%',
-					($this->isSearchForm ? ' id="search-content"' : ''),
+					($this->searchFormURL ? ' id="search-content"' : ''),
 					"\n\t",
 					"\n\t\t",
 					$this->buildHeaderRow(),
@@ -164,7 +166,7 @@ abstract class FOGPage
 					}
 					
 					// Set message
-					if (!$this->isSearchForm)
+					if (!$this->searchFormURL)
 					{
 						$GLOBALS['FOGCore']->setMessage(sprintf('%s %s%s found', count($this->data), ucwords($this->node), (count($this->data) == 1 ? '' : (substr($this->node, -1) == 's' ? '' : 's'))));
 					}
