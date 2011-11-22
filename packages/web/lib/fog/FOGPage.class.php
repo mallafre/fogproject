@@ -54,7 +54,7 @@ abstract class FOGPage
 	{
 		// Setup classes
 		$this->db = $GLOBALS['db'];
-		$this->FOG = $GLOBALS['FOGCore'];
+		$this->FOGCore = $GLOBALS['FOGCore'];
 		$this->HookManager = $GLOBALS['HookManager'];
 		$this->currentUser = $GLOBALS['currentUser'];
 		
@@ -119,7 +119,7 @@ abstract class FOGPage
 			$result = '';
 			
 			// Is AJAX Request?
-			if ($GLOBALS['FOGCore']->isAJAXRequest())
+			if ($this->FOGCore->isAJAXRequest())
 			{
 				// JSON output
 				$result = json_encode(array(
@@ -168,7 +168,7 @@ abstract class FOGPage
 					// Set message
 					if (!$this->searchFormURL)
 					{
-						$GLOBALS['FOGCore']->setMessage(sprintf('%s %s%s found', count($this->data), ucwords($this->node), (count($this->data) == 1 ? '' : (substr($this->node, -1) == 's' ? '' : 's'))));
+						$this->FOGCore->setMessage(sprintf('%s %s%s found', count($this->data), ucwords($this->node), (count($this->data) == 1 ? '' : (substr($this->node, -1) == 's' ? '' : 's'))));
 					}
 				}
 				else

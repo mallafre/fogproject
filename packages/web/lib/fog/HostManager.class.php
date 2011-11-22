@@ -49,7 +49,8 @@ class HostManager extends FOGManagerController
 					iSysproduct like "%${keyword}%" 
 				GROUP BY 	
 					hostID DESC';
-	
+
+	// LEGACY
 	const SORT_HOST_ASC = 1;
 	const SORT_HOST_DESC = 2;
 	const SORT_IP_ASC = 3;

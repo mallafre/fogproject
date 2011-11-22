@@ -3,9 +3,16 @@
 // Blackout - 11:47 AM 2/10/2011
 class ImageManager extends FOGManagerController
 {
+	// Table
+	protected $databaseTable = 'images';
+
 	// Search query
 	protected $searchQuery = 'SELECT * FROM images WHERE imageName LIKE "%${keyword}%"';
-
+	
+	
+	
+	
+	
 	// Legacy - remove when all updated
 	// Blackout - 1:13 PM 23/09/2011
 	function getAllImages()

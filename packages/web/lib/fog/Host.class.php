@@ -258,11 +258,11 @@ class Host extends FOGController
 												}
 											
 												$keymapapp = "";
-												$keymap = $GLOBALS['FOGCore']->getSetting("FOG_KEYMAP");
+												$keymap = $this->FOGCore->getSetting("FOG_KEYMAP");
 												if ( $keymap != null && $keymap != "" )
 													$keymapapp = "keymap=$keymap";																							
 
-												$strKern = $GLOBALS['FOGCore']->getSetting("FOG_TFTP_PXE_KERNEL" );
+												$strKern = $this->FOGCore->getSetting("FOG_TFTP_PXE_KERNEL" );
 												if ( $this->get('kernel') != "" && $this->get('kernel') != null )
 													$strKern = $this->get('kernel');		
 													
@@ -270,23 +270,23 @@ class Host extends FOGController
 															  DEFAULT fog\n
 															  LABEL fog\n
 															  kernel " . $strKern . "\n
-															  append initrd=" . $GLOBALS['FOGCore']->getSetting("FOG_PXE_BOOT_IMAGE" ) . "  root=/dev/ram0 rw ramdisk_size=" . $GLOBALS['FOGCore']->getSetting("FOG_KERNEL_RAMDISK_SIZE" ) . " ip=dhcp dns=" . $GLOBALS['FOGCore']->getSetting("FOG_PXE_IMAGE_DNSADDRESS" ) . " type=down img=" . $this->getImage()->getPath() . " mac=" . $mac->getMACWithColon() . " ftp=" . sloppyNameLookup($GLOBALS['FOGCore']->getSetting("FOG_TFTP_HOST" )) . " storage=" . $masterNode->getHostIP() . ":" . $masterNode->getRoot() . " web=" . sloppyNameLookup($GLOBALS['FOGCore']->getSetting("FOG_WEB_HOST")) . $GLOBALS['FOGCore']->getSetting("FOG_WEB_ROOT" ) . " osid=" . $this->get('osID') . " $imgType $keymapapp shutdown=" . ( $blShutdown ? "on" : " " ) . " loglevel=4 "  . $GLOBALS['FOGCore']->getSetting("FOG_KERNEL_ARGS" ) . " " . $this->get('kernelArgs');
+															  append initrd=" . $this->FOGCore->getSetting("FOG_PXE_BOOT_IMAGE" ) . "  root=/dev/ram0 rw ramdisk_size=" . $this->FOGCore->getSetting("FOG_KERNEL_RAMDISK_SIZE" ) . " ip=dhcp dns=" . $this->FOGCore->getSetting("FOG_PXE_IMAGE_DNSADDRESS" ) . " type=down img=" . $this->getImage()->getPath() . " mac=" . $mac->getMACWithColon() . " ftp=" . sloppyNameLookup($this->FOGCore->getSetting("FOG_TFTP_HOST" )) . " storage=" . $masterNode->getHostIP() . ":" . $masterNode->getRoot() . " web=" . sloppyNameLookup($this->FOGCore->getSetting("FOG_WEB_HOST")) . $this->FOGCore->getSetting("FOG_WEB_ROOT" ) . " osid=" . $this->get('osID') . " $imgType $keymapapp shutdown=" . ( $blShutdown ? "on" : " " ) . " loglevel=4 "  . $this->FOGCore->getSetting("FOG_KERNEL_ARGS" ) . " " . $this->get('kernelArgs');
 
 												$tmp = createPXEFile( $output );
 												if( $tmp !== null )
 												{
 													// make sure there is no active task for this mac address
-													$num = $this->FOG->getClass('TaskManager')->getCountOfActiveTasksWithMAC($mac->getMACWithColon());
+													$num = $this->FOGCore->getClass('TaskManager')->getCountOfActiveTasksWithMAC($mac->getMACWithColon());
 				
 													if ( $num == 0 )
 													{
 														// attempt to ftp file
 										
-														$ftp = ftp_connect($GLOBALS['FOGCore']->getSetting("FOG_TFTP_HOST" )); 
-														$ftp_loginres = ftp_login($ftp, $GLOBALS['FOGCore']->getSetting("FOG_TFTP_FTP_USERNAME" ), $GLOBALS['FOGCore']->getSetting("FOG_TFTP_FTP_PASSWORD" )); 			
+														$ftp = ftp_connect($this->FOGCore->getSetting("FOG_TFTP_HOST" )); 
+														$ftp_loginres = ftp_login($ftp, $this->FOGCore->getSetting("FOG_TFTP_FTP_USERNAME" ), $this->FOGCore->getSetting("FOG_TFTP_FTP_PASSWORD" )); 			
 														if ($ftp && $ftp_loginres ) 
 														{
-															if ( ftp_put( $ftp, $GLOBALS['FOGCore']->getSetting("FOG_TFTP_PXE_CONFIG_DIR" ) . $mac->getMACImageReady(), $tmp, FTP_ASCII ) )
+															if ( ftp_put( $ftp, $this->FOGCore->getSetting("FOG_TFTP_PXE_CONFIG_DIR" ) . $mac->getMACImageReady(), $tmp, FTP_ASCII ) )
 															{			
 																$uname = "FOGScheduler";
 											
@@ -314,7 +314,7 @@ class Host extends FOGController
 																}
 																else
 																{
-																	ftp_delete( $ftp, $GLOBALS['FOGCore']->getSetting("FOG_TFTP_PXE_CONFIG_DIR" ) . $mac->getMACImageReady() ); 									
+																	ftp_delete( $ftp, $this->FOGCore->getSetting("FOG_TFTP_PXE_CONFIG_DIR" ) . $mac->getMACImageReady() ); 									
 																	$reason = mysql_error($conn);
 																}
 															}  
@@ -412,20 +412,20 @@ class Host extends FOGController
 														$nfsroot .= "/dev/";
 														
 													$pct = "pct=5";
-													if ( is_numeric($GLOBALS['FOGCore']->getSetting("FOG_UPLOADRESIZEPCT") ) && $GLOBALS['FOGCore']->getSetting("FOG_UPLOADRESIZEPCT") >= 5 && $GLOBALS['FOGCore']->getSetting("FOG_UPLOADRESIZEPCT") < 100 )
-														$pct = "pct=" . $GLOBALS['FOGCore']->getSetting("FOG_UPLOADRESIZEPCT");
+													if ( is_numeric($this->FOGCore->getSetting("FOG_UPLOADRESIZEPCT") ) && $this->FOGCore->getSetting("FOG_UPLOADRESIZEPCT") >= 5 && $this->FOGCore->getSetting("FOG_UPLOADRESIZEPCT") < 100 )
+														$pct = "pct=" . $this->FOGCore->getSetting("FOG_UPLOADRESIZEPCT");
 														
 													$ignorepg = "0";
 			
-													if ( $GLOBALS['FOGCore']->getSetting("FOG_UPLOADIGNOREPAGEHIBER" ) )
+													if ( $this->FOGCore->getSetting("FOG_UPLOADIGNOREPAGEHIBER" ) )
 														$ignorepg = "1";		
 														
 													$keymapapp = "";
-													$keymap = $GLOBALS['FOGCore']->getSetting("FOG_KEYMAP" );
+													$keymap = $this->FOGCore->getSetting("FOG_KEYMAP" );
 													if ( $keymap != null && $keymap != "" )
 														$keymapapp = "keymap=$keymap";	
 														
-													$strKern = $GLOBALS['FOGCore']->getSetting("FOG_TFTP_PXE_KERNEL" );
+													$strKern = $this->FOGCore->getSetting("FOG_TFTP_PXE_KERNEL" );
 													if ( $this->get('kernel') != "" && $this->get('kernel') != null )
 														$strKern = $this->get('kernel');	
 														
@@ -433,18 +433,18 @@ class Host extends FOGController
 																  DEFAULT send\n
 																  LABEL send\n
 																  kernel " . $strKern . "\n
-																  append initrd=" . $GLOBALS['FOGCore']->getSetting("FOG_PXE_BOOT_IMAGE" ) . "  root=/dev/ram0 rw ramdisk_size=" . $GLOBALS['FOGCore']->getSetting("FOG_KERNEL_RAMDISK_SIZE" ) . " ip=dhcp dns=" . $GLOBALS['FOGCore']->getSetting("FOG_PXE_IMAGE_DNSADDRESS" ) . " type=up img=" .  $this->getImage()->getPath()  . " imgid=" . $this->getImage()->get('id') . " mac=" . $mac->getMACWithColon() . " storage=" . $masterNode->getHostIP() . ":" . $nfsroot . " web=" . sloppyNameLookup($GLOBALS['FOGCore']->getSetting("FOG_WEB_HOST")) . $GLOBALS['FOGCore']->getSetting("FOG_WEB_ROOT" ) . " ignorepg=$ignorepg osid=" . $this->get('osID') . " $pct $imgType $keymapapp shutdown=" . ( $blShutdown ? "on" : " " ) . " loglevel=4 "  . $GLOBALS['FOGCore']->getSetting("FOG_KERNEL_ARGS" ) . " " . $this->get('kernelArgs');																									
+																  append initrd=" . $this->FOGCore->getSetting("FOG_PXE_BOOT_IMAGE" ) . "  root=/dev/ram0 rw ramdisk_size=" . $this->FOGCore->getSetting("FOG_KERNEL_RAMDISK_SIZE" ) . " ip=dhcp dns=" . $this->FOGCore->getSetting("FOG_PXE_IMAGE_DNSADDRESS" ) . " type=up img=" .  $this->getImage()->getPath()  . " imgid=" . $this->getImage()->get('id') . " mac=" . $mac->getMACWithColon() . " storage=" . $masterNode->getHostIP() . ":" . $nfsroot . " web=" . sloppyNameLookup($this->FOGCore->getSetting("FOG_WEB_HOST")) . $this->FOGCore->getSetting("FOG_WEB_ROOT" ) . " ignorepg=$ignorepg osid=" . $this->get('osID') . " $pct $imgType $keymapapp shutdown=" . ( $blShutdown ? "on" : " " ) . " loglevel=4 "  . $this->FOGCore->getSetting("FOG_KERNEL_ARGS" ) . " " . $this->get('kernelArgs');																									
 			 										$tmp = createPXEFile( $output );
 													if( $tmp !== null )
 													{ 
-														$num = $this->FOG->getClass('TaskManager')->getCountOfActiveTasksWithMAC($mac->getMACWithColon());
+														$num = $this->FOGCore->getClass('TaskManager')->getCountOfActiveTasksWithMAC($mac->getMACWithColon());
 														if ( $num == 0 )
 														{
-															$ftp = ftp_connect($GLOBALS['FOGCore']->getSetting("FOG_TFTP_HOST" )); 
-															$ftp_loginres = ftp_login($ftp, $GLOBALS['FOGCore']->getSetting("FOG_TFTP_FTP_USERNAME" ), $GLOBALS['FOGCore']->getSetting("FOG_TFTP_FTP_PASSWORD" )); 			
+															$ftp = ftp_connect($this->FOGCore->getSetting("FOG_TFTP_HOST" )); 
+															$ftp_loginres = ftp_login($ftp, $this->FOGCore->getSetting("FOG_TFTP_FTP_USERNAME" ), $this->FOGCore->getSetting("FOG_TFTP_FTP_PASSWORD" )); 			
 															if ($ftp && $ftp_loginres ) 
 															{
-																if ( ftp_put( $ftp, $GLOBALS['FOGCore']->getSetting("FOG_TFTP_PXE_CONFIG_DIR" ) . $mac->getMACImageReady(), $tmp, FTP_ASCII ) )
+																if ( ftp_put( $ftp, $this->FOGCore->getSetting("FOG_TFTP_PXE_CONFIG_DIR" ) . $mac->getMACImageReady(), $tmp, FTP_ASCII ) )
 																{			
 																	$uname = "FOGScheduler";
 																	$sql = "INSERT INTO 
@@ -461,7 +461,7 @@ class Host extends FOGController
 																	}
 																	else
 																	{
-																		ftp_delete( $ftp, $GLOBALS['FOGCore']->getSetting("FOG_TFTP_PXE_CONFIG_DIR" ) . $mac->getMACImageReady() ); 									
+																		ftp_delete( $ftp, $this->FOGCore->getSetting("FOG_TFTP_PXE_CONFIG_DIR" ) . $mac->getMACImageReady() ); 									
 																		$reason = mysql_error($conn);
 																																			
 																	}
@@ -534,11 +534,11 @@ class Host extends FOGController
 														$wipemode="wipemode=full";
 												
 													$keymapapp = "";
-													$keymap = $GLOBALS['FOGCore']->getSetting("FOG_KEYMAP" );
+													$keymap = $this->FOGCore->getSetting("FOG_KEYMAP" );
 													if ( $keymap != null && $keymap != "" )
 														$keymapapp = "keymap=$keymap";	
 														
-													$strKern = $GLOBALS['FOGCore']->getSetting("FOG_TFTP_PXE_KERNEL" );
+													$strKern = $this->FOGCore->getSetting("FOG_TFTP_PXE_KERNEL" );
 													if ( $this->get('kernel') != "" && $this->get('kernel') != null )
 														$strKern = $this->get('kernel');													
 													
@@ -546,7 +546,7 @@ class Host extends FOGController
 															  DEFAULT send\n
 															  LABEL send\n
 															  kernel " . $strKern . "\n
-															  append initrd=" . $GLOBALS['FOGCore']->getSetting("FOG_PXE_BOOT_IMAGE" ) . "  root=/dev/ram0 rw ramdisk_size=" . $GLOBALS['FOGCore']->getSetting("FOG_KERNEL_RAMDISK_SIZE" ) . " ip=dhcp dns=" . $GLOBALS['FOGCore']->getSetting("FOG_PXE_IMAGE_DNSADDRESS" ) . " mac=" . $mac->getMACWithColon() . " web=" . sloppyNameLookup( $GLOBALS['FOGCore']->getSetting("FOG_WEB_HOST") ) . $GLOBALS['FOGCore']->getSetting("FOG_WEB_ROOT" ) . " osid=" . $this->get('osID') . " $wipemode mode=wipe $keymapapp shutdown=" . ( $blShutdown ? "on" : " " ) . " loglevel=4 " . $GLOBALS['FOGCore']->getSetting("FOG_KERNEL_ARGS" ) . " " . $this->get('kernelArgs') ;												
+															  append initrd=" . $this->FOGCore->getSetting("FOG_PXE_BOOT_IMAGE" ) . "  root=/dev/ram0 rw ramdisk_size=" . $this->FOGCore->getSetting("FOG_KERNEL_RAMDISK_SIZE" ) . " ip=dhcp dns=" . $this->FOGCore->getSetting("FOG_PXE_IMAGE_DNSADDRESS" ) . " mac=" . $mac->getMACWithColon() . " web=" . sloppyNameLookup( $this->FOGCore->getSetting("FOG_WEB_HOST") ) . $this->FOGCore->getSetting("FOG_WEB_ROOT" ) . " osid=" . $this->get('osID') . " $wipemode mode=wipe $keymapapp shutdown=" . ( $blShutdown ? "on" : " " ) . " loglevel=4 " . $this->FOGCore->getSetting("FOG_KERNEL_ARGS" ) . " " . $this->get('kernelArgs') ;												
 												
 													//cancelSnapinsForHost( $conn, $this->get('id') );
 													//deploySnapinsForHost( $conn, $this->get('id'), trim($args2) );
@@ -554,14 +554,14 @@ class Host extends FOGController
 													$tmp = createPXEFile( $output );
 													if( $tmp !== null )
 													{ 
-														$num = $this->FOG->getClass('TaskManager')->getCountOfActiveTasksWithMAC($mac->getMACWithColon());
+														$num = $this->FOGCore->getClass('TaskManager')->getCountOfActiveTasksWithMAC($mac->getMACWithColon());
 														if ( $num == 0 )
 														{
-															$ftp = ftp_connect($GLOBALS['FOGCore']->getSetting("FOG_TFTP_HOST" )); 
-															$ftp_loginres = ftp_login($ftp, $GLOBALS['FOGCore']->getSetting("FOG_TFTP_FTP_USERNAME" ), $GLOBALS['FOGCore']->getSetting("FOG_TFTP_FTP_PASSWORD" )); 			
+															$ftp = ftp_connect($this->FOGCore->getSetting("FOG_TFTP_HOST" )); 
+															$ftp_loginres = ftp_login($ftp, $this->FOGCore->getSetting("FOG_TFTP_FTP_USERNAME" ), $this->FOGCore->getSetting("FOG_TFTP_FTP_PASSWORD" )); 			
 															if ($ftp && $ftp_loginres ) 
 															{
-																if ( ftp_put( $ftp, $GLOBALS['FOGCore']->getSetting("FOG_TFTP_PXE_CONFIG_DIR" ) . $mac->getMACImageReady(), $tmp, FTP_ASCII ) )
+																if ( ftp_put( $ftp, $this->FOGCore->getSetting("FOG_TFTP_PXE_CONFIG_DIR" ) . $mac->getMACImageReady(), $tmp, FTP_ASCII ) )
 																{			
 																	$uname = "FOGScheduler";
 																	$sql = "INSERT INTO 
@@ -578,7 +578,7 @@ class Host extends FOGController
 																	}
 																	else
 																	{
-																		ftp_delete( $ftp, $GLOBALS['FOGCore']->getSetting("FOG_TFTP_PXE_CONFIG_DIR" ) . $mac->getMACImageReady() ); 									
+																		ftp_delete( $ftp, $this->FOGCore->getSetting("FOG_TFTP_PXE_CONFIG_DIR" ) . $mac->getMACImageReady() ); 									
 																		$reason = mysql_error($conn);
 																																			
 																	}
@@ -648,11 +648,11 @@ class Host extends FOGController
 											if ( $mac->isValid( ) )
 											{
 												$keymapapp = "";
-												$keymap = $GLOBALS['FOGCore']->getSetting("FOG_KEYMAP" );
+												$keymap = $this->FOGCore->getSetting("FOG_KEYMAP" );
 												if ( $keymap != null && $keymap != "" )
 													$keymapapp = "keymap=$keymap";	
 													
-												$strKern = $GLOBALS['FOGCore']->getSetting("FOG_TFTP_PXE_KERNEL" );
+												$strKern = $this->FOGCore->getSetting("FOG_TFTP_PXE_KERNEL" );
 												if ( $this->get('kernel') != "" && $this->get('kernel') != null )
 													$strKern = $this->get('kernel');													
 												
@@ -660,19 +660,19 @@ class Host extends FOGController
 														  DEFAULT send\n
 														  LABEL send\n
 														  kernel " . $strKern . "\n
-														  append initrd=" . $GLOBALS['FOGCore']->getSetting("FOG_PXE_BOOT_IMAGE" ) . "  root=/dev/ram0 rw ramdisk_size=" . $GLOBALS['FOGCore']->getSetting("FOG_KERNEL_RAMDISK_SIZE" ) . " ip=dhcp dns=" . $GLOBALS['FOGCore']->getSetting("FOG_PXE_IMAGE_DNSADDRESS" ) . " mac=" . $mac->getMACWithColon() . " web=" . sloppyNameLookup($GLOBALS['FOGCore']->getSetting("FOG_WEB_HOST")) . $GLOBALS['FOGCore']->getSetting("FOG_WEB_ROOT" ) . " mode=badblocks $keymapapp shutdown=" . ( $blShutdown ? "on" : " " ) . " loglevel=4 " . $GLOBALS['FOGCore']->getSetting("FOG_KERNEL_ARGS" ) . " " . $this->get('kernelArgs');
+														  append initrd=" . $this->FOGCore->getSetting("FOG_PXE_BOOT_IMAGE" ) . "  root=/dev/ram0 rw ramdisk_size=" . $this->FOGCore->getSetting("FOG_KERNEL_RAMDISK_SIZE" ) . " ip=dhcp dns=" . $this->FOGCore->getSetting("FOG_PXE_IMAGE_DNSADDRESS" ) . " mac=" . $mac->getMACWithColon() . " web=" . sloppyNameLookup($this->FOGCore->getSetting("FOG_WEB_HOST")) . $this->FOGCore->getSetting("FOG_WEB_ROOT" ) . " mode=badblocks $keymapapp shutdown=" . ( $blShutdown ? "on" : " " ) . " loglevel=4 " . $this->FOGCore->getSetting("FOG_KERNEL_ARGS" ) . " " . $this->get('kernelArgs');
 
 												$tmp = createPXEFile( $output );
 												if( $tmp !== null )
 												{ 
-													$num = $this->FOG->getClass('TaskManager')->getCountOfActiveTasksWithMAC($mac->getMACWithColon());
+													$num = $this->FOGCore->getClass('TaskManager')->getCountOfActiveTasksWithMAC($mac->getMACWithColon());
 													if ( $num == 0 )
 													{
-														$ftp = ftp_connect($GLOBALS['FOGCore']->getSetting("FOG_TFTP_HOST" )); 
-														$ftp_loginres = ftp_login($ftp, $GLOBALS['FOGCore']->getSetting("FOG_TFTP_FTP_USERNAME" ), $GLOBALS['FOGCore']->getSetting("FOG_TFTP_FTP_PASSWORD" )); 			
+														$ftp = ftp_connect($this->FOGCore->getSetting("FOG_TFTP_HOST" )); 
+														$ftp_loginres = ftp_login($ftp, $this->FOGCore->getSetting("FOG_TFTP_FTP_USERNAME" ), $this->FOGCore->getSetting("FOG_TFTP_FTP_PASSWORD" )); 			
 														if ($ftp && $ftp_loginres ) 
 														{
-															if ( ftp_put( $ftp, $GLOBALS['FOGCore']->getSetting("FOG_TFTP_PXE_CONFIG_DIR" ) . $mac->getMACImageReady(), $tmp, FTP_ASCII ) )
+															if ( ftp_put( $ftp, $this->FOGCore->getSetting("FOG_TFTP_PXE_CONFIG_DIR" ) . $mac->getMACImageReady(), $tmp, FTP_ASCII ) )
 															{			
 																$uname = "FOGScheduler";
 																$sql = "INSERT INTO 
@@ -689,7 +689,7 @@ class Host extends FOGController
 																}
 																else
 																{
-																	ftp_delete( $ftp, $GLOBALS['FOGCore']->getSetting("FOG_TFTP_PXE_CONFIG_DIR" ) . $mac->getMACImageReady() ); 									
+																	ftp_delete( $ftp, $this->FOGCore->getSetting("FOG_TFTP_PXE_CONFIG_DIR" ) . $mac->getMACImageReady() ); 									
 																	$reason = mysql_error($conn);
 																																		
 																}
@@ -793,11 +793,11 @@ class Host extends FOGController
 														}
 													
 														$keymapapp = "";
-														$keymap = $GLOBALS['FOGCore']->getSetting("FOG_KEYMAP" );
+														$keymap = $this->FOGCore->getSetting("FOG_KEYMAP" );
 														if ( $keymap != null && $keymap != "" )
 															$keymapapp = "keymap=$keymap";	
 														
-														$strKern = $GLOBALS['FOGCore']->getSetting("FOG_TFTP_PXE_KERNEL" );
+														$strKern = $this->FOGCore->getSetting("FOG_TFTP_PXE_KERNEL" );
 														if ( $this->get('kernel') != "" && $this->get('kernel') != null )
 															$strKern = $this->get('kernel');	
 														
@@ -807,23 +807,23 @@ class Host extends FOGController
 																	  DEFAULT send\n
 																	  LABEL send\n
 																	  kernel " . $strKern . "\n
-																	  append initrd=" . $GLOBALS['FOGCore']->getSetting("FOG_PXE_BOOT_IMAGE" ) . " root=/dev/ram0 rw ramdisk_size=" . $GLOBALS['FOGCore']->getSetting("FOG_KERNEL_RAMDISK_SIZE" ) . " ip=dhcp dns=" . $GLOBALS['FOGCore']->getSetting("FOG_PXE_IMAGE_DNSADDRESS" ) . " type=down img=" .  $this->getImage()->getPath()  . " mc=yes port=" . $port . " storageip=" . $masterNode->getHostIP() . " storage=" . $masterNode->getHostIP() . ":" . $nfsroot . " mac=" . $mac->getMACWithColon() . " ftp=" . sloppyNameLookup($GLOBALS['FOGCore']->getSetting("FOG_TFTP_HOST" )) . " web=" . sloppyNameLookup($GLOBALS['FOGCore']->getSetting("FOG_WEB_HOST")) . $GLOBALS['FOGCore']->getSetting("FOG_WEB_ROOT" ) . " osid=" . $this->get('osID') . " $mode $imgType $keymapapp shutdown=" . ( $blShutdown ? "on" : " " ) . " loglevel=4 " . $GLOBALS['FOGCore']->getSetting("FOG_KERNEL_ARGS" ) . " " . $this->get('kernelArgs');
+																	  append initrd=" . $this->FOGCore->getSetting("FOG_PXE_BOOT_IMAGE" ) . " root=/dev/ram0 rw ramdisk_size=" . $this->FOGCore->getSetting("FOG_KERNEL_RAMDISK_SIZE" ) . " ip=dhcp dns=" . $this->FOGCore->getSetting("FOG_PXE_IMAGE_DNSADDRESS" ) . " type=down img=" .  $this->getImage()->getPath()  . " mc=yes port=" . $port . " storageip=" . $masterNode->getHostIP() . " storage=" . $masterNode->getHostIP() . ":" . $nfsroot . " mac=" . $mac->getMACWithColon() . " ftp=" . sloppyNameLookup($this->FOGCore->getSetting("FOG_TFTP_HOST" )) . " web=" . sloppyNameLookup($this->FOGCore->getSetting("FOG_WEB_HOST")) . $this->FOGCore->getSetting("FOG_WEB_ROOT" ) . " osid=" . $this->get('osID') . " $mode $imgType $keymapapp shutdown=" . ( $blShutdown ? "on" : " " ) . " loglevel=4 " . $this->FOGCore->getSetting("FOG_KERNEL_ARGS" ) . " " . $this->get('kernelArgs');
 																						
 				 										$tmp = createPXEFile( $output );
 														if( $tmp !== null )
 														{ 
 															// make sure there is no active task for this mac address
-															$num = $this->FOG->getClass('TaskManager')->getCountOfActiveTasksWithMAC($mac->getMACWithColon());
+															$num = $this->FOGCore->getClass('TaskManager')->getCountOfActiveTasksWithMAC($mac->getMACWithColon());
 				
 															if ( $num == 0 )
 															{
 																// attempt to ftp file
 										
-																$ftp = ftp_connect($GLOBALS['FOGCore']->getSetting("FOG_TFTP_HOST" )); 
-																$ftp_loginres = ftp_login($ftp, $GLOBALS['FOGCore']->getSetting("FOG_TFTP_FTP_USERNAME" ), $GLOBALS['FOGCore']->getSetting("FOG_TFTP_FTP_PASSWORD" )); 			
+																$ftp = ftp_connect($this->FOGCore->getSetting("FOG_TFTP_HOST" )); 
+																$ftp_loginres = ftp_login($ftp, $this->FOGCore->getSetting("FOG_TFTP_FTP_USERNAME" ), $this->FOGCore->getSetting("FOG_TFTP_FTP_PASSWORD" )); 			
 																if ($ftp && $ftp_loginres ) 
 																{
-																	if ( ftp_put( $ftp, $GLOBALS['FOGCore']->getSetting("FOG_TFTP_PXE_CONFIG_DIR" ) . $mac->getMACImageReady(), $tmp, FTP_ASCII ) )
+																	if ( ftp_put( $ftp, $this->FOGCore->getSetting("FOG_TFTP_PXE_CONFIG_DIR" ) . $mac->getMACImageReady(), $tmp, FTP_ASCII ) )
 																	{			
 																		$uname = "FOGScheduler";
 											
@@ -860,7 +860,7 @@ class Host extends FOGController
 																		}
 																		else
 																		{
-																			ftp_delete( $ftp, $GLOBALS['FOGCore']->getSetting("FOG_TFTP_PXE_CONFIG_DIR" ) . $mac->getMACImageReady() ); 									
+																			ftp_delete( $ftp, $this->FOGCore->getSetting("FOG_TFTP_PXE_CONFIG_DIR" ) . $mac->getMACImageReady() ); 									
 																			$reason = mysql_error($conn);
 																		}
 																	}  
@@ -929,11 +929,11 @@ class Host extends FOGController
 													$scanmode="avmode=q";
 											
 												$keymapapp = "";
-												$keymap = $GLOBALS['FOGCore']->getSetting("FOG_KEYMAP" );
+												$keymap = $this->FOGCore->getSetting("FOG_KEYMAP" );
 												if ( $keymap != null && $keymap != "" )
 													$keymapapp = "keymap=$keymap";	
 													
-												$strKern = $GLOBALS['FOGCore']->getSetting("FOG_TFTP_PXE_KERNEL" );
+												$strKern = $this->FOGCore->getSetting("FOG_TFTP_PXE_KERNEL" );
 												if ( $this->get('kernel') != "" && $this->get('kernel') != null )
 													$strKern = $this->get('kernel');													
 												
@@ -941,19 +941,19 @@ class Host extends FOGController
 														  DEFAULT send\n
 														  LABEL send\n
 														  kernel " . $strKern . "\n
-														  append initrd=" . $GLOBALS['FOGCore']->getSetting("FOG_PXE_BOOT_IMAGE" ) . "  root=/dev/ram0 rw ramdisk_size=" . $GLOBALS['FOGCore']->getSetting("FOG_KERNEL_RAMDISK_SIZE" ) . " ip=dhcp dns=" . $GLOBALS['FOGCore']->getSetting("FOG_PXE_IMAGE_DNSADDRESS" ) . " mac=" . $mac->getMACWithColon() . " web=" . sloppyNameLookup($GLOBALS['FOGCore']->getSetting("FOG_WEB_HOST")) . $GLOBALS['FOGCore']->getSetting("FOG_WEB_ROOT" ) . " osid=" . $this->get('osID') . " $scanmode mode=clamav $keymapapp shutdown=" . ( $blShutdown ? "on" : " " ) . " loglevel=4 " . $GLOBALS['FOGCore']->getSetting("FOG_KERNEL_ARGS" ) . " " . $this->get('kernelArgs');												
+														  append initrd=" . $this->FOGCore->getSetting("FOG_PXE_BOOT_IMAGE" ) . "  root=/dev/ram0 rw ramdisk_size=" . $this->FOGCore->getSetting("FOG_KERNEL_RAMDISK_SIZE" ) . " ip=dhcp dns=" . $this->FOGCore->getSetting("FOG_PXE_IMAGE_DNSADDRESS" ) . " mac=" . $mac->getMACWithColon() . " web=" . sloppyNameLookup($this->FOGCore->getSetting("FOG_WEB_HOST")) . $this->FOGCore->getSetting("FOG_WEB_ROOT" ) . " osid=" . $this->get('osID') . " $scanmode mode=clamav $keymapapp shutdown=" . ( $blShutdown ? "on" : " " ) . " loglevel=4 " . $this->FOGCore->getSetting("FOG_KERNEL_ARGS" ) . " " . $this->get('kernelArgs');												
 											
 												$tmp = createPXEFile( $output );
 												if( $tmp !== null )
 												{ 
-													$num = $this->FOG->getClass('TaskManager')->getCountOfActiveTasksWithMAC($mac->getMACWithColon());
+													$num = $this->FOGCore->getClass('TaskManager')->getCountOfActiveTasksWithMAC($mac->getMACWithColon());
 													if ( $num == 0 )
 													{
-														$ftp = ftp_connect($GLOBALS['FOGCore']->getSetting("FOG_TFTP_HOST" )); 
-														$ftp_loginres = ftp_login($ftp, $GLOBALS['FOGCore']->getSetting("FOG_TFTP_FTP_USERNAME" ), $GLOBALS['FOGCore']->getSetting("FOG_TFTP_FTP_PASSWORD" )); 			
+														$ftp = ftp_connect($this->FOGCore->getSetting("FOG_TFTP_HOST" )); 
+														$ftp_loginres = ftp_login($ftp, $this->FOGCore->getSetting("FOG_TFTP_FTP_USERNAME" ), $this->FOGCore->getSetting("FOG_TFTP_FTP_PASSWORD" )); 			
 														if ($ftp && $ftp_loginres ) 
 														{
-															if ( ftp_put( $ftp, $GLOBALS['FOGCore']->getSetting("FOG_TFTP_PXE_CONFIG_DIR" ) . $mac->getMACImageReady(), $tmp, FTP_ASCII ) )
+															if ( ftp_put( $ftp, $this->FOGCore->getSetting("FOG_TFTP_PXE_CONFIG_DIR" ) . $mac->getMACImageReady(), $tmp, FTP_ASCII ) )
 															{			
 																$uname = "FOGScheduler";
 																$sql = "INSERT INTO 
@@ -970,7 +970,7 @@ class Host extends FOGController
 																}
 																else
 																{
-																	ftp_delete( $ftp, $GLOBALS['FOGCore']->getSetting("FOG_TFTP_PXE_CONFIG_DIR" ) . $mac->getMACImageReady() ); 									
+																	ftp_delete( $ftp, $this->FOGCore->getSetting("FOG_TFTP_PXE_CONFIG_DIR" ) . $mac->getMACImageReady() ); 									
 																	$reason = mysql_error($conn);
 																																		
 																}
@@ -1034,11 +1034,11 @@ class Host extends FOGController
 											if ( $mac->isValid( ) )
 											{
 												$keymapapp = "";
-												$keymap = $GLOBALS['FOGCore']->getSetting("FOG_KEYMAP" );
+												$keymap = $this->FOGCore->getSetting("FOG_KEYMAP" );
 												if ( $keymap != null && $keymap != "" )
 													$keymapapp = "keymap=$keymap";	
 													
-												$strKern = $GLOBALS['FOGCore']->getSetting("FOG_TFTP_PXE_KERNEL" );
+												$strKern = $this->FOGCore->getSetting("FOG_TFTP_PXE_KERNEL" );
 												if ( $this->get('kernel') != "" && $this->get('kernel') != null )
 													$strKern = $this->get('kernel');													
 												
@@ -1046,19 +1046,19 @@ class Host extends FOGController
 														  DEFAULT send\n
 														  LABEL send\n
 														  kernel " . $strKern . "\n
-														  append initrd=" . $GLOBALS['FOGCore']->getSetting("FOG_PXE_BOOT_IMAGE" ) . "  root=/dev/ram0 rw ramdisk_size=" . $GLOBALS['FOGCore']->getSetting("FOG_KERNEL_RAMDISK_SIZE" ) . " ip=dhcp dns=" . $GLOBALS['FOGCore']->getSetting("FOG_PXE_IMAGE_DNSADDRESS" ) . " mac_deployed=" . $mac->getMACWithColon() . " web=" . sloppyNameLookup($GLOBALS['FOGCore']->getSetting("FOG_WEB_HOST")) . $GLOBALS['FOGCore']->getSetting("FOG_WEB_ROOT" ) . " mode=autoreg deployed=1 $keymapapp shutdown=" . ( $blShutdown ? "on" : " " ) . " loglevel=4 " . $GLOBALS['FOGCore']->getSetting("FOG_KERNEL_ARGS" ) . " " . $this->get('kernelArgs');											
+														  append initrd=" . $this->FOGCore->getSetting("FOG_PXE_BOOT_IMAGE" ) . "  root=/dev/ram0 rw ramdisk_size=" . $this->FOGCore->getSetting("FOG_KERNEL_RAMDISK_SIZE" ) . " ip=dhcp dns=" . $this->FOGCore->getSetting("FOG_PXE_IMAGE_DNSADDRESS" ) . " mac_deployed=" . $mac->getMACWithColon() . " web=" . sloppyNameLookup($this->FOGCore->getSetting("FOG_WEB_HOST")) . $this->FOGCore->getSetting("FOG_WEB_ROOT" ) . " mode=autoreg deployed=1 $keymapapp shutdown=" . ( $blShutdown ? "on" : " " ) . " loglevel=4 " . $this->FOGCore->getSetting("FOG_KERNEL_ARGS" ) . " " . $this->get('kernelArgs');											
 											
 												$tmp = createPXEFile( $output );
 												if( $tmp !== null )
 												{ 
-													$num = $this->FOG->getClass('TaskManager')->getCountOfActiveTasksWithMAC($mac->getMACWithColon());
+													$num = $this->FOGCore->getClass('TaskManager')->getCountOfActiveTasksWithMAC($mac->getMACWithColon());
 													if ( $num == 0 )
 													{
-														$ftp = ftp_connect($GLOBALS['FOGCore']->getSetting("FOG_TFTP_HOST" )); 
-														$ftp_loginres = ftp_login($ftp, $GLOBALS['FOGCore']->getSetting("FOG_TFTP_FTP_USERNAME" ), $GLOBALS['FOGCore']->getSetting("FOG_TFTP_FTP_PASSWORD" )); 			
+														$ftp = ftp_connect($this->FOGCore->getSetting("FOG_TFTP_HOST" )); 
+														$ftp_loginres = ftp_login($ftp, $this->FOGCore->getSetting("FOG_TFTP_FTP_USERNAME" ), $this->FOGCore->getSetting("FOG_TFTP_FTP_PASSWORD" )); 			
 														if ($ftp && $ftp_loginres ) 
 														{
-															if ( ftp_put( $ftp, $GLOBALS['FOGCore']->getSetting("FOG_TFTP_PXE_CONFIG_DIR" ) . $mac->getMACImageReady(), $tmp, FTP_ASCII ) )
+															if ( ftp_put( $ftp, $this->FOGCore->getSetting("FOG_TFTP_PXE_CONFIG_DIR" ) . $mac->getMACImageReady(), $tmp, FTP_ASCII ) )
 															{			
 																$uname = "FOGScheduler";
 																$sql = "INSERT INTO 
@@ -1075,7 +1075,7 @@ class Host extends FOGController
 																}
 																else
 																{
-																	ftp_delete( $ftp, $GLOBALS['FOGCore']->getSetting("FOG_TFTP_PXE_CONFIG_DIR" ) . $mac->getMACImageReady() ); 									
+																	ftp_delete( $ftp, $this->FOGCore->getSetting("FOG_TFTP_PXE_CONFIG_DIR" ) . $mac->getMACImageReady() ); 									
 																	$reason = mysql_error($conn);
 																																		
 																}

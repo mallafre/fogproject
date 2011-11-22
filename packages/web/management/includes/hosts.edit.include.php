@@ -438,7 +438,7 @@ if ($currentUser != null && $currentUser->isLoggedIn())
 				echo ( "</select>" );
 
 				//echo ( "<tr><td>"._("Host OS").":</td><td>" );
-				//	echo ( getOSDropDown( $conn, $name="os", $Host->getImage()->getOS()->get('id') ) );
+				//	echo ( $FOGCore->getClass('OSManager')->buildSelectBox($Host->getImage()->getOS()->get('id')) );
 				echo ( "</td></tr>" );
 				echo ( "<tr><td>"._("Host Kernel").":</td><td><input class=\"smaller\" type=\"text\" name=\"kern\" value=\"" . $Host->get('kernel') . "\" /></td></tr>" );
 				echo ( "<tr><td>"._("Host Kernel Arguments").":</td><td><input class=\"smaller\" type=\"text\" name=\"args\" value=\"\" /></td></tr>" );

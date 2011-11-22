@@ -73,8 +73,8 @@ if ($_POST['add'])
 		<tr><td><?php print _("Host IP"); ?>:</td><td><input type="text" name="ip" value="<?php print $_POST['ip']; ?>" /></td></tr>
 		<tr><td><?php print _("Primary MAC"); ?>:*</td><td><input type="text" id='mac' name="mac" value="<?php print $_POST['mac']; ?>" /> &nbsp; <span id='priMaker'></span> </td></tr>
 		<tr><td><?php print _("Host Description"); ?>:</td><td><textarea name="description" rows="5" cols="40"><?php print $_POST['description']; ?></textarea></td></tr>
-		<tr><td><?php print _("Host Image"); ?>:</td><td><?php print getImageDropDown( $conn, 'image', $_POST['image'] );  ?></td></tr>
-		<tr><td><?php print _("Host OS"); ?>:</td><td><?php print getOSDropDown( $conn, 'os', $_POST['os'] ); ?></td></tr>
+		<tr><td><?php print _("Host Image"); ?>:</td><td><?php print $FOGCore->getClass('ImageManager')->buildSelectBox($_POST['image']);  ?></td></tr>
+		<tr><td><?php print _("Host OS"); ?>:</td><td><?php print $FOGCore->getClass('OSManager')->buildSelectBox($_POST['os']); ?></td></tr>
 		<tr><td><?php print _("Host Kernel"); ?>:</td><td><input type="text" name="kern" value="<?php print $_POST['kern']; ?>" /></td></tr>		
 		<tr><td><?php print _("Host Kernel Arguments"); ?>:</td><td><input type="text" name="args" value="<?php print $_POST['args']; ?>" /></td></tr>	
 		<tr><td><?php print _("Host Primary Disk"); ?>:</td><td><input type="text" name="dev" value="<?php print $_POST['dev']; ?>" /></td></tr>		

@@ -19,10 +19,7 @@ abstract class FOGController
 	protected $additionalFields = array();
 	
 	// Required database fields
-	protected $databaseFieldsRequired = array(
-		'id',
-		'name'
-	);
+	protected $databaseFieldsRequired = array();
 	
 	// Store data array
 	protected $data = array();
@@ -37,7 +34,7 @@ abstract class FOGController
 	protected $db;
 	
 	// FOG Core Class
-	protected $core;
+	protected $FOGCore;
 	
 	// Construct
 	public function __construct($data)
@@ -55,7 +52,7 @@ abstract class FOGController
 			
 			// Database
 			$this->db = $GLOBALS['db'];
-			$this->core = $GLOBALS['core'];
+			$this->FOGCore = $GLOBALS['FOGCore'];
 			
 			// Created By
 			if (array_key_exists('createdBy', $this->databaseFields) && !empty($_SESSION['FOG_USER']))

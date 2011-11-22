@@ -48,7 +48,7 @@ class UserManagementPage extends FOGPage
 		$this->title = _('All Current Users');
 		
 		// Find data
-		$Users = $this->FOG->getClass('UserManager')->find();
+		$Users = $this->FOGCore->getClass('UserManager')->find();
 	
 		// Error checking
 		if (!count($Users))
@@ -95,7 +95,7 @@ class UserManagementPage extends FOGPage
 			try
 			{
 				// UserManager
-				$UserManager = $this->FOG->getClass('UserManager');
+				$UserManager = $this->FOGCore->getClass('UserManager');
 				
 				// Error checking
 				if (count($UserManager->find(array('uName' => $_POST['name']))))
@@ -122,13 +122,13 @@ class UserManagementPage extends FOGPage
 					$this->HookManager->processEvent('USER_ADD_SUCCESS', array('User' => &$User));
 					
 					// Log History event
-					$this->FOG->logHistory(sprintf('%s: ID: %s, Name: %s', _('User created'), $User->get('id'), $User->get('name')));
+					$this->FOGCore->logHistory(sprintf('%s: ID: %s, Name: %s', _('User created'), $User->get('id'), $User->get('name')));
 					
 					// Set session message
-					$this->FOG->setMessage(_('User created'));
+					$this->FOGCore->setMessage(_('User created'));
 					
 					// Redirect to new entry
-					$this->FOG->redirect(sprintf('?node=%s&sub=edit&%s=%s', $this->request['node'], $this->id, $User->get('id')));
+					$this->FOGCore->redirect(sprintf('?node=%s&sub=edit&%s=%s', $this->request['node'], $this->id, $User->get('id')));
 				}
 				else
 				{
@@ -142,10 +142,10 @@ class UserManagementPage extends FOGPage
 				$this->HookManager->processEvent('USER_ADD_FAIL', array('User' => &$User));
 				
 				// Set session message
-				$this->FOG->setMessage($e->getMessage());
+				$this->FOGCore->setMessage($e->getMessage());
 				
 				// Redirect to new entry
-				$this->FOG->redirect($this->formAction);
+				$this->FOGCore->redirect($this->formAction);
 			}
 		}
 		else
@@ -180,7 +180,7 @@ class UserManagementPage extends FOGPage
 			try
 			{
 				// UserManager
-				$UserManager = $this->FOG->getClass('UserManager');
+				$UserManager = $this->FOGCore->getClass('UserManager');
 				
 				// Error checking
 				if ($UserCheck = $UserManager->find(array('uName' => $_POST['name'])) && is_array($UserCheck) && $UserCheck = end($UserCheck) && $UserCheck->get('id') != $User->get('id'))
@@ -212,13 +212,13 @@ class UserManagementPage extends FOGPage
 					$this->HookManager->processEvent('USER_UPDATE_SUCCESS', array('User' => &$User));
 					
 					// Log History event
-					$this->FOG->logHistory(sprintf('%s: ID: %s, Name: %s', _('User updated'), $User->get('id'), $User->get('name')));
+					$this->FOGCore->logHistory(sprintf('%s: ID: %s, Name: %s', _('User updated'), $User->get('id'), $User->get('name')));
 					
 					// Set session message
-					$this->FOG->setMessage(_('User updated'));
+					$this->FOGCore->setMessage(_('User updated'));
 					
 					// Redirect to new entry
-					$this->FOG->redirect(sprintf('?node=%s&sub=edit&%s=%s', $this->request['node'], $this->id, $User->get('id')));
+					$this->FOGCore->redirect(sprintf('?node=%s&sub=edit&%s=%s', $this->request['node'], $this->id, $User->get('id')));
 				}
 				else
 				{
@@ -232,10 +232,10 @@ class UserManagementPage extends FOGPage
 				$this->HookManager->processEvent('USER_UPDATE_FAIL', array('User' => &$User));
 				
 				// Set session message
-				$this->FOG->setMessage($e->getMessage());
+				$this->FOGCore->setMessage($e->getMessage());
 				
 				// Redirect to new entry
-				$this->FOG->redirect($this->formAction);
+				$this->FOGCore->redirect($this->formAction);
 			}
 		}
 		else
@@ -279,13 +279,13 @@ class UserManagementPage extends FOGPage
 				$this->HookManager->processEvent('USER_DELETE_SUCCESS', array('User' => &$User));
 				
 				// Log History event
-				$this->FOG->logHistory(sprintf('%s: ID: %s, Name: %s', _('User deleted'), $User->get('id'), $User->get('name')));
+				$this->FOGCore->logHistory(sprintf('%s: ID: %s, Name: %s', _('User deleted'), $User->get('id'), $User->get('name')));
 				
 				// Set session message
-				$this->FOG->setMessage(sprintf('%s: %s', _('User deleted'), $User->get('name')));
+				$this->FOGCore->setMessage(sprintf('%s: %s', _('User deleted'), $User->get('name')));
 				
 				// Redirect
-				$this->FOG->redirect(sprintf('?node=%s', $this->request['node']));
+				$this->FOGCore->redirect(sprintf('?node=%s', $this->request['node']));
 			}
 			catch (Exception $e)
 			{
@@ -293,10 +293,10 @@ class UserManagementPage extends FOGPage
 				$this->HookManager->processEvent('USER_DELETE_FAIL', array('User' => &$User));
 				
 				// Set session message
-				$this->FOG->setMessage($e->getMessage());
+				$this->FOGCore->setMessage($e->getMessage());
 				
 				// Redirect
-				$this->FOG->redirect($this->formAction);
+				$this->FOGCore->redirect($this->formAction);
 			}
 		}
 		else

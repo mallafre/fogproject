@@ -171,7 +171,7 @@ else
 			echo ( "<table cellpadding=0 cellspacing=0 border=0 width=90%>" );
 				echo ( "<tr><td>"._("Image Name").":</td><td><input type=\"text\" name=\"name\" value=\"" . $image->get('name') . "\" /></td></tr>" );
 				echo ( "<tr><td>"._("Image Description").":</td><td><textarea name=\"description\" rows=\"10\" cols=\"40\">" . $image->get('description') . "</textarea></td></tr>" );
-				echo ( "<tr><td>"._("Operating System").":</td><td>" . getOSDropDown( $conn, "os", $image->get('osID')) . "</td></tr>" );
+				echo ( "<tr><td>"._("Operating System").":</td><td>" . $FOGCore->getClass('OSManager')->buildSelectBox($image->get('osID')) . "</td></tr>" );
 				echo ( "<tr><td>"._("Storage Group").":</td><td>" . getNFSGroupDropDown( $conn, "storagegroup", $image->get('storageGroupID')) . "</td></tr>" );				
 				
 				$masterStorageNode = $image->getStorageGroup()->getMasterStorageNode();

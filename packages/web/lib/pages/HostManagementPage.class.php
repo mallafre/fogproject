@@ -60,7 +60,7 @@ class HostManagementPage extends FOGPage
 		$this->title = _('All Hosts');
 		
 		// Find data
-		$Hosts = $this->FOG->getClass('HostManager')->find();
+		$Hosts = $this->FOGCore->getClass('HostManager')->find();
 	
 		// Error checking
 		if (!count($Hosts))
@@ -143,13 +143,13 @@ class HostManagementPage extends FOGPage
 					$this->HookManager->processEvent('HOST_ADD_SUCCESS', array('Host' => &$Host));
 					
 					// Log History event
-					$this->FOG->logHistory(sprintf('%s: ID: %s, Name: %s', _('Host added'), $Host->get('id'), $Host->get('name')));
+					$this->FOGCore->logHistory(sprintf('%s: ID: %s, Name: %s', _('Host added'), $Host->get('id'), $Host->get('name')));
 				
 					// Set session message
-					$this->FOG->setMessage(_('Host added'));
+					$this->FOGCore->setMessage(_('Host added'));
 				
 					// Redirect to new entry
-					$this->FOG->redirect(sprintf('?node=%s&sub=edit&%s=%s', $this->request['node'], $this->id, $Host->get('id')));
+					$this->FOGCore->redirect(sprintf('?node=%s&sub=edit&%s=%s', $this->request['node'], $this->id, $Host->get('id')));
 				}
 				else
 				{
@@ -163,10 +163,10 @@ class HostManagementPage extends FOGPage
 				$this->HookManager->processEvent('HOST_ADD_FAIL', array('Host' => &$Host));
 				
 				// Set session message
-				$this->FOG->setMessage($e->getMessage());
+				$this->FOGCore->setMessage($e->getMessage());
 				
 				// Redirect to new entry
-				$this->FOG->redirect($this->formAction);
+				$this->FOGCore->redirect($this->formAction);
 			}
 		}
 		else
@@ -179,7 +179,7 @@ class HostManagementPage extends FOGPage
 				<table cellpadding="0" cellspacing="0" border="0" width="100%">
 					<tr><td width="35%"><?php print _("Host Name"); ?>:*</td><td><input type="text" name="host" value="<?php print $_POST['host']; ?>" /></td></tr>
 					<tr><td><?php print _("Host IP"); ?>:</td><td><input type="text" name="ip" value="<?php print $_POST['ip']; ?>" /></td></tr>
-					<tr><td><?php print _("Primary MAC"); ?>:*</td><td><input type="text" id='mac' name="mac" value="<?php print $_POST['mac']; ?>" /> &nbsp; <span id='priMaker'></span> </td></tr>
+					<tr><td><?php print _("Primary MAC"); ?>:*</td><td><input type="text" id="mac" name="mac" value="<?php print $_POST['mac']; ?>" /> &nbsp; <span id="priMaker"></span> </td></tr>
 					<tr><td><?php print _("Host Description"); ?>:</td><td><textarea name="description" rows="5" cols="40"><?php print $_POST['description']; ?></textarea></td></tr>
 					<tr><td><?php print _("Host Image"); ?>:</td><td><?php print getImageDropDown( $conn, 'image', $_POST['image'] );  ?></td></tr>
 					<tr><td><?php print _("Host OS"); ?>:</td><td><?php print getOSDropDown( $conn, 'os', $_POST['os'] ); ?></td></tr>
@@ -191,7 +191,7 @@ class HostManagementPage extends FOGPage
 				<br />
 				<h2><?php print _("Active Directory"); ?></h2>		
 				<table cellpadding="0" cellspacing="0" border="0" width="100%">
-					<tr><td width="35%"><?php print _("Join Domain after image task"); ?>:</td><td><input id='adEnabled' type="checkbox" name="domain" value="on"<?php print ($_POST['domain'] == 'on' ? ' selected="selected"' : ''); ?> /></td></tr>
+					<tr><td width="35%"><?php print _("Join Domain after image task"); ?>:</td><td><input id="adEnabled" type="checkbox" name="domain" value="on"<?php print ($_POST['domain'] == 'on' ? ' selected="selected"' : ''); ?> /></td></tr>
 					<tr><td><?php print _("Domain name"); ?>:</td><td><input id="adDomain" type="text" name="domainname" value="<?php print $_POST['domainname']; ?>" /></td></tr>				
 					<tr><td><?php print _("Organizational Unit"); ?>:</td><td><input id="adOU" type="text" name="ou" value="<?php print $_POST['ou']; ?>" /> <?php print _("(Blank for default)"); ?></td></tr>				
 					<tr><td><?php print _("Domain Username"); ?>:</td><td><input id="adUsername" type="text" name="domainuser" value="<?php print $_POST['domainuser']; ?>" /></td></tr>						
@@ -202,62 +202,61 @@ class HostManagementPage extends FOGPage
 			<?php
 		}
 	}
-	
-	
-	// TODO: FROM USER
-	/*
+
 	public function edit()
 	{
-		$User = new Host($this->request['id']);
+		$Host = new Host($this->request['id']);
 		
 		// Hook
-		$this->HookManager->processEvent('USER_ADD', array('Host' => &$Host));
+		$this->HookManager->processEvent('HOST_EDIT', array('Host' => &$Host));
 		
 		// POST ?
 		if ($this->post)
 		{
 			try
 			{
-				// UserManager
-				$HostManager = $this->FOG->getClass('HostManager');
-				
 				// Error checking
-				if ($UserCheck = $HostManager->find(array('uName' => $_POST['name'])) && is_array($UserCheck) && $UserCheck = end($UserCheck) && $UserCheck->get('id') != $User->get('id'))
+				if (empty($_POST['id']))
 				{
-					throw new Exception(_('Username already exists'));
-				}
-				if ($_POST['password'] && $_POST['password_confirm'])
-				{
-					if (!$HostManager->isPasswordValid($_POST['password'], $_POST['password_confirm']))
-					{
-						throw new Exception(_('Password is invalid'));
-					}
+					throw new Exception('Host ID is required');
 				}
 				
-				// Update User Object
-				$User	->set('name',		$_POST['name'])
-					->set('type',		($_POST['isGuest'] == 'on' ? '1' : '0'));
+				// Variables
+				$mac = new MACAddress($_POST['mac']);
 				
-				// Set new password if password was passed
-				if ($_POST['password'] && $_POST['password_confirm'])
+				if (!$mac->isValid())
 				{
-					$User->set('password',	$_POST['password']);
+					throw new Exception('MAC Address is not valid');
 				}
+			
+				// Define new Image object with data provided
+				$Host	->set('name',		$_POST['host'])
+					->set('description',	$_POST['description'])
+					->set('ip',		$_POST['ip'])
+					->set('mac',		$mac)
+					->set('osID',		$_POST['os'])
+					->set('imageID',	$_POST['image'])
+					->set('kernel',		$_POST['kern'])
+					->set('kernelArgs',	$_POST['args'])
+					->set('kernelDevice',	$_POST['dev']);
 				
-				// Save
-				if ($User->save())
+				// Add Additional MAC Addresses
+				$Host->set('additionalMACs', (array)$_POST['additionalMACs']);
+			
+				// Save to database
+				if ($Host->save())
 				{
 					// Hook
-					$this->HookManager->processEvent('HOST_UPDATE_SUCCESS', array('Host' => &$Host));
+					$HookManager->processEvent('HOST_EDIT_SUCCESS', array('host' => &$Host));
 					
 					// Log History event
-					$this->FOG->logHistory(sprintf('%s: ID: %s, Name: %s', _('User updated'), $User->get('id'), $User->get('name')));
-					
+					$FOGCore->logHistory(sprintf('Host updated: ID: %s, Name: %s', $Host->get('id'), $Host->get('name')));
+				
 					// Set session message
-					$this->FOG->setMessage(_('User updated'));
-					
+					$FOGCore->setMessage('Host updated!');
+				
 					// Redirect to new entry
-					$this->FOG->redirect(sprintf('?node=%s&sub=edit&%s=%s', $this->request['node'], $this->id, $User->get('id')));
+					$FOGCore->redirect("$_SERVER[PHP_SELF]?node=$node&sub=edit&id=" . $Host->get('id'));
 				}
 				else
 				{
@@ -268,36 +267,44 @@ class HostManagementPage extends FOGPage
 			catch (Exception $e)
 			{
 				// Hook
-				$this->HookManager->processEvent('HOST_UPDATE_FAIL', array('Host' => &$Host));
+				$HookManager->processEvent('HOST_EDIT_FAIL', array('Host' => &$Host));
 				
+				// Log History event
+				$FOGCore->logHistory(sprintf('Host update failed: Name: %s, Error: %s', $_POST['name'], $e->getMessage()));
+			
 				// Set session message
-				$this->FOG->setMessage($e->getMessage());
-				
-				// Redirect to new entry
-				$this->FOG->redirect($this->formAction);
+				$FOGCore->setMessage($e->getMessage());
 			}
 		}
 		else
 		{
 			// TODO: Put table rows into variables -> Add hooking
 			?>
+			<h2><?php print _("Add new host definition"); ?></h2>
 			<form method="POST" action="<?php print $this->formAction; ?>">
-				<input type="hidden" name="update" value="<?php print $User->get('id'); ?>" />
+				<input type="hidden" name="add" value="1" />
 				<table cellpadding="0" cellspacing="0" border="0" width="100%">
-					<tr><td><?php print _("User Name"); ?>:</td><td><input type="text" name="name" value="<?php print $User->get('name'); ?>" /></td></tr>
-					<tr><td><?php print _("New Password"); ?>:</td><td><input type="password" name="password" value="" /></td></tr>
-					<tr><td><?php print _("New Password (confirm)"); ?>:</td><td><input type="password" name="password_confirm" value="" /></td></tr>
-					<tr><td><?php print _("Mobile/Quick Image Access Only?"); ?></td><td><input type="checkbox" name="isGuest"<?php print ($User->get('type') == User::TYPE_MOBILE ? ' checked="checked"' : ''); ?>></td></tr>
-					<tr><td>&nbsp;</td><td><input type="submit" value="<?php print _('Update'); ?>" /></td></tr>
+					<tr><td width="35%"><?php print _("Host Name"); ?>:*</td><td><input type="text" name="host" value="<?php print $Host->get('name'); ?>" /></td></tr>
+					<tr><td><?php print _("Host IP"); ?>:</td><td><input type="text" name="ip" value="<?php print $Host->get('ip'); ?>" /></td></tr>
+					<tr><td><?php print _("Primary MAC"); ?>:*</td><td><input type="text" id="mac" name="mac" value="<?php print $Host->get('mac'); ?>" /> &nbsp; <span id="priMaker"></span> </td></tr>
+					<tr><td><?php print _("Host Description"); ?>:</td><td><textarea name="description" rows="5" cols="40"><?php print $Host->get('description'); ?></textarea></td></tr>
+					<tr><td><?php print _("Host Image"); ?>:</td><td><?php print $this->FOGCore->getClass('ImageManager')->buildSelectBox($Host->get('imageID')); ?></td></tr>
+					<tr><td><?php print _("Host OS"); ?>:</td><td><?php print $this->FOGCore->getClass('OSManager')->buildSelectBox($Host->get('OSID')); ?></td></tr>
+					<tr><td><?php print _("Host Kernel"); ?>:</td><td><input type="text" name="kern" value="<?php print $Host->get('kern'); ?>" /></td></tr>		
+					<tr><td><?php print _("Host Kernel Arguments"); ?>:</td><td><input type="text" name="args" value="<?php print $Host->get('args'); ?>" /></td></tr>	
+					<tr><td><?php print _("Host Primary Disk"); ?>:</td><td><input type="text" name="dev" value="<?php print $Host->get('dev'); ?>" /></td></tr>		
 				</table>
 			</form>
 			<?php
 		}
 	}
 	
+	
+	// TODO: FROM USER
+	/*	
 	public function delete()
 	{
-		$User = new Host($this->request['id']);
+		$Host = new Host($this->request['id']);
 		
 		// Hook
 		$this->HookManager->processEvent('USER_ADD', array('Host' => &$Host));
@@ -317,13 +324,13 @@ class HostManagementPage extends FOGPage
 				$this->HookManager->processEvent('HOST_DELETE_SUCCESS', array('Host' => &$Host));
 				
 				// Log History event
-				$this->FOG->logHistory(sprintf('%s: ID: %s, Name: %s', _('User deleted'), $User->get('id'), $User->get('name')));
+				$this->FOGCore->logHistory(sprintf('%s: ID: %s, Name: %s', _('User deleted'), $User->get('id'), $User->get('name')));
 				
 				// Set session message
-				$this->FOG->setMessage(sprintf('%s: %s', _('User deleted'), $User->get('name')));
+				$this->FOGCore->setMessage(sprintf('%s: %s', _('User deleted'), $User->get('name')));
 				
 				// Redirect
-				$this->FOG->redirect(sprintf('?node=%s', $this->request['node']));
+				$this->FOGCore->redirect(sprintf('?node=%s', $this->request['node']));
 			}
 			catch (Exception $e)
 			{
@@ -331,10 +338,10 @@ class HostManagementPage extends FOGPage
 				$this->HookManager->processEvent('HOST_DELETE_FAIL', array('Host' => &$Host));
 				
 				// Set session message
-				$this->FOG->setMessage($e->getMessage());
+				$this->FOGCore->setMessage($e->getMessage());
 				
 				// Redirect
-				$this->FOG->redirect($this->formAction);
+				$this->FOGCore->redirect($this->formAction);
 			}
 		}
 		else

@@ -78,7 +78,7 @@ if ($_POST['add'])
 	<tr><td><?php print _("Image Name"); ?>:</td><td><input type="text" name="name" id="iName" onblur="duplicateImageName();" value="<?php print $_POST['name']; ?>" /></td></tr>
 	<tr><td><?php print _("Image Description"); ?>:</td><td><textarea name="description" rows="5" cols="65"><?php print $_POST['description']; ?></textarea></td></tr>
 	<tr><td><?php print _("Storage Group"); ?>:</td><td><?php print getNFSGroupDropDown( $conn, 'storagegroup', $_POST['storagegroup'] ); ?></td></tr>
-	<tr><td><?php print _("Operating System"); ?>:</td><td><?php print getOSDropDown( $conn, "os", $_POST['os']); ?></td></tr>
+	<tr><td><?php print _("Operating System"); ?>:</td><td><?php print $FOGCore->getClass('OSManager')->buildSelectBox($_POST['os']); ?></td></tr>
 	<tr><td><?php print _("Image Path"); ?>:</td><td>/images/<input type="text" name="file" id="iFile" value="<?php print $_POST['file']; ?>" /></td></tr>
 	<tr><td><?php print _("Image Type"); ?>:</td><td><?php print getImageTypeDropDown(  ); ?> <span class="icon icon-help" title="TODO!"></span></td></tr>				
 	<tr><td colspan=2><center><br /><input type="submit" value="<?php print _("Add"); ?>" /></center></td></tr>				

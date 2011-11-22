@@ -83,7 +83,7 @@ var Loader;
 		}
 		
 		// If the container already contains data, show, else hide
-		if ($('tbody > tr', Container).size() > 0)
+		if ($('tbody > tr', Container).filter('.no-active-tasks').size() > 0)
 		{
 			Container.show();
 		}
@@ -91,7 +91,6 @@ var Loader;
 		{
 			Container.hide();
 		}
-		
 		
 		// Iterate each element
 		return this.each(function()

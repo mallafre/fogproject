@@ -113,12 +113,28 @@ abstract class FOGManagerController
 		return false;
 	}
 	
+	// Blackout - 11:28 AM 22/11/2011
+	function buildSelectBox($matchID = '', $elementName = '')
+	{
+		if (empty($elementName))
+		{
+			$elementName = strtolower($this->childClass);
+		}
+	
+		foreach ($this->find() AS $Object)
+		{
+			$listArray[] = sprintf('<option value="%s"%s>[%s] %s</option>', $Object->get('id'), ($matchID == $Object->get('id') ? ' selected="selected"' : ''), $Object->get('id'), $Object->get('name'));
+		}
+		
+		return (isset($listArray) ? sprintf('<select name="%s"><option value="">- %s -</option>%s</select>', $elementName, _('Please select an option'), implode("\n", $listArray)) : false);
+	}
+	
 	// Error
 	protected function error($txt, $data = array())
 	{
 		if ($this->debug)
 		{
-			$GLOBALS['FOGCore']->error('%s: %s', array(get_class($this), (count($data) ? vsprintf($txt, $data) : $txt)));
+			$this->FOGCore->error('%s: %s', array(get_class($this), (count($data) ? vsprintf($txt, $data) : $txt)));
 		}
 	}
 	// Info
@@ -126,7 +142,7 @@ abstract class FOGManagerController
 	{
 		if ($this->debug)
 		{
-			$GLOBALS['FOGCore']->info('%s: %s', array(get_class($this), (count($data) ? vsprintf($txt, $data) : $txt)));
+			$this->FOGCore->info('%s: %s', array(get_class($this), (count($data) ? vsprintf($txt, $data) : $txt)));
 		}
 	}
 }

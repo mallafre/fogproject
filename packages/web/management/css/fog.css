@@ -44,6 +44,7 @@ form { margin: 0; padding: 0; }
 fieldset { margin: 0; padding: 0; border: none; }
 legend { display: none; }
 input, textarea, select { font-family: "Trebuchet MS", Arial, Helvetica, sans-serif; font-size: 13px; color: #333333; }
+select > option { border-bottom: 1px dashed #ccc; padding: 2px 5px; }
 
 /* Menu */
 

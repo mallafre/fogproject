@@ -435,7 +435,7 @@ if ( $groupid != null && is_numeric( $groupid ) )
 			<?php
 			echo ( "<div class=\"hostgroup\">" );
 				echo ( "<form method=\"POST\" action=\"?node=$node&sub=$sub&groupid=$groupid&tab=$tab\">" );
-				echo ( getOSDropDown( $conn, $name="grpos" ) );
+				echo ( $FOGCore->getClass('OSManager')->buildSelectBox($Host->get('osID'), "grpos") );
 				echo ( "<p><input type=\"submit\" value=\""._("Update Operating System")."\" /></p>" );
 				echo ( "</form>" );
 			echo ( "</div>" );
