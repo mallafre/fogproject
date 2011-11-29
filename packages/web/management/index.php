@@ -116,14 +116,15 @@ $pageTitle = (isset($pageTitles[$node]) ? $pageTitles[$node] : 'Dashboard');
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
+	<meta http-equiv="X-UA-Compatible" content="IE=Edge"/>
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	
 	<title><?php print $pageTitle; ?> &gt; FOG &gt; Open Source Computer Cloning Solution</title>
 	
-	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
-	<meta http-equiv="x-ua-compatible" content="IE=8">
-	
 	<!-- Stylesheets -->
+	<link rel="stylesheet" type="text/css" href="css/calendar/calendar-win2k-1.css"  />
+	<link rel="stylesheet" type="text/css" href="css/jquery.organicTabs.css" />
 	<link rel="stylesheet" type="text/css" href="css/fog.css" />
-	<link rel="stylesheet" type="text/css" media="all" href="css/calendar/calendar-win2k-1.css"  />
 	
 	<link rel="shortcut icon" href="../favicon.ico" type="image/x-icon" />
 <?php
@@ -193,6 +194,7 @@ $FOGCore->getMessages();
 <script type="text/javascript" src="js/jquery.tipsy.js"></script>
 <script type="text/javascript" src="js/jquery.progressbar.js"></script>
 <script type="text/javascript" src="js/jquery.tmpl.js"></script>
+<script type="text/javascript" src="js/jquery.organicTabs.js"></script>
 <script type="text/javascript" src="js/fog.js"></script>
 <script type="text/javascript" src="js/fog.main.js"></script>
 <?php

@@ -34,12 +34,12 @@ class HostManagementPage extends FOGPage
 		
 		// Row templates
 		$this->templates = array(
-			'<input type="checkbox" name="HID%id%" checked="checked" />',
+			'<input type="checkbox" name="HID${id}" checked="checked" />',
 			'<span class="icon ping"></span>',
-			'<a href="?node=host&sub=edit&id=%id%" title="Edit">%name%</a>',
-			'%mac%',
-			'%ip%',
-			'<a href="?node=host&sub=edit&id=%id%"><span class="icon icon-edit" title="Edit: %hostname%"></span></a>'
+			'<a href="?node=host&sub=edit&id=${id}" title="Edit">${name}</a>',
+			'${mac}',
+			'${ip}',
+			'<a href="?node=host&sub=edit&id=${id}"><span class="icon icon-edit" title="Edit: ${hostname}"></span></a>'
 		);
 		
 		// Row attributes
@@ -172,6 +172,7 @@ class HostManagementPage extends FOGPage
 		else
 		{
 			// TODO: Put table rows into variables -> Add hooking
+			// TODO: Add tabs with other options
 			?>
 			<h2><?php print _("Add new host definition"); ?></h2>
 			<form method="POST" action="<?php print $this->formAction; ?>">
@@ -196,7 +197,7 @@ class HostManagementPage extends FOGPage
 					<tr><td><?php print _("Organizational Unit"); ?>:</td><td><input id="adOU" type="text" name="ou" value="<?php print $_POST['ou']; ?>" /> <?php print _("(Blank for default)"); ?></td></tr>				
 					<tr><td><?php print _("Domain Username"); ?>:</td><td><input id="adUsername" type="text" name="domainuser" value="<?php print $_POST['domainuser']; ?>" /></td></tr>						
 					<tr><td><?php print _("Domain Password"); ?>:</td><td><input id="adPassword" type="text" name="domainpassword" value="<?php print $_POST['domainpassword']; ?>" /> <?php print _("(Must be encrypted)"); ?></td></tr>											
-					<tr><td>&nbsp;</td><td><input type="submit" value="<?php print _("Add"); ?>" /></td></tr>				
+					<tr><td>&nbsp;</td><td><input type="submit" value="<?php print _("Add"); ?>" /></td></tr>
 				</table>	
 			</form>
 			<?php
@@ -247,16 +248,16 @@ class HostManagementPage extends FOGPage
 				if ($Host->save())
 				{
 					// Hook
-					$HookManager->processEvent('HOST_EDIT_SUCCESS', array('host' => &$Host));
+					$this->HookManager->processEvent('HOST_EDIT_SUCCESS', array('host' => &$Host));
 					
 					// Log History event
-					$FOGCore->logHistory(sprintf('Host updated: ID: %s, Name: %s', $Host->get('id'), $Host->get('name')));
+					$this->FOGCore->logHistory(sprintf('Host updated: ID: %s, Name: %s', $Host->get('id'), $Host->get('name')));
 				
 					// Set session message
-					$FOGCore->setMessage('Host updated!');
+					$this->FOGCore->setMessage('Host updated!');
 				
 					// Redirect to new entry
-					$FOGCore->redirect("$_SERVER[PHP_SELF]?node=$node&sub=edit&id=" . $Host->get('id'));
+					$this->FOGCore->redirect(sprintf('?node=%s&sub=edit&%s=%s', $this->request['node'], $this->id, $Host->get('id')));
 				}
 				else
 				{
@@ -267,47 +268,47 @@ class HostManagementPage extends FOGPage
 			catch (Exception $e)
 			{
 				// Hook
-				$HookManager->processEvent('HOST_EDIT_FAIL', array('Host' => &$Host));
+				$this->HookManager->processEvent('HOST_EDIT_FAIL', array('Host' => &$Host));
 				
 				// Log History event
-				$FOGCore->logHistory(sprintf('Host update failed: Name: %s, Error: %s', $_POST['name'], $e->getMessage()));
+				$this->FOGCore->logHistory(sprintf('Host update failed: Name: %s, Error: %s', $_POST['name'], $e->getMessage()));
 			
 				// Set session message
-				$FOGCore->setMessage($e->getMessage());
+				$this->FOGCore->setMessage($e->getMessage());
 			}
 		}
 		else
 		{
 			// TODO: Put table rows into variables -> Add hooking
+			// TODO: Add ping lookup + additional macs from original HTML (its awful and messy, needs a rewrite)
+			// TODO: Add tabs with other options
 			?>
-			<h2><?php print _("Add new host definition"); ?></h2>
+			<h2><?php print _("Edit host definition"); ?></h2>
 			<form method="POST" action="<?php print $this->formAction; ?>">
-				<input type="hidden" name="add" value="1" />
+				<input type="hidden" name="id" value="<?php print $this->request['id']; ?>" />
 				<table cellpadding="0" cellspacing="0" border="0" width="100%">
 					<tr><td width="35%"><?php print _("Host Name"); ?>:*</td><td><input type="text" name="host" value="<?php print $Host->get('name'); ?>" /></td></tr>
 					<tr><td><?php print _("Host IP"); ?>:</td><td><input type="text" name="ip" value="<?php print $Host->get('ip'); ?>" /></td></tr>
 					<tr><td><?php print _("Primary MAC"); ?>:*</td><td><input type="text" id="mac" name="mac" value="<?php print $Host->get('mac'); ?>" /> &nbsp; <span id="priMaker"></span> </td></tr>
 					<tr><td><?php print _("Host Description"); ?>:</td><td><textarea name="description" rows="5" cols="40"><?php print $Host->get('description'); ?></textarea></td></tr>
 					<tr><td><?php print _("Host Image"); ?>:</td><td><?php print $this->FOGCore->getClass('ImageManager')->buildSelectBox($Host->get('imageID')); ?></td></tr>
-					<tr><td><?php print _("Host OS"); ?>:</td><td><?php print $this->FOGCore->getClass('OSManager')->buildSelectBox($Host->get('OSID')); ?></td></tr>
+					<tr><td><?php print _("Host OS"); ?>:</td><td><?php print $this->FOGCore->getClass('OSManager')->buildSelectBox($Host->get('osID')); ?></td></tr>
 					<tr><td><?php print _("Host Kernel"); ?>:</td><td><input type="text" name="kern" value="<?php print $Host->get('kern'); ?>" /></td></tr>		
 					<tr><td><?php print _("Host Kernel Arguments"); ?>:</td><td><input type="text" name="args" value="<?php print $Host->get('args'); ?>" /></td></tr>	
-					<tr><td><?php print _("Host Primary Disk"); ?>:</td><td><input type="text" name="dev" value="<?php print $Host->get('dev'); ?>" /></td></tr>		
+					<tr><td><?php print _("Host Primary Disk"); ?>:</td><td><input type="text" name="dev" value="<?php print $Host->get('dev'); ?>" /></td></tr>
+					<tr><td>&nbsp;</td><td><input type="submit" value="<?php print _("Update"); ?>" /></td></tr>
 				</table>
 			</form>
 			<?php
 		}
 	}
-	
-	
-	// TODO: FROM USER
-	/*	
+
 	public function delete()
 	{
 		$Host = new Host($this->request['id']);
 		
 		// Hook
-		$this->HookManager->processEvent('USER_ADD', array('Host' => &$Host));
+		$this->HookManager->processEvent('HOST_ADD', array('Host' => &$Host));
 		
 		// POST ?
 		if ($this->request['confirm'])
@@ -315,19 +316,19 @@ class HostManagementPage extends FOGPage
 			try
 			{
 				// Error checking
-				if (!$User->destroy())
+				if (!$Host->destroy())
 				{
-					throw new Exception(_('Failed to destroy User'));
+					throw new Exception(_('Failed to destroy Host'));
 				}
 				
 				// Hook
 				$this->HookManager->processEvent('HOST_DELETE_SUCCESS', array('Host' => &$Host));
 				
 				// Log History event
-				$this->FOGCore->logHistory(sprintf('%s: ID: %s, Name: %s', _('User deleted'), $User->get('id'), $User->get('name')));
+				$this->FOGCore->logHistory(sprintf('%s: ID: %s, Name: %s', _('Host deleted'), $Host->get('id'), $Host->get('name')));
 				
 				// Set session message
-				$this->FOGCore->setMessage(sprintf('%s: %s', _('User deleted'), $User->get('name')));
+				$this->FOGCore->setMessage(sprintf('%s: %s', _('Host deleted'), $Host->get('name')));
 				
 				// Redirect
 				$this->FOGCore->redirect(sprintf('?node=%s', $this->request['node']));
@@ -345,15 +346,14 @@ class HostManagementPage extends FOGPage
 			}
 		}
 		else
-		{
+		{			
 			// TODO: Put table rows into variables -> Add hooking
 			?>
-			<p class="C"><?php printf('%s <b>%s</b>?', _('Are you sure you wish to remove the user'), $User->get('name')); ?></p>
+			<p class="C"><?php printf('%s <b>%s</b>?', _('Click on the icon below to delete this host from the FOG database.'), $Host->get('name')); ?></p>
 			<p class="C"><a href="<?php print $this->formAction . '&confirm=1'; ?>"><span class="icon icon-kill"></span></a></p>
 			<?php
 		}
 	}
-	*/
 }
 
 // Register page with FOGPageManager

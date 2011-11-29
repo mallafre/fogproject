@@ -68,7 +68,7 @@ class FOGPageManager
 		{
 			// Variables
 			$node = $GLOBALS[$this->nodeVariable];
-			$sub = $GLOBALS[$this->subVariable];
+			$sub = $method = $GLOBALS[$this->subVariable];
 			$class = $this->nodes[$node];
 		
 			// Error checking
@@ -76,20 +76,22 @@ class FOGPageManager
 			{
 				throw new Exception('No FOGPage Class found for this node');
 			}
-			if (!method_exists($class, $sub))
+			
+			// Figure out which method to call - default to index() if method is not found
+			if (empty($sub) || !method_exists($class, $sub))
 			{
-				if (!empty($sub))
+				if (!empty($sub) && $sub != 'list')
 				{
 					$this->error('Class: %s, Method: %s, Error: Method not found in class, defaulting to index()', array(get_class($class), $sub));
 				}
 				
-				$sub = 'index';
+				$method = 'index';
 			}
 			
-			// FOG - Default view
-			if ($sub == 'index' && $this->FOGCore->getSetting('FOG_VIEW_DEFAULT_SCREEN') != 'LIST')
+			// FOG - Default view override
+			if ($sub != 'list' && $method == 'index' && $this->FOGCore->getSetting('FOG_VIEW_DEFAULT_SCREEN') != 'LIST')
 			{
-				$sub = 'search';
+				$method = 'search';
 			}
 			
 			// Arguments
@@ -98,7 +100,7 @@ class FOGPageManager
 			// Render result to variable - we do this so we can send HTTP Headers in a class method
 			// TODO: Create a better solution
 			ob_start();
-			call_user_method_array($sub, $class, array($args));
+			call_user_method_array($method, $class, array($args));
 			$result = ob_get_contents();
 			ob_end_clean();
 			

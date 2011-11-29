@@ -77,7 +77,7 @@ if ($currentUser != null && $currentUser->isLoggedIn())
 								_('Hardware')		=> "$_SERVER[PHP_SELF]?node=$node&sub=inv&id=$id",
 								_('Virus History')	=> "virus",
 								_('Login History')	=> "$_SERVER[PHP_SELF]?node=$node&sub=loginhist&id=$id",
-								_('Delete')		=> "delete",
+								_('Delete')		=> "$_SERVER[PHP_SELF]?node=$node&sub=delete&id=$id",
 						), 'id', $hostname);
 
 			// Host Management: Notes

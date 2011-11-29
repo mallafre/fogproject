@@ -125,8 +125,9 @@ $content = $FOGPageManager->load()->render();
 	
 	<title><?php print $pageTitle; ?> &gt; FOG &gt; Open Source Computer Cloning Solution</title>
 	
+	<link rel="stylesheet" type="text/css" href="css/calendar/calendar-win2k-1.css"  />
+	<link rel="stylesheet" type="text/css" href="css/jquery.organicTabs.css" />
 	<link rel="stylesheet" type="text/css" href="css/fog.css" />
-	<link rel="stylesheet" type="text/css" media="all" href="css/calendar/calendar-win2k-1.css"  />
 	
 	<link rel="shortcut icon" href="../favicon.ico" type="image/x-icon" />
 <?php
@@ -200,6 +201,8 @@ $FOGCore->getMessages();
 <script type="text/javascript" src="js/calendar/calendar-en.js"></script>
 <script type="text/javascript" src="js/jquery.tipsy.js"></script>
 <script type="text/javascript" src="js/jquery.progressbar.js"></script>
+<script type="text/javascript" src="js/jquery.tmpl.js"></script>
+<script type="text/javascript" src="js/jquery.organicTabs.js"></script>
 <script type="text/javascript" src="js/fog.js"></script>
 <script type="text/javascript" src="js/fog.main.js"></script>
 <?php
