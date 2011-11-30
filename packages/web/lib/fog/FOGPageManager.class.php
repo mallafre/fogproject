@@ -9,6 +9,8 @@ class FOGPageManager
 	
 	private $FOGCore;
 	
+	private $debug = false;
+	
 	public function __construct()
 	{
 		$this->FOGCore = $GLOBALS['FOGCore'];
@@ -94,6 +96,12 @@ class FOGPageManager
 				$method = 'search';
 			}
 			
+			// POST - Change method to 'method_post', if the method exists
+			if ($_SERVER['REQUEST_METHOD'] == 'POST' && method_exists($class, $method . '_post'))
+			{
+				$method = $method . '_post';
+			}
+			
 			// Arguments
 			$args = (!empty($GLOBALS[$class->id]) ? array('id' => $GLOBALS[$class->id]) : array());
 		
@@ -118,12 +126,18 @@ class FOGPageManager
 	// Error
 	protected function error($txt, $data = array())
 	{
-		$this->FOGCore->error('%s: %s', array(get_class($this), (count($data) ? vsprintf($txt, $data) : $txt)));
+		if ($this->debug)
+		{
+			$this->FOGCore->error('%s: %s', array(get_class($this), (count($data) ? vsprintf($txt, $data) : $txt)));
+		}
 	}
 	
 	// Info
 	protected function info($txt, $data = array())
 	{
-		$this->FOGCore->info('%s: %s', array(get_class($this), (count($data) ? vsprintf($txt, $data) : $txt)));
+		if ($this->debug)
+		{
+			$this->FOGCore->info('%s: %s', array(get_class($this), (count($data) ? vsprintf($txt, $data) : $txt)));
+		}
 	}
 }

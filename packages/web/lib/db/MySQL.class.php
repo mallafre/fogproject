@@ -12,7 +12,7 @@ class MySQL
 	public $ROW_NUM = 2;	// MYSQL_NUM
 	public $ROW_BOTH = 3;	// MYSQL_BOTH
 	
-	public $debug = true;
+	public $debug = false;
 	
 	function __construct($host, $user, $pass, $db = '')
 	{

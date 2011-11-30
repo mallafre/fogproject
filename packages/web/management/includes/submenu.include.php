@@ -33,18 +33,37 @@ if ($currentUser != null && $currentUser->isLoggedIn())
 		if ($groupid)
 		{
 			// Group Management: Edit
-			$FOGSubMenu->addItems('group', array(	_('General')		=> "gen",
-								_('Basic Tasks')	=> "tasks",
-								_('Membership')		=> "member",
-								_('Image Association')	=> "image",
-								_('OS Association')	=> "os",
-								_('Add Snap-ins')	=> "snapadd",
-								_('Remove Snap-ins')	=> "snapdel",
-								_('Service Settings')	=> "service",
-								_('Active Directory')	=> "ad",
-								_('Printers')		=> "$_SERVER[PHP_SELF]?node=$node&sub=printers&groupid=$groupid",
-								_('Delete')		=> "del",
-						), 'groupid', 'Group Menu');
+			if (preg_match('#pagetest#', $_SERVER['PHP_SELF']))
+			{
+				$FOGSubMenu->addItems('group', array(	_('General')		=> "$_SERVER[PHP_SELF]?node=$node&sub=edit&groupid=$groupid#group-general",
+									_('Basic Tasks')	=> "$_SERVER[PHP_SELF]?node=$node&sub=edit&groupid=$groupid#group-tasks",
+									_('Membership')		=> "$_SERVER[PHP_SELF]?node=$node&sub=edit&groupid=$groupid#group-membership",
+									_('Image Association')	=> "$_SERVER[PHP_SELF]?node=$node&sub=edit&groupid=$groupid#group-image",
+									_('OS Association')	=> "$_SERVER[PHP_SELF]?node=$node&sub=edit&groupid=$groupid#group-os",
+									_('Add Snap-ins')	=> "$_SERVER[PHP_SELF]?node=$node&sub=edit&groupid=$groupid#group-snap-add",
+									_('Remove Snap-ins')	=> "$_SERVER[PHP_SELF]?node=$node&sub=edit&groupid=$groupid#group-snap-delete",
+									_('Service Settings')	=> "$_SERVER[PHP_SELF]?node=$node&sub=edit&groupid=$groupid#group-service",
+									_('Active Directory')	=> "$_SERVER[PHP_SELF]?node=$node&sub=edit&groupid=$groupid#group-active-directory",
+									//_('Printers')		=> "$_SERVER[PHP_SELF]?node=$node&sub=printers&groupid=$groupid",
+									_('Printers')		=> "$_SERVER[PHP_SELF]?node=$node&sub=edit&groupid=$groupid#group-printers",
+									_('Delete')		=> "delete",
+							), 'groupid', 'Group Menu');
+			}
+			else
+			{
+				$FOGSubMenu->addItems('group', array(	_('General')		=> "gen",
+									_('Basic Tasks')	=> "tasks",
+									_('Membership')		=> "member",
+									_('Image Association')	=> "image",
+									_('OS Association')	=> "os",
+									_('Add Snap-ins')	=> "snapadd",
+									_('Remove Snap-ins')	=> "snapdel",
+									_('Service Settings')	=> "service",
+									_('Active Directory')	=> "ad",
+									_('Printers')		=> "$_SERVER[PHP_SELF]?node=$node&sub=printers&groupid=$groupid",
+									_('Delete')		=> "del",
+							), 'groupid', 'Group Menu');
+			}
 			
 			// Group Management: Notes
 			$FOGSubMenu->addNotes('group', array(	_("Group")		=> getGroupNameByID( $conn, $groupid ),

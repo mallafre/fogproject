@@ -179,7 +179,7 @@ pre { white-space: pre-wrap; }
 .r { text-align: right; }
 
 /* ICONS */
-.icon { outline: 0; display: inline-block; width: 16px; height: 16px; }
+.icon { outline: 0; border: 0; display: inline-block; width: 16px; height: 16px; }
 .icon-force { background: url('../images/icon-force.png') no-repeat center center; }
 .icon-forced { background: url('../images/icon-forced.png') no-repeat center center; }
 .icon-kill { background: url('../images/kill.png') no-repeat center center; }
