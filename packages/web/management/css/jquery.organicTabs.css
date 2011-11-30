@@ -1,18 +1,18 @@
 /* Default tab container */
-.organic-tabs { background: #eee; padding: 10px; margin: 0 0 20px 0; -moz-box-shadow: 0 0 5px #666; -webkit-box-shadow: 0 0 5px #666; overflow: hidden; }
+.organic-tabs { overflow: hidden; }
 .organic-tabs > div { }
 .organic-tabs ul { list-style: none; }
 
 /* Default tab header styles */
-.organic-tabs > ul { overflow: hidden; margin: 0 0 10px 0; }
-.organic-tabs > ul > li { width: 97px; float: left; margin: 0 10px 0 0; }
-.organic-tabs > ul > li:last-child { margin-right: 0; }
-.organic-tabs > ul > li a { display: block; padding: 5px; background: #959290; color: white; font-size: 10px; text-align: center; border: 0; }
-.organic-tabs > ul > li a:hover { background-color: #111; }
+.organic-tabs > ul { overflow: hidden; }
+.organic-tabs > ul > li { }
+.organic-tabs > ul > li:last-child { }
+.organic-tabs > ul > li a { }
+.organic-tabs > ul > li a:hover { }
 
 /* Default content styles */
-.organic-tabs > div > ul > li a { display: block; border-bottom: 1px solid #666; padding: 4px; color: #666; }
-.organic-tabs > div > ul > li a:hover { background: #fe4902; color: white; }
+.organic-tabs > div > ul > li a { }
+.organic-tabs > div > ul > li a:hover { }
 .organic-tabs > div > ul > li:last-child a { border: none; }
 
 /* State classes */

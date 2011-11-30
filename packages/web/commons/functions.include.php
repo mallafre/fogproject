@@ -1366,7 +1366,7 @@ function getImageMemberFromHostID( $conn, $hostid )
 	$Task = new Task(array(
 		'hostID'	=> $hostid,
 		'NFSGroupID'	=> $Host->getImage()->getStorageGroup()->get('id'),
-		'NFSMemberID'	=> $Host->getImage()->getStorageGroup()->getRandomStorageNode()->get('id'),
+		'NFSMemberID'	=> $Host->getImage()->getStorageGroup()->getRandomStorageNode()->get('id')
 	));
 	
 	return $Task;

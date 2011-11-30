@@ -69,11 +69,12 @@ abstract class FOGPage
 		{
 			$this->request[$x] = (isset($_REQUEST[$x]) && !empty($_REQUEST[$x]) ? $_REQUEST[$x] : false);
 		}
-		$this->request['id'] = (isset($_REQUEST[$this->id]) && !empty($_REQUEST[$this->id]) ? $_REQUEST[$this->id] : false);
+		$this->request['id'] = $this->request[$this->id] = (isset($_REQUEST[$this->id]) && !empty($_REQUEST[$this->id]) ? $_REQUEST[$this->id] : false);
 		
 		$this->post = ($_SERVER['REQUEST_METHOD'] == 'POST' ? true : false);
 		$this->formAction = sprintf('%s?node=%s&sub=%s%s', $_SERVER['PHP_SELF'], $this->request['node'], $this->request['sub'], ($this->request['id'] ? sprintf('&%s=%s', $this->id, $this->request['id']) : ''));
 		
+		// DEBUG
 		//printf('node: %s, sub: %s, id: %s, id value: %s, post: %s', $this->node, $this->sub, $this->id, $this->request['id'], ($this->post === false ? 'false' : $this->post));
 	}
 	

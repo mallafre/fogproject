@@ -111,12 +111,20 @@ class FOGSubMenu
 		{
 			foreach ($this->items[$node] AS $title => $data)
 			{
+				// HACK: Add div around submenu items for tabs
+				// Blackout - 8:24 AM 30/11/2011
+				$output .= (++$i >= 2 ? '<div class="organic-tabs">' . "\n\t\t" : '');
+				
 				$output .= "<h2>" . $this->fixTitle($title) . "</h2>\n\t\t<ul>\n";
 				foreach ($data AS $label => $link)
 				{
 					$output .= "\t\t\t" . '<li><a href="' . (!$this->isExternalLink($link) ? $_SERVER['PHP_SELF'] . "?node=$node" . ($link != '' ? '&sub=' : '') . ($GLOBALS['sub'] && $title != "Main Menu" ? ($this->defaultSubs[$node] ? $this->defaultSubs[$node] : $GLOBALS['sub']) . "&tab=" : '') . $link : $link) . '">' . $label . '</a></li>' . "\n";
 				}
 				$output .= "\t\t</ul>\n";
+				
+				// HACK: Add div around submenu items for tabs
+				// Blackout - 8:24 AM 30/11/2011
+				$output .= ($i >= 2 ? "\t\t</div>\n" : '');
 			}
 		}
 		
@@ -150,7 +158,7 @@ class FOGSubMenu
 	
 	// Test if the link is a node link or an external link
 	function isExternalLink($link) {
-		if (substr($link, 0, 4) == 'http' || $link{0} == '/' ||  $link{0} == '?') return true;
+		if (substr($link, 0, 4) == 'http' || $link{0} == '/' ||  $link{0} == '?' || $link{0} == '#') return true;
 		return false;
 	}
 	

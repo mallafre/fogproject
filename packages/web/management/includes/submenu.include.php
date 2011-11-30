@@ -68,17 +68,36 @@ if ($currentUser != null && $currentUser->isLoggedIn())
 			$hostname = ($Host->isValid() ? $Host->get('name') : '-');
 		
 			// Host Management: Edit
-			$FOGSubMenu->addItems('host', array(	_('General')		=> "gen",
-								_('Basic Tasks')	=> "tasks",
-								_('Active Directory')	=> "ad",
-								_('Printers')		=> "$_SERVER[PHP_SELF]?node=$node&sub=printers&id=$id",
-								_('Snap-ins')		=> "snapins",
-								_('Service Settings')	=> "service",
-								_('Hardware')		=> "$_SERVER[PHP_SELF]?node=$node&sub=inv&id=$id",
-								_('Virus History')	=> "virus",
-								_('Login History')	=> "$_SERVER[PHP_SELF]?node=$node&sub=loginhist&id=$id",
-								_('Delete')		=> "$_SERVER[PHP_SELF]?node=$node&sub=delete&id=$id",
-						), 'id', $hostname);
+			if (preg_match('#pagetest#', $_SERVER['PHP_SELF']))
+			{
+				// NEW menu items - tab based, single page
+				$FOGSubMenu->addItems('host', array(	_('General')		=> "$_SERVER[PHP_SELF]?node=$node&sub=edit&id=$id#host-general",
+									_('Basic Tasks')	=> "$_SERVER[PHP_SELF]?node=$node&sub=edit&id=$id#host-tasks",
+									_('Active Directory')	=> "$_SERVER[PHP_SELF]?node=$node&sub=edit&id=$id#host-active-directory",
+									_('Printers')		=> "$_SERVER[PHP_SELF]?node=$node&sub=edit&id=$id#host-printers",
+									_('Snap-ins')		=> "$_SERVER[PHP_SELF]?node=$node&sub=edit&id=$id#host-snapins",
+									_('Service Settings')	=> "$_SERVER[PHP_SELF]?node=$node&sub=edit&id=$id#host-service",
+									_('Hardware')		=> "$_SERVER[PHP_SELF]?node=$node&sub=edit&id=$id#host-hardware-inventory",
+									_('Virus History')	=> "$_SERVER[PHP_SELF]?node=$node&sub=edit&id=$id#host-virus-history",
+									_('Login History')	=> "$_SERVER[PHP_SELF]?node=$node&sub=edit&id=$id#host-login-history",
+									_('Delete')		=> "$_SERVER[PHP_SELF]?node=$node&sub=delete&id=$id",
+							), 'id', $hostname);
+			}
+			else
+			{
+				// LEGACY menu items - old includes style
+				$FOGSubMenu->addItems('host', array(	_('General')		=> "gen",
+									_('Basic Tasks')	=> "tasks",
+									_('Active Directory')	=> "ad",
+									_('Printers')		=> "$_SERVER[PHP_SELF]?node=$node&sub=printers&id=$id",
+									_('Snap-ins')		=> "snapins",
+									_('Service Settings')	=> "service",
+									_('Hardware')		=> "$_SERVER[PHP_SELF]?node=$node&sub=inv&id=$id",
+									_('Virus History')	=> "virus",
+									_('Login History')	=> "$_SERVER[PHP_SELF]?node=$node&sub=loginhist&id=$id",
+									_('Delete')		=> "$_SERVER[PHP_SELF]?node=$node&sub=delete&id=$id",
+							), 'id', $hostname);
+			}
 
 			// Host Management: Notes
 			$FOGSubMenu->addNotes('host', array(	_('Host')	=> stripslashes($hostname),
@@ -268,7 +287,8 @@ if ($currentUser != null && $currentUser->isLoggedIn())
 	// User Management
 	if ($node == "users")
 	{
-		$FOGSubMenu->addItems('users', array(	_('List All Users')		=> '',
+		$FOGSubMenu->addItems('users', array(	_('New Search')			=> 'search',
+							_('List All Users')		=> 'list',
 							_('New User')			=> 'add',
 					));
 		

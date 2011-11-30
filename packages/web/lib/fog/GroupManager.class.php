@@ -9,7 +9,7 @@ class GroupManager extends FOGManagerController
 	// Search query
 	protected $searchQuery = 'SELECT * FROM groups WHERE groupName LIKE "%${keyword}%"';
 
-	// Legacy - remove when all updated
+	// Custom methods
 	public function getGroupByName($name)
 	{
 		$Group = new Group(array('name' => $name));
@@ -18,6 +18,12 @@ class GroupManager extends FOGManagerController
 		return $Group;
 	}
 	
+	function groupNameExists($name)
+	{
+		return ($this->getGroupByName($name)->get('id') == '' ? false : true);
+	}
+	
+	// Legacy - remove when all updated
 	public function createGroup($name, $user)
 	{
 		if ($this->db != null && ! $this->doesGroupExist( $name ) && $name != null && strlen( $name ) > 0 && $user != null)
@@ -114,16 +120,6 @@ class GroupManager extends FOGManagerController
 		*/
 	}
 	
-	public function searchOLD( $crit, $sortingOpts )
-	{
-		$arResults = array();
-		if ( $this->db != null && $crit != null )
-		{
-			
-		}
-		return $arResults;
-	}
-	
 	// function either returns true or throws an exception
 	public function updateGroup( $group )
 	{
@@ -139,21 +135,5 @@ class GroupManager extends FOGManagerController
 			return true;
 		}
 		return false;
-	}
-	
-	// groupExists() moved from functions.include.php - Blackout - 11:15 AM 23/09/2011
-	function groupExists( $conn, $groupName, $id=-1 )
-	{
-		if ( $conn != null && $groupName != null )
-		{
-			$sql = "select count(*) as cnt from groups where groupName = '" . mysql_real_escape_string( $groupName ) . "' and groupID <> $id";
-			$res = mysql_query( $sql, $conn ) or criticalError( mysql_error(), _("FOG :: Database error!") );
-			if ( $ar = mysql_fetch_array( $res ) )
-			{
-				if ( $ar["cnt"] == 0 )
-					return false;
-			}
-		}
-		return true;
 	}
 }

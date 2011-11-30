@@ -28,7 +28,7 @@ if ( $groupid != null && is_numeric( $groupid ) )
 	
 	if ( $_POST["update"] == "1" )
 	{
-		if (!$core->getGroupManager()->groupExists($conn, $_POST["name"], $groupid))
+		if (!$core->getGroupManager()->groupNameExists($_POST["name"]))
 		{
 			// Set Gruop data -> Save new data
 			$group	->set('name',		$_POST['name'])

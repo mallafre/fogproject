@@ -212,8 +212,14 @@ var Loader;
 								// Replace variable data
 								for (var k in response['data'][i])
 								{
+									// New
+									row = row.replace(new RegExp('\$\{' + k + '\}', 'g'), (response['data'][i][k] ? response['data'][i][k] : ''));
+									// Legacy
 									row = row.replace(new RegExp('%' + k + '%', 'g'), (response['data'][i][k] ? response['data'][i][k] : ''));
 								}
+								// New
+								row = row.replace(/\$\{\w+\}/g, '');
+								// LEGACY
 								row = row.replace(/%\w+%/g, '');
 								
 								// Add to rows
@@ -537,6 +543,11 @@ var Loader;
 			// Remove element from DOM
 			$this.remove();
 		});
+	}
+	
+	jQuery.fn.exists = function()
+	{
+		return this.length > 0;
 	}
 	
 	

@@ -30,8 +30,8 @@ class UserManagementPage extends FOGPage
 		
 		// Row templates
 		$this->templates = array(
-			'<a href="?node=${node}&sub=edit&id=${id}">${name}</a>',
-			'<a href="?node=${node}&sub=edit&id=${id}"><span class="icon icon-edit"></span></a>'
+			'<a href="?node=users&sub=edit&id=${id}">${name}</a>',
+			'<a href="?node=users&sub=edit&id=${id}"><span class="icon icon-edit"></span></a>'
 		);
 		
 		// Row attributes

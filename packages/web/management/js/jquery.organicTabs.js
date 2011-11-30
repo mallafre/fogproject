@@ -1,4 +1,4 @@
-// Updated: Blackout - 1:15 PM 28/11/2011
+// Updated: Blackout - 12:22 PM 30/11/2011
 (function($)
 {
 	$.organicTabs = function(el, options)
@@ -13,44 +13,67 @@
 		base.$el = $(el);
 		base.$nav = base.$el.find('> ul:eq(0)');
 		base.$content = (base.options.targetID ? $(base.options.targetID) : base.$el.find('> div:eq(0)'));
-		base.anchor = window.location.href.split('#')[1] || false;
-		base.total = base.$nav.find('li > a').size();
+		base.anchor = location.hash.substring(1) || '';
+		base.total = base.$nav.find('li > a[href*="#"]').size();
 		
 		// Init function
 		base.init = function()
 		{
 			// Nav: Hook click event
-			base.$nav.delegate('li > a', 'click', function()
+			base.$nav.delegate('li > a[href*="#"]', 'click', function()
 			{
 				// New content and content ID
 				var newContent = $(this);
-				var newContentID = newContent.attr('href').substring(1);
+				var newContentID = base.findAnchor(newContent.attr('href'));
 				
 				// Figure out current list via CSS class
-				var currentContentID = base.$el.find('a.organic-tabs-current').attr('href').substring(1);
+				var currentContentID = base.findAnchor(base.$nav.find('a.organic-tabs-current').attr('href'));
+				
+				// DEBUG
+				//if (window.console) window.console.log('current: ', currentContentID, ', new: ', newContentID);
 				
 				// Set content's outer wrapper height to (static) height of current inner content
 				base.$content.height( base.$content.height() );
 				
 				if ((newContentID != currentContentID) && (base.$el.find(':animated').length == 0))
 				{
-					// Fade out current list
-					$('#' + currentContentID).fadeOut(base.options.speed, function()
-					{
-						$(this).hide();
+					var newContentContainer = $('#' + newContentID);
 					
-						// Fade in new list on callback
-						$('#' + newContentID).fadeIn(base.options.speed);
+					if (newContentContainer.exists())
+					{
+						// Found new content container - show
+						// Fade out current list
+						$('#' + currentContentID).fadeOut(base.options.speed, function()
+						{
+							$(this).hide();
 						
-						// Adjust outer wrapper to fit new list snuggly
-						base.$content.animate({
-							'height'	: $('#' + newContentID).height()
+							// Fade in new list on callback
+							newContentContainer.fadeIn(base.options.speed);
+							
+							// Adjust outer wrapper to fit new list snuggly
+							base.$content.animate({
+								'height'	: $('#' + newContentID).height()
+							});
+							
+							// Remove highlighting - Add to just-clicked tab
+							base.$nav.find('li a').removeClass('organic-tabs-current');
+							newContent.addClass('organic-tabs-current');
 						});
 						
-						// Remove highlighting - Add to just-clicked tab
-						base.$nav.find('li a').removeClass('organic-tabs-current');
-						newContent.addClass('organic-tabs-current');
-					});
+						window.location.hash = newContentID;
+					}
+					else if (newContent.attr('href').substring(0, 1) != '#' && window.location.href.replace(new RegExp(window.location.hash), '') != newContent.attr('href'))
+					{
+						// Content container was not found - but URL differs from the current URL - forward browser to new URL with anchor so the tab can be auto displayed
+						//alert('Content container not found, but the URL differs from the current page. Redirecting you to the URL.');
+					
+						window.location = newContent.attr('href');
+					}
+					else
+					{
+						// Content container was not found - 
+						alert('Failed to find new content container with the ID: #' + newContentID);
+					}
 				}
 				
 				// Don't behave like a regular link
@@ -59,12 +82,19 @@
 			});
 			
 			// Content: Hide all tabs expect for the first tab
-			base.$content.find('ul').addClass('organic-tabs-hidden').eq(0).removeClass('organic-tabs-hidden');
+			base.$content.children().addClass('organic-tabs-hidden').eq(0).removeClass('organic-tabs-hidden');
+			
+			// Nav: Make first tab the default selected
+			base.$nav.find('li > a[href*="#"]').removeClass('organic-tabs-current').eq(0).addClass('organic-tabs-current');
 			
 			// Content: On load -> Check anchor -> Click anchor link to change tab to content
 			if (base.anchor)
 			{
-				$('a[href="#' + base.anchor + '"]').click();
+				// TODO: Fix - make seemless on load instead of animate
+				//base.$nav.find('.organic-tabs-current').removeClass('organic-tabs-current').end().find('a[href="#' + base.anchor + '"]').addClass('organic-tabs-current');
+				//base.$content.find('#' + base.anchor).removeClass('organic-tabs-hidden').siblings().addClass('#organic-tabs-hidden');
+				
+				$('a[href$="#' + base.anchor + '"]').click();
 			}		
 		};
 		
@@ -77,7 +107,7 @@
 		// Function: Selects a tab
 		base.activate = function(position)
 		{
-			base.$nav.find('li > a').eq(position).click();
+			base.$nav.find('li > a[href*="#"]').eq(position).click();
 		};
 		
 		// Function: Activates the next tab
@@ -101,6 +131,11 @@
 			
 			return prev;
 		};
+		
+		base.findAnchor = function(url)
+		{
+			return (url.substring(0, 1) == '#' ? url.substring(1) : url.split('#')[1]);
+		}
 		
 		// Add 'organicTabs' data to element - can be used to call organicTabs
 		// i.e. $('#tabs').data('organicTabs').next();
