@@ -4,10 +4,10 @@
 class GroupManager extends FOGManagerController
 {
 	// Table
-	protected $databaseTable = 'groups';
+	public $databaseTable = 'groups';
 	
 	// Search query
-	protected $searchQuery = 'SELECT * FROM groups WHERE groupName LIKE "%${keyword}%"';
+	public $searchQuery = 'SELECT * FROM groups WHERE groupName LIKE "%${keyword}%"';
 
 	// Custom methods
 	public function getGroupByName($name)
@@ -18,10 +18,9 @@ class GroupManager extends FOGManagerController
 		return $Group;
 	}
 	
-	function groupNameExists($name)
-	{
-		return ($this->getGroupByName($name)->get('id') == '' ? false : true);
-	}
+	
+	
+	
 	
 	// Legacy - remove when all updated
 	public function createGroup($name, $user)

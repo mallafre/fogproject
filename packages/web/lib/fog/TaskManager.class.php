@@ -4,10 +4,10 @@
 class TaskManager extends FOGManagerController
 {
 	// Table
-	protected $databaseTable = 'tasks';
+	public $databaseTable = 'tasks';
 	
 	// Search query
-	protected $searchQuery = 'SELECT * FROM tasks WHERE taskName LIKE "%${keyword}%"';
+	public $searchQuery = 'SELECT * FROM tasks WHERE taskName LIKE "%${keyword}%"';
 
 	// Legacy - remove when all updated
         function hasActiveTaskCheckedIn($taskid)

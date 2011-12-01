@@ -1,11 +1,11 @@
 <?php
 
-// Blackout - 12:38 PM 25/09/2011
-class UserManagementPage extends FOGPage
+// Blackout - 10:40 AM 1/12/2011
+class TemplateManagementPage extends FOGPage
 {
 	// Base variables
-	var $name = 'User Management';
-	var $node = 'users';
+	var $name = 'Template Management';
+	var $node = 'template';
 	var $id = 'id';
 	
 	// Menu Items
@@ -117,7 +117,7 @@ class UserManagementPage extends FOGPage
 			$UserManager = $this->FOGCore->getClass('UserManager');
 			
 			// Error checking
-			if ($UserManager->exists($_POST['name']))
+			if (count($UserManager->find(array('uName' => $_POST['name']))))
 			{
 				throw new Exception(_('Username already exists'));
 			}
@@ -206,7 +206,7 @@ class UserManagementPage extends FOGPage
 			$UserManager = $this->FOGCore->getClass('UserManager');
 			
 			// Error checking
-			if ($UserManager->exists($_POST['name'], $User->get('id')))
+			if ($UserCheck = $UserManager->find(array('uName' => $_POST['name'])) && is_array($UserCheck) && $UserCheck = end($UserCheck) && $UserCheck->get('id') != $User->get('id'))
 			{
 				throw new Exception(_('Username already exists'));
 			}
@@ -323,4 +323,4 @@ class UserManagementPage extends FOGPage
 }
 
 // Register page with FOGPageManager
-$FOGPageManager->add(new UserManagementPage());
+//$FOGPageManager->add(new UserManagementPage());

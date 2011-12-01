@@ -22,13 +22,18 @@
 class UserManager extends FOGManagerController
 {
 	// Table
-	protected $databaseTable = 'users';
+	public $databaseTable = 'users';
 	
 	// Search query
-	protected $searchQuery = 'SELECT * FROM users WHERE uName LIKE "%${keyword}%"';
+	public $searchQuery = 'SELECT * FROM users WHERE uName LIKE "%${keyword}%"';
+	
+	// Custom function
 	
 	
 	
+	
+	
+	// LEGACY
 	const ORDERBY_USERNAME = 1;
 	
 	function isPasswordValid($password, $passwordConfirm)
@@ -169,7 +174,7 @@ class UserManager extends FOGManagerController
 	{
 		if ( $this->db != null && $user != null && $user->get('id') >= 0 )
 		{
-			if ( ! $this->doesUserExist( $user->get('name'), $user->get('id') ) )
+			if ( ! $this->exists( $user->get('name'), $user->get('id') ) )
 			{
 				$sql = "UPDATE 
 						users 
@@ -192,7 +197,7 @@ class UserManager extends FOGManagerController
 	{
 		if ( $this->db != null && $user != null )
 		{
-			if ( ! $this->doesUserExist( $user->get('name') ) )
+			if ( ! $this->exists( $user->get('name') ) )
 			{
 				$sql = "INSERT INTO 
 						users( uName, uPass, uCreateDate, uCreateBy, uType ) 
@@ -204,24 +209,5 @@ class UserManager extends FOGManagerController
 		}
 		
 		return false;	
-	}
-	
-	public function doesUserExist($username, $exclude=-1)
-	{
-		if ( $this->db != null && $username != null )
-		{
-			$sql = "SELECT count(*) as cnt from users where uName = '" . $this->db->sanitize( $username ) . "' and uId <> $exclude";
-			
-			if ( $this->db->query($sql) )
-			{
-				while( $ar = $this->db->fetch()->get() )
-				{
-					if ( $ar["cnt"] > 0 )
-						return true;
-				}
-			}		
-		}
-		return false;
-		
 	}
 }

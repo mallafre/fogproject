@@ -101,7 +101,7 @@ else
 			{
 				throw new Exception('An image name is required!');
 			}
-			if ($core->getImageManager()->imageDefExists($conn, $_POST['name'], $_POST['imgid']))
+			if ($FOGCore->getClass('ImageManager')->exists($_POST['name'], $_POST['imgid']))
 			{
 				throw new Exception('An image already exists with this name!');
 			}
@@ -172,12 +172,12 @@ else
 				echo ( "<tr><td>"._("Image Name").":</td><td><input type=\"text\" name=\"name\" value=\"" . $image->get('name') . "\" /></td></tr>" );
 				echo ( "<tr><td>"._("Image Description").":</td><td><textarea name=\"description\" rows=\"10\" cols=\"40\">" . $image->get('description') . "</textarea></td></tr>" );
 				echo ( "<tr><td>"._("Operating System").":</td><td>" . $FOGCore->getClass('OSManager')->buildSelectBox($image->get('osID')) . "</td></tr>" );
-				echo ( "<tr><td>"._("Storage Group").":</td><td>" . getNFSGroupDropDown( $conn, "storagegroup", $image->get('storageGroupID')) . "</td></tr>" );				
+				echo ( "<tr><td>"._("Storage Group").":</td><td>" . $FOGCore->getClass('StorageGroupManager')->buildSelectBox($image->get('storageGroupID')) . "</td></tr>" );				
 				
 				$masterStorageNode = $image->getStorageGroup()->getMasterStorageNode();
 				
 				echo ( "<tr><td>"._("Image File").":</td><td>" . ($masterStorageNode ? $masterStorageNode->get('path') : '') . "<input type=\"text\" name=\"file\" value=\"" . $image->get('path') . "\" /></td></tr>" );
-				echo ( "<tr><td>"._("Image Type").":</td><td>" . getImageTypeDropDown( "imagetype", $image->get('type') ) . " <a href=\"javascript:popUpWindow('static/imagetypehelp.html');\"><img class=\"noBorder\" src=\"./images/help.png\" /></a></td></tr>" );
+				echo ( "<tr><td>"._("Image Type").":</td><td>" .  $FOGCore->getClass('ImageTypeManager')->buildSelectBox($image->get('type')) . " <a href=\"javascript:popUpWindow('static/imagetypehelp.html');\"><img class=\"noBorder\" src=\"./images/help.png\" /></a></td></tr>" );
 				echo ( "<tr><td colspan=2><center><br /><input type=\"hidden\" name=\"update\" value=\"1\" /><input type=\"hidden\" name=\"imgid\" value=\"" . $image->get('id') . "\" /><input type=\"submit\" value=\""._("Update")."\" /></center></td></tr>" );				
 			echo ( "</table>" );
 			echo ( "</form>" );

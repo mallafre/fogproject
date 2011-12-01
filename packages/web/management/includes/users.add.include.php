@@ -25,7 +25,7 @@ $uMan = $core->getUserManager();
 
 if ( $_POST["add"] != null )
 {
-	if ( ! $uMan->doesUserExist( $_POST["name"] ) )
+	if ( ! $FOGCore->getClass('UserManager')->exists( $_POST["name"] ) )
 	{
 		$name = $_POST["name"];
 		$password1 = $_POST["p1"];

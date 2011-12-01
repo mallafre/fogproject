@@ -4,5 +4,5 @@
 class SnapinManager extends FOGManagerController
 {
 	// Search query
-	protected $searchQuery = 'SELECT * FROM snapins WHERE sName LIKE "%${keyword}%" OR sFilePath LIKE "%${keyword}%"';
+	public $searchQuery = 'SELECT * FROM snapins WHERE sName LIKE "%${keyword}%" OR sFilePath LIKE "%${keyword}%"';
 }

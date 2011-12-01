@@ -652,7 +652,7 @@ if ( $currentUser != null && $currentUser->isLoggedIn() )
 				echo ( "<input type=\"hidden\" name=\"type\" value=\"" . $_GET["type"] . "\" />" );
 				echo ( "<input type=\"hidden\" name=\"direction\" value=\"" . $_GET["direction"] . "\" />" );
 				echo ( "<div class=\"confirm-message\">" );
-					echo ( "<p class=\"confirm-message\">"._("Which snapin would you like to deployed to the machines listed below?")."<br /><br />" . getSnapinDropDown( $conn ) . "<br /><br /></p>" );
+					echo ( "<p class=\"confirm-message\">"._("Which snapin would you like to deployed to the machines listed below?")."<br /><br />" . $FOGCore->getClass('SnapinManager')->buildSelectBox() . "<br /><br /></p>" );
 					echo ( "<div class=\"advanced-settings\">" );
 						echo ( "<h2>"._("Advanced Settings")."</h2>" );
 						echo ( "<input type=\"checkbox\" name=\"singlesched\" id=\"singlesched\"> "._("Schedule Single Task Execution?") );

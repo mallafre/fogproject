@@ -647,7 +647,7 @@ if ($currentUser != null && $currentUser->isLoggedIn())
 			echo ( "<div class=\"hostgroup\">" );
 				echo ( "<form method=\"POST\" action=\"?node=$node&sub=$sub&id=$id&tab=$tab\">" );
 				echo("<p>"._("Add new snapin package.")."</p>");
-				echo ( getSnapinDropDown( $conn ) );
+				echo $FOGCore->getClass('SnapinManager')->buildSelectBox();
 				echo( "<p><input type=\"submit\" value=\""._("Add Snapin")."\" /></p>" );
 				echo ( "</form>" );
 			echo ( "</div>" );

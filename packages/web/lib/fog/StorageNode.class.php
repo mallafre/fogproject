@@ -4,10 +4,10 @@
 class StorageNode extends FOGController
 {
 	// Table
-	protected $databaseTable = 'nfsGroupMembers';
+	public $databaseTable = 'nfsGroupMembers';
 	
 	// Name -> Database field name
-	protected $databaseFields = array(
+	public $databaseFields = array(
 		'id'		=> 'ngmID',
 		'name'		=> 'ngmMemberName',
 		'description'	=> 'ngmMemberDescription',
@@ -26,7 +26,7 @@ class StorageNode extends FOGController
 	);
 	
 	// Allow setting / getting of these additional fields
-	protected $additionalFields = array(
+	public $additionalFields = array(
 		
 	);
 	

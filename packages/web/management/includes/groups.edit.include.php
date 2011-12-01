@@ -28,7 +28,7 @@ if ( $groupid != null && is_numeric( $groupid ) )
 	
 	if ( $_POST["update"] == "1" )
 	{
-		if (!$core->getGroupManager()->groupNameExists($_POST["name"]))
+		if (!$FOGCore->getClass('GroupManager')->exists($_POST["name"]))
 		{
 			// Set Gruop data -> Save new data
 			$group	->set('name',		$_POST['name'])
@@ -417,7 +417,7 @@ if ( $groupid != null && is_numeric( $groupid ) )
 				echo( "<select name=\"image\" size=\"1\">" );
 				echo ( "<option value=\"\">"._("Do Nothing")."</option>" );
 				//while( $ar1 = mysql_fetch_array( $res ) )
-				foreach ($core->getImageManager()->getAllImages() AS $image)
+				foreach ($FOGCore->getClass('ImageManager')->find() AS $image)
 				{
 					//echo ( "<option value=\"" . $ar1["imageID"] . "\" >" . $ar1["imageName"] . "</option>" );
 					printf('<option value="%s">%s</option>', $image->get('id'), $image->get('name'));
@@ -527,7 +527,7 @@ if ( $groupid != null && is_numeric( $groupid ) )
 			<?php
 			echo ( "<div class=\"hostgroup\">" );
 				echo ( "<form method=\"POST\" action=\"?node=" . $node . "&sub=" . $sub . "&groupid=" . $groupid . "&tab=$tab\">" );
-				echo ( getSnapinDropDown( $conn ) );
+				echo ( $FOGCore->getClass('SnapinManager')->buildSelectBox() );
 				echo( "<p><input type=\"hidden\" name=\"gsnapinadd\" value=\"1\" /><input type=\"submit\" value=\""._("Add Snapin")."\" /></p>" );
 				echo ( "</form>" );
 			echo ( "</div>" );
@@ -540,7 +540,7 @@ if ( $groupid != null && is_numeric( $groupid ) )
 			<?php
 			echo ( "<div class=\"hostgroup\">" );
 				echo ( "<form method=\"POST\" action=\"?node=" . $node . "&sub=" . $sub . "&groupid=" . $groupid . "&tab=$tab\">" );
-				echo ( getSnapinDropDown( $conn ) );
+				echo ( $FOGCore->getClass('SnapinManager')->buildSelectBox() );
 				echo( "<p><input type=\"hidden\" name=\"gsnapindel\" value=\"1\" /><input type=\"submit\" value=\""._("Remove Snapin")."\" /></p>" );
 				echo ( "</form>" );
 			echo ( "</div>" );

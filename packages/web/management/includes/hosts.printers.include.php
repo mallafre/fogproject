@@ -123,7 +123,7 @@ if ( $currentUser != null && $currentUser->isLoggedIn() )
 			
 			echo ( "<div class=\"hostgroup\">" );
 				echo("<p>Add new printer.</p>");
-				echo ( getPrinterDropDown( $conn, "prnt" ) );
+				print $this->FOGCore->getClass('PrinterManager')->buildSelectBox('', 'prnt');
 				//echo ( "<br /><br />" ); // Blackout - stop using block elements to create space!!
 			echo ( "</div>" );
 			

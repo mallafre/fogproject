@@ -4,10 +4,10 @@
 class Snapin extends FOGController
 {
 	// Table
-	protected $databaseTable = 'snapins';
+	public $databaseTable = 'snapins';
 	
 	// Name -> Database field name
-	protected $databaseFields = array(
+	public $databaseFields = array(
 		'id'		=> 'sID',
 		'name'		=> 'sName',
 		'description'	=> 'sDesc',

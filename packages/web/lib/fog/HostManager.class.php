@@ -22,10 +22,10 @@
 class HostManager extends FOGManagerController
 {
 	// Table
-	protected $databaseTable = 'hosts';
+	public $databaseTable = 'hosts';
 	
 	// Search query
-	protected $searchQuery = 'SELECT 
+	public $searchQuery = 'SELECT 
 					hosts.* 
 				FROM
 					hosts 

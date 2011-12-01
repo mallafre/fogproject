@@ -59,6 +59,7 @@ $installPath[23] = array( 186, 187, 188, 189 );
 $installPath[24] = array( 190, 191, 192, 193, 194 );
 $installPath[25] = array( 195, 196, 197, 198 );
 $installPath[26] = array( 199, 200, 201, 202, 203, 204, 205, 206, 207, 208, 209, 210, 211, 212, 213 );
+$installPath[27] = array( 214, 215, 216 );
 
 $dbschema[0] = "CREATE DATABASE " . MYSQL_DATABASE ;
 
@@ -1036,6 +1037,33 @@ $dbschema[210] = "ALTER TABLE `" . MYSQL_DATABASE . "`.`users` CHANGE `uCreateDa
 $dbschema[211] = "ALTER TABLE `" . MYSQL_DATABASE . "`.`userTracking` CHANGE `utDateTime` `utDateTime` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP";
 $dbschema[212] = "ALTER TABLE `" . MYSQL_DATABASE . "`.`virus` CHANGE `vDateTime` `vDateTime` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP";
 $dbschema[213] = "UPDATE `" . MYSQL_DATABASE . "`.`schemaVersion` set vValue = '27'";
+
+// 28 - Blackout - 1:48 PM 1/12/2011
+// Add 'imageTypes' table and data
+$dbschema[214] = "CREATE TABLE IF NOT EXISTS `imageTypes` (
+  `imageTypeID` mediumint(9) NOT NULL auto_increment,
+  `imageTypeName` varchar(100) NOT NULL,
+  PRIMARY KEY  (`imageTypeID`)
+) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=5 ;";
+$dbschema[215] = "INSERT INTO `imageTypes` (`imageTypeID`, `imageTypeName`) VALUES
+(1, 'Single Partition (NTFS Only, Resizable)'),
+(2, 'Multiple Partition Image - Single Disk (Not Resizable)'),
+(3, 'Multiple Partition Image - All Disks  (Not Resizable)'),
+(4, 'Raw Image (Sector By Sector, DD, Slow)');";
+$dbschema[216] = "UPDATE `" . MYSQL_DATABASE . "`.`schemaVersion` set vValue = '28'";
+
+
+
+
+// Blackout - 1:52 PM 1/12/2011
+// TODO: Search 'hosts' -> compare with 'images.osID' -> update 'osID' in 'hosts'
+// TODO: Search 'images' -> Get image type -> +1 to image type value
+/*
+	const IMAGE_TYPE_SINGLE_PARTITION_NTFS = 0;
+	const IMAGE_TYPE_DD = 1;
+	const IMAGE_TYPE_MULTIPARTITION_SINGLE_DISK = 2;
+	const IMAGE_TYPE_MULTIPARTITION_MULTIDISK = 3;
+*/
 
 
 

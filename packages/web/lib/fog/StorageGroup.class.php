@@ -4,17 +4,17 @@
 class StorageGroup extends FOGController
 {
 	// Table
-	protected $databaseTable = 'nfsGroups';
+	public $databaseTable = 'nfsGroups';
 	
 	// Name -> Database field name
-	protected $databaseFields = array(
+	public $databaseFields = array(
 		'id'		=> 'ngID',
 		'name'		=> 'ngName',
 		'description'	=> 'ngDesc'
 	);
 	
 	// Allow setting / getting of these additional fields
-	protected $additionalFields = array(
+	public $additionalFields = array(
 		'storageNodes'
 	);
 	

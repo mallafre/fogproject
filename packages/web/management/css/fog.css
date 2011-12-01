@@ -124,13 +124,13 @@ pre { white-space: pre-wrap; }
 .code { font-family: monospace; font-size: 13px; line-height: 16px; }
 
 /* LOADER */
-#loader-wrapper { z-index: 10; position: absolute; width: 233px; top: 40px; left: 50%; padding: 5px; min-height: 50px; }
+#loader-wrapper { z-index: 10; position: absolute; min-width: 233px; max-width: 300px; top: 40px; left: 50%; padding: 5px; min-height: 50px; }
 #loader-wrapper * { cursor: default; }
 #loader { display: none; border: 1px solid #bbb; background: #fff; min-height: 28px; }
 #loader.loading {  background: #fff url('../images/loader.gif') 5px center no-repeat; padding-left: 25px; }
 #loader.error { background: #fff url('../images/loader-error.png') 5px center no-repeat; padding-left: 25px;  }
 #loader.info { background: #fff url('../images/loader-information.png') 5px center no-repeat; padding-left: 25px; }
-#loader p { text-align: center; line-height: 15px; margin: 6px 0; }
+#loader p { text-align: center; line-height: 15px; margin: 6px 10px; }
 #progress { text-align: center; margin-bottom: 5px; }
 
 .alt1 { background: transparent; }

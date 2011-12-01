@@ -44,7 +44,6 @@ if ($currentUser != null && $currentUser->isLoggedIn())
 									_('Remove Snap-ins')	=> "$_SERVER[PHP_SELF]?node=$node&sub=edit&groupid=$groupid#group-snap-delete",
 									_('Service Settings')	=> "$_SERVER[PHP_SELF]?node=$node&sub=edit&groupid=$groupid#group-service",
 									_('Active Directory')	=> "$_SERVER[PHP_SELF]?node=$node&sub=edit&groupid=$groupid#group-active-directory",
-									//_('Printers')		=> "$_SERVER[PHP_SELF]?node=$node&sub=printers&groupid=$groupid",
 									_('Printers')		=> "$_SERVER[PHP_SELF]?node=$node&sub=edit&groupid=$groupid#group-printers",
 									_('Delete')		=> "delete",
 							), 'groupid', 'Group Menu');
@@ -146,9 +145,18 @@ if ($currentUser != null && $currentUser->isLoggedIn())
 		if ($imageid)
 		{
 			// Image Management: Edit
-			$FOGSubMenu->addItems('images', array(	_('General')		=> "",
-								_('Delete')		=> "delete",
-						), 'imageid', 'Image Menu');
+			if (preg_match('#pagetest#', $_SERVER['PHP_SELF']))
+			{
+				$FOGSubMenu->addItems('images', array(	_('General')		=> "$_SERVER[PHP_SELF]?node=$node&sub=list&imageid=$imageid",
+									_('Delete')		=> "$_SERVER[PHP_SELF]?node=$node&sub=delete&imageid=$imageid",
+							), 'imageid', 'Image Menu');
+			}
+			else
+			{
+				$FOGSubMenu->addItems('images', array(	_('General')		=> "list",
+									_('Delete')		=> "delete",
+							), 'imageid', 'Image Menu');
+			}
 						
 			// Image Management: Notes
 			$FOGSubMenu->addNotes('images',  create_function('', '	$allImages = mysql_query("select * from images where imageID = \'' . $imageid . '\'");

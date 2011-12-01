@@ -4,10 +4,10 @@
 abstract class FOGManagerController
 {
 	// Table
-	protected $databaseTable = '';
+	public $databaseTable = '';
 	
 	// Search query
-	protected $searchQuery = '';
+	public $searchQuery = '';
 	
 	// DEBUG mode - print all Errors & SQL queries
 	protected $debug = true;	
@@ -18,8 +18,10 @@ abstract class FOGManagerController
 	// FOG Core Class
 	protected $FOGCore;
 	
-	// Child class name
+	// Child class name variables
 	protected $childClass;
+	protected $classVariables;
+	protected $databaseFields;
 	
 	// Construct
 	public function __construct()
@@ -30,6 +32,13 @@ abstract class FOGManagerController
 	
 		// Set child classes name
 		$this->childClass = preg_replace('#Manager$#', '', get_class($this));
+		
+		// Get child class variables
+		$this->classVariables = get_class_vars($this->childClass);
+		
+		// Set required child variable data
+		$this->databaseFields = $this->classVariables['databaseFields'];
+		$this->databaseTable = $this->classVariables['databaseTable'];
 	}
 	
 	// Search
@@ -127,6 +136,23 @@ abstract class FOGManagerController
 		}
 		
 		return (isset($listArray) ? sprintf('<select name="%s"><option value="">- %s -</option>%s</select>', $elementName, _('Please select an option'), implode("\n", $listArray)) : false);
+	}
+	
+	// TODO: Read DB fields from child class
+	function exists($name, $id = 0)
+	{
+		$this->db->query("SELECT COUNT(%s) AS total FROM `%s` WHERE `%s` = '%s' AND `%s` <> '%s'", 
+			array(	
+				$this->databaseFields['id'],
+				$this->databaseTable,
+				$this->databaseFields['name'],
+				$name,
+				$this->databaseFields['id'],
+				$id
+			)
+		);
+		
+		return ($this->db->fetch()->get('total') ? true : false);
 	}
 	
 	// Error

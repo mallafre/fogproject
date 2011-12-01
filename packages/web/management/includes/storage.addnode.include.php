@@ -109,7 +109,7 @@ echo ( "<center>" );
 			echo ( "<tr><td>"._("IP Address").":</td><td><input class=\"smaller\" type=\"text\" name=\"ip\" value=\"" . $ar["ngmHostname"] . "\" /></td></tr>" );				
 			echo ( "<tr><td>"._("Max Clients").":</td><td><input class=\"smaller\" type=\"text\" name=\"clients\" value=\"" . $ar["ngmMaxClients"] . "\" /></td></tr>" );				
 			echo ( "<tr><td>"._("Is Master Node").":</td><td><input type=\"checkbox\" name=\"ismaster\" $checked />&nbsp;&nbsp;<span class=\"icon icon-help hand\" title=\"" . _("Use extreme caution with this setting!  This setting, if used incorrectly could potentially wipe out all of your images stored on all current storage nodes.  The 'Is Master Node' setting defines which node is the distributor of the images.  If you add a blank node, meaning a node that has no images on it, and set it to master, it will distribute its store, which is empty, to all hosts in the group.") . "\"></span></td></tr>" );	
-			echo ( "<tr><td>"._("Storage Group").":</td><td>" . getNFSGroupDropDown( $conn ) . "</td></tr>" );
+			echo ( "<tr><td>"._("Storage Group").":</td><td>" . $FOGCore->getClass('StorageGroupManager')->buildSelectBox() . "</td></tr>" );
 			echo ( "<tr><td>"._("Image Location").":</td><td><input class=\"smaller\" type=\"text\" name=\"imageloc\" value=\"" . $ar["ngmRootPath"] . "\" /></td></tr>" );														
 			echo ( "<tr><td>"._("Is Enabled").":</td><td><input type=\"checkbox\" name=\"isenabled\" checked=\"checked\" /></td></tr>" );					
 			echo ( "<tr><td>"._("Management Username").":</td><td><input class=\"smaller\" type=\"text\" name=\"username\" value=\"" . $ar["ngmUser"] . "\" /></td></tr>" );				

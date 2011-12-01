@@ -4,5 +4,5 @@
 class OSManager extends FOGManagerController
 {
 	// Table
-	protected $databaseTable = 'os';
+	public $databaseTable = 'os';
 }

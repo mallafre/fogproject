@@ -4,28 +4,28 @@
 abstract class FOGController
 {
 	// Table
-	protected $databaseTable = '';
+	public $databaseTable = '';
 	
 	// Name -> Database field name
-	protected $databaseFields = array();
+	public $databaseFields = array();
 	
 	// Do not update these database fields
-	protected $databaseFieldsToIgnore = array(
+	public $databaseFieldsToIgnore = array(
 		'createdBy',
 		'createdTime'
 	);
 	
 	// Allow setting / getting of these additional fields
-	protected $additionalFields = array();
+	public $additionalFields = array();
 	
 	// Required database fields
-	protected $databaseFieldsRequired = array();
+	public $databaseFieldsRequired = array();
 	
 	// Store data array
 	protected $data = array();
 	
 	// Auto save class data on __destruct
-	protected $autoSave = false;
+	public $autoSave = false;
 	
 	// DEBUG mode - print all Errors & SQL queries
 	protected $debug = true;	

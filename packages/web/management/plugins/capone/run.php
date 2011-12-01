@@ -101,8 +101,8 @@ if ( $plugin->isInstalled() )
 	echo ( "<form action=\"?node=" . $_GET["node"] . "&run=" . $_GET["run"] . "\" method=\"post\">" );
 		echo ( "<input type=\"hidden\" name=\"addass\" value=\"1\" />" );
 		echo ( "<table width=\"300\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\">" );
-		echo ( "<tr><td>Image Definition: </td><td>" . getImageDropDown( $conn, "image" ) . "</td></tr>" );
-		echo ( "<tr><td>Operating System: </td><td>" . getOSDropDown( $conn, "os" ) . "</td></tr>" );	
+		echo ( "<tr><td>Image Definition: </td><td>" . $FOGCore->getClass('ImageManager')->buildSelectBox() . "</td></tr>" );
+		echo ( "<tr><td>Operating System: </td><td>" . $FOGCore->getClass('OSManager')->buildSelectBox() . "</td></tr>" );	
 		echo ( "<tr><td>DMI Result: </td><td><input type=\"text\" name=\"key\" /></td></tr>" );	
 		echo ( "<tr><td colspan=\"2\"><center><input type=\"submit\" style=\"margin-top: 7px;\" value=\"Add Association\" /></center></td></tr>" );			
 		echo ( "</table>" );	

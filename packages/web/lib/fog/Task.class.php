@@ -4,10 +4,10 @@
 class Task extends FOGController
 {
 	// Table
-	protected $databaseTable = 'tasks';
+	public $databaseTable = 'tasks';
 	
 	// Name -> Database field name
-	protected $databaseFields = array(
+	public $databaseFields = array(
 		'id'			=> 'taskID',
 		'name'			=> 'taskName',
 		'checkInTime'		=> 'taskCheckIn',
@@ -32,7 +32,7 @@ class Task extends FOGController
 	);
 	
 	// Required database fields
-	protected $databaseFieldsRequired = array(
+	public $databaseFieldsRequired = array(
 		'id',
 		'type',
 		'hostID',

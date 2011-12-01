@@ -134,21 +134,26 @@ abstract class FOGPage
 				// HTML output
 				if ($this->searchFormURL)
 				{
-					$result = sprintf('<input id="%s-search" type="text" value="%s" class="search-input" />', (substr($this->node, -1) == 's' ? substr($this->node, 0, -1) : $this->node), _('Search'));
+					$result = sprintf('<h2>%s</h2>%s<input id="%s-search" type="text" value="%s" class="search-input" />',
+						_('Search'),
+						"\n\t\t\t",
+						(substr($this->node, -1) == 's' ? substr($this->node, 0, -1) : $this->node),
+						_('Search')
+					);
 				}
 			
 				// Table -> Header Row
 				$result .= sprintf('%s<table width="%s" cellpadding="0" cellspacing="0" border="0"%s>%s<thead>%s<tr class="header">%s</tr>%s<thead>%s<tbody>%s',
-					"\n\n",
+					"\n\n\t\t\t",
 					'100%',
 					($this->searchFormURL ? ' id="search-content"' : ''),
-					"\n\t",
-					"\n\t\t",
+					"\n\t\t\t\t",
+					"\n\t\t\t\t\t",
 					$this->buildHeaderRow(),
-					"\n\t",
-					"\n\t",
-					"\n\t\t",
-					"\n"
+					"\n\t\t\t\t",
+					"\n\t\t\t\t",
+					"\n\t\t\t\t\t",
+					"\n\t\t\t"
 				);
 			
 				// Rows
@@ -162,7 +167,7 @@ abstract class FOGPage
 							$rowData['id'],
 							(++$i % 2 ? 'alt1' : 'alt2'),
 							$this->buildRow($rowData),
-							"\n"
+							"\n\t\t\t\t\t"
 						);
 					}
 					
@@ -182,7 +187,7 @@ abstract class FOGPage
 				}
 				
 				// Table close
-				$result .= sprintf('%s</tbody>%s</table>%s', "\n\t", "\n", "\n\n");
+				$result .= sprintf('%s</tbody>%s</table>%s', "\n\t\t\t\t", "\n\t\t\t", "\n\n\t\t\t");
 			}
 		
 			// Return output
@@ -217,7 +222,7 @@ abstract class FOGPage
 		}
 		
 		// Return result
-		return "\n\t\t\t" . implode("\n\t\t\t", $result) . "\n\t\t";
+		return "\n\t\t\t\t\t\t" . implode("\n\t\t\t\t\t\t", $result) . "\n\t\t\t\t\t";
 	}
 	
 	public function buildRow($data)
@@ -274,6 +279,6 @@ abstract class FOGPage
 		}
 		
 		// Return result
-		return "\n\t\t\t" . implode("\n\t\t\t", $result) . "\n\t\t";
+		return "\n\t\t\t\t\t\t" . implode("\n\t\t\t\t\t\t", $result) . "\n\t\t\t\t\t";
 	}
 }

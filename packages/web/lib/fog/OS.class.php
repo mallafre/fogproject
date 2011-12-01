@@ -4,10 +4,10 @@
 class OS extends FOGController
 {
 	// Table
-	protected $databaseTable = 'os';
+	public $databaseTable = 'os';
 	
 	// Name -> Database field name
-	protected $databaseFields = array(
+	public $databaseFields = array(
 		'id'		=> 'osID',
 		'name'		=> 'osName',
 		'description'	=> 'osDescription'

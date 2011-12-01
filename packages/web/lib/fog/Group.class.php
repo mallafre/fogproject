@@ -4,10 +4,10 @@
 class Group extends FOGController
 {
 	// Table
-	protected $databaseTable = 'groups';
+	public $databaseTable = 'groups';
 	
 	// Name -> Database field name
-	protected $databaseFields = array(
+	public $databaseFields = array(
 		'id'		=> 'groupID',
 		'name'		=> 'groupName',
 		'description'	=> 'groupDesc',
@@ -20,7 +20,7 @@ class Group extends FOGController
 	);
 	
 	// Allow setting / getting of these additional fields
-	protected $additionalFields = array(
+	public $additionalFields = array(
 		'hosts'
 	);
 	

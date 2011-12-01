@@ -10,10 +10,10 @@ class Image extends FOGController
 	const IMAGE_TYPE_MULTIPARTITION_MULTIDISK = 3;
 	
 	// Table
-	protected $databaseTable = 'images';
+	public $databaseTable = 'images';
 	
 	// Name -> Database field name
-	protected $databaseFields = array(
+	public $databaseFields = array(
 		'id'		=> 'imageID',
 		'name'		=> 'imageName',
 		'description'	=> 'imageDesc',

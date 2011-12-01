@@ -65,7 +65,7 @@ if ($userid != null && is_numeric($userid))
 		{
 			$uId = $_POST["update"];
 			$name = $_POST["name"];
-			if ( ! $uMan->doesUserExist( $name, $uId ) )
+			if ( ! $FOGCore->getClass('UserManager')->exists( $name, $uId ) )
 			{
 				$user->set('name', $name);
 				$blGo = true;

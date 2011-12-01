@@ -4,10 +4,10 @@
 class Printer extends FOGController
 {
 	// Table
-	protected $databaseTable = 'printers';
+	public $databaseTable = 'printers';
 	
 	// Name -> Database field name
-	protected $databaseFields = array(
+	public $databaseFields = array(
 		'id'		=> 'pID',
 		'name'		=> 'pAlias',
 		'port'		=> 'pPort',
@@ -22,12 +22,12 @@ class Printer extends FOGController
 	);
 	
 	// Allow setting / getting of these additional fields
-	protected $additionalFields = array(
+	public $additionalFields = array(
 		'default'
 	);
 	
 	// Required database fields
-	protected $databaseFieldsRequired = array(
+	public $databaseFieldsRequired = array(
 		'id',
 		'name',
 		'ip',

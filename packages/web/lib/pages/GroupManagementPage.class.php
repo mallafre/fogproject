@@ -127,7 +127,7 @@ class GroupManagementPage extends FOGPage
 			{
 				throw new Exception('Group Name is required');
 			}
-			if ($this->FOGCore->getClass('GroupManager')->groupNameExists($_POST['name']))
+			if ($this->FOGCore->getClass('GroupManager')->exists($_POST['name']))
 			{
 				throw new Exception('Group Name already exists');
 			}
@@ -226,13 +226,13 @@ class GroupManagementPage extends FOGPage
 					if ( $_GET["delhostid"] != null && is_numeric( $_GET["delhostid"] ) )
 					{
 						$sql = "delete from groupMembers where gmGroupID = '" . mysql_real_escape_string( $groupid ) . "' and gmHostID = '" . mysql_real_escape_string( $_GET["delhostid"] ) . "'";
-						if ( !mysql_query( $sql, $conn ) )
+						if ( !mysql_query( $sql, $GLOBALS['conn'] ) )
 							msgBox( _("Failed to remove host from group!") );
 
 					}
 
 
-					$members = getImageMembersByGroupID( $conn, $Group->get('id') );
+					$members = getImageMembersByGroupID( $GLOBALS['conn'], $Group->get('id') );
 					if ( $members != null )
 					{
 						for( $i = 0; $i < count( $members ); $i++ )
@@ -284,7 +284,7 @@ class GroupManagementPage extends FOGPage
 					<h2><?php print _("Add Snapin to all hosts in ") . $Group->get('name'); ?></h2>
 					<form method="POST" action="?node=" . $node . "&sub=" . $sub . "&groupid=" . $groupid . "&tab=$tab">
 					<?php
-					print getSnapinDropDown( $GLOBALS['conn'] );
+					print $this->FOGCore->getClass('SnapinManager')->buildSelectBox();
 					?>
 					<p><input type="hidden" name="gsnapinadd" value="1" /><input type="submit" value="<?php print _("Add Snapin"); ?>" /></p>
 					</form>
@@ -295,7 +295,7 @@ class GroupManagementPage extends FOGPage
 					<h2><?php print _("Remove Snapin to all hosts in ") . $Group->get('name'); ?></h2>
 					<form method="POST" action="?node=" . $node . "&sub=" . $sub . "&groupid=" . $groupid . "&tab=$tab">
 					<?php
-					print getSnapinDropDown( $GLOBALS['conn'] );
+					print $this->FOGCore->getClass('SnapinManager')->buildSelectBox();
 					?>
 					<p><input type="hidden" name="gsnapindel" value="1" /><input type="submit" value="<?php print _("Remove Snapin"); ?>" /></p>
 					</form>
@@ -390,7 +390,7 @@ class GroupManagementPage extends FOGPage
 					<div class="hostgroup">
 						<h2><?php print _("Add new printer to all hosts in this group."); ?></h2>
 						<?php
-						print getPrinterDropDown( $conn, "prntadd" );
+						print $this->FOGCore->getClass('PrinterManager')->buildSelectBox('', "prntadd");
 						?>
 						<br /><br />
 					</div>
@@ -398,7 +398,7 @@ class GroupManagementPage extends FOGPage
 					<div class="hostgroup">
 						<h2><?php print _("Remove printer from all hosts in this group."); ?></h2>
 						<?php
-						print getPrinterDropDown( $conn, "prntdel" );
+						print $this->FOGCore->getClass('PrinterManager')->buildSelectBox('', "prntdel");
 						?>
 						<br /><br />
 					</div>

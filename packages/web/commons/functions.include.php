@@ -663,102 +663,6 @@ function doAllMembersHaveSameImage( $members )
 	}
 	return false;
 }
- 
-function getImageTypeDropDown( $name="imagetype", $selected=null )
-{
-
-	$buffer = "<select name=\"$name\" size=\"1\">\n";
-	$buffer .= "<option value=\"\" label=\"Select One\">"._("Select One")."</option>\n";
-		$tmpType = _("Single Partition (NTFS Only, Resizable)");
-		$sel = "";
-		if ( $selected == Image::IMAGE_TYPE_SINGLE_PARTITION_NTFS && $selected !== null && $selected != "")
-			$sel = "selected=\"selected\"";
-		$buffer .= "<option value=\"" . Image::IMAGE_TYPE_SINGLE_PARTITION_NTFS . "\" label=\"$tmpType\" $sel>" . $tmpType . "</option>\n";		
-		
-		$tmpType = _("Multiple Partition Image - Single Disk (Not Resizable)");
-		$sel = "";
-		if ( $selected == Image::IMAGE_TYPE_MULTIPARTITION_SINGLE_DISK )
-			$sel = "selected=\"selected\"";
-		$buffer .= "<option value=\"" . Image::IMAGE_TYPE_MULTIPARTITION_SINGLE_DISK . "\" label=\"$tmpType\" $sel>" . $tmpType . "</option>\n";
-
-		$tmpType = _("Multiple Partition Image - All Disks  (Not Resizable)");
-		$sel = "";
-		if ( $selected == Image::IMAGE_TYPE_MULTIPARTITION_MULTIDISK )
-			$sel = "selected=\"selected\"";
-		$buffer .= "<option value=\"" . Image::IMAGE_TYPE_MULTIPARTITION_MULTIDISK . "\" label=\"$tmpType\" $sel>" . $tmpType . "</option>\n";
-		
-		$tmpType = _("Raw Image (Sector By Sector, DD, Slow)");
-		$sel = "";
-		if ( $selected == Image::IMAGE_TYPE_DD )
-			$sel = "selected=\"selected\"";
-		$buffer .= "<option value=\"" . Image::IMAGE_TYPE_DD . "\" label=\"$tmpType\" $sel>" . $tmpType . "</option>\n";					
-	$buffer .= "</select>\n";
-	return $buffer;
-
-}
- 
-function getOSDropDown( $conn, $name="os", $selected=null )
-{
-	if ( $conn != null )
-	{
-		$sql = "select * from supportedOS order by osValue";
-		$res = mysql_query( $sql, $conn ) or criticalError( mysql_error(), _("FOG :: Database error!") );
-		$buffer = "<select name=\"$name\" size=\"1\">\n";
-		$buffer .= "<option value=\"\" label=\"Select One\">"._("Select One")."</option>\n";
-		while( $ar = mysql_fetch_array( $res ) )
-		{
-			$sel = "";
-			if ( $selected == $ar["osValue"] )
-				$sel = "selected=\"selected\"";
-			$buffer .= "<option value=\"" . $ar["osValue"] . "\" label=\"" . $ar["osName"] . " (" . $ar["osValue"] . ")\" $sel>" . $ar["osName"] . " (" . $ar["osValue"] . ")</option>\n";
-		}
-		$buffer .= "</select>\n";
-		return $buffer;
-	}
-	return null;
-}
-
-function getImageDropDown( $conn, $name="image", $selected=null )
-{
-	if ( $conn != null )
-	{
-		$sql = "select * from images order by imageName";
-		$res = mysql_query( $sql, $conn ) or criticalError( mysql_error(), _("FOG :: Database error!") );
-		$buffer = "<select name=\"$name\" size=\"1\">\n";
-		$buffer .= "<option value=\"\" label=\"Select One\">"._("Select One")."</option>\n";
-		while( $ar = mysql_fetch_array( $res ) )
-		{
-			$sel = "";
-			if ( $selected == $ar["imageID"] )
-				$sel = "selected=\"selected\"";
-			$buffer .= "<option value=\"" . $ar["imageID"] . "\" label=\"" . $ar["imageName"] . " (" . $ar["imageID"] . ") \" $sel>" . $ar["imageName"] . " (" . $ar["imageID"] . ")</option>\n";
-		}
-		$buffer .= "</select>\n";
-		return $buffer;
-	}
-	return null;
-}
-
-function getSnapinDropDown( $conn, $name="snap", $selected=null )
-{
-	if ( $conn != null )
-	{
-		$sql = "select * from snapins order by sName";
-		$res = mysql_query( $sql, $conn ) or criticalError( mysql_error(), _("FOG :: Database error!") );
-		$buffer = "<select name=\"$name\" size=\"1\">\n";
-		$buffer .= "<option value=\"\" label=\"Select One\">"._("Select One")."</option>\n";
-		while( $ar = mysql_fetch_array( $res ) )
-		{
-			$sel = "";
-			if ( $selected == $ar["sName"] )
-				$sel = "selected=\"selected\"";
-			$buffer .= "<option value=\"" . $ar["sID"] . "\" label=\"" . $ar["sName"] . "\" $sel>" . $ar["sName"] . "</option>\n";
-		}
-		$buffer .= "</select>\n";
-		return $buffer;
-	}
-	return null;
-}
 
 function addPrinter( $conn, $hostId, $printerId )
 {
@@ -846,27 +750,6 @@ function setDefaultPrinter( $conn, $printerAssocId )
 		}
 	}
 	return false;
-}
-
-function getPrinterDropDown( $conn, $name="printer", $selected=null )
-{
-	if ( $conn != null )
-	{
-		$sql = "select * from printers order by pAlias";
-		$res = mysql_query( $sql, $conn ) or criticalError( mysql_error(), _("FOG :: Database error!") );
-		$buffer = "<select name=\"$name\" size=\"1\">\n";
-		$buffer .= "<option value=\"\" label=\"Select One\">"._("Select One")."</option>\n";
-		while( $ar = mysql_fetch_array( $res ) )
-		{
-			$sel = "";
-			if ( $selected == $ar["pID"] )
-				$sel = "selected=\"selected\"";
-			$buffer .= "<option value=\"" . $ar["pID"] . "\" label=\"" . $ar["pAlias"] . "\" $sel>" . $ar["pAlias"] . "</option>\n";
-		}
-		$buffer .= "</select>\n";
-		return $buffer;
-	}
-	return null;
 }
 
 function isHostAssociatedWithSnapin( $conn, $hostid, $snapinid )
@@ -3136,27 +3019,6 @@ function doesStorageNodeExist( $conn, $name, $id=-1 )
 	}
 	// play it safe
 	return true;
-}
-
-function getNFSGroupDropDown( $conn, $name="storagegroup", $selected=null )
-{
-	if ( $conn != null )
-	{
-		$sql = "select * from nfsGroups order by ngName";
-		$res = mysql_query( $sql, $conn ) or criticalError( mysql_error(), _("FOG :: Database error!") );
-		$buffer = "<select name=\"$name\" size=\"1\">\n";
-		$buffer .= "<option value=\"\" label=\"Select One\">"._("Select One")."</option>\n";
-		while( $ar = mysql_fetch_array( $res ) )
-		{
-			$sel = "";
-			if ( $selected == $ar["ngID"] )
-				$sel = "selected=\"selected\"";
-			$buffer .= "<option value=\"" . $ar["ngID"] . "\" label=\"" . $ar["ngName"] . "\" $sel>" . $ar["ngName"] . "</option>\n";
-		}
-		$buffer .= "</select>\n";
-		return $buffer;
-	}
-	return null;
 }
 
 function getStorageRootByGroupID( $conn, $groupid )

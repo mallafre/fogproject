@@ -8,10 +8,10 @@ class User extends FOGController
 	public $regenerateSessionTimeout = 0.5;		// In hours
 
 	// Table
-	protected $databaseTable = 'users';
+	public $databaseTable = 'users';
 	
 	// Name -> Database field name
-	protected $databaseFields = array(
+	public $databaseFields = array(
 		'id'		=> 'uId',
 		'name'		=> 'uName',
 		'password'	=> 'uPass',
@@ -21,7 +21,7 @@ class User extends FOGController
 	);
 	
 	// Allow setting / getting of these additional fields
-	protected $additionalFields = array(
+	public $additionalFields = array(
 		'authIP',
 		'authTime',
 		'salt'

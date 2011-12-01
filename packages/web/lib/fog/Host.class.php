@@ -4,10 +4,10 @@
 class Host extends FOGController
 {
 	// Table
-	protected $databaseTable = 'hosts';
+	public $databaseTable = 'hosts';
 	
 	// Name -> Database field name
-	protected $databaseFields = array(
+	public $databaseFields = array(
 		'id'		=> 'hostID',
 		'name'		=> 'hostName',
 		'description'	=> 'hostDesc',
@@ -31,7 +31,7 @@ class Host extends FOGController
 	);
 	
 	// Allow setting / getting of these additional fields
-	protected $additionalFields = array(
+	public $additionalFields = array(
 		'additionalMACs',
 		'groups',
 		'primayGroup',
@@ -39,7 +39,7 @@ class Host extends FOGController
 	);
 	
 	// Required database fields
-	protected $databaseFieldsRequired = array(
+	public $databaseFieldsRequired = array(
 		'id',
 		'name',
 		'mac'
