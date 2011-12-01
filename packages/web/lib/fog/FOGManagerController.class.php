@@ -78,7 +78,7 @@ abstract class FOGManagerController
 		return false;
 	}
 
-	public function find($where = array(), $whereOperator = 'AND')
+	public function find($where = array(), $whereOperator = 'AND', $orderBy = 'name', $sort = 'ASC')
 	{
 		try
 		{
@@ -104,7 +104,13 @@ abstract class FOGManagerController
 			}
 
 			// Select all
-			$this->db->query("SELECT * FROM `%s`%s", array($this->databaseTable, (count($whereArray) ? ' WHERE ' . implode(' ' . $whereOperator . ' ', $whereArray) : '')));
+			$this->db->query("SELECT * FROM `%s`%s ORDER BY `%s` %s", array(
+				$this->databaseTable,
+				(count($whereArray) ? ' WHERE ' . implode(' ' . $whereOperator . ' ', $whereArray) : ''),
+				$this->databaseFields[$orderBy],
+				$sort
+			));
+			
 			while ($row = $this->db->fetch()->get())
 			{
 				//$data[] = $row;

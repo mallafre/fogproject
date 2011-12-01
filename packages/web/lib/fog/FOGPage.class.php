@@ -137,7 +137,7 @@ abstract class FOGPage
 					$result = sprintf('<h2>%s</h2>%s<input id="%s-search" type="text" value="%s" class="search-input" />',
 						_('Search'),
 						"\n\t\t\t",
-						(substr($this->node, -1) == 's' ? substr($this->node, 0, -1) : $this->node),
+						(substr($this->node, -1) == 's' ? substr($this->node, 0, -1) : $this->node),	// TODO: Store this in class as variable
 						_('Search')
 					);
 				}
@@ -163,7 +163,7 @@ abstract class FOGPage
 					foreach ($this->data AS $rowData)
 					{
 						$result .= sprintf('<tr id="%s-%s" class="%s">%s</tr>%s',
-							$this->name,
+							(substr($this->node, -1) == 's' ? substr($this->node, 0, -1) : $this->node),	// TODO: Store this in class as variable
 							$rowData['id'],
 							(++$i % 2 ? 'alt1' : 'alt2'),
 							$this->buildRow($rowData),
