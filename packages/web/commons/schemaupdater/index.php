@@ -1040,12 +1040,12 @@ $dbschema[213] = "UPDATE `" . MYSQL_DATABASE . "`.`schemaVersion` set vValue = '
 
 // 28 - Blackout - 1:48 PM 1/12/2011
 // Add 'imageTypes' table and data
-$dbschema[214] = "CREATE TABLE IF NOT EXISTS `imageTypes` (
+$dbschema[214] = "CREATE TABLE IF NOT EXISTS `" . MYSQL_DATABASE . "`.`imageTypes` (
   `imageTypeID` mediumint(9) NOT NULL auto_increment,
   `imageTypeName` varchar(100) NOT NULL,
   PRIMARY KEY  (`imageTypeID`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=5 ;";
-$dbschema[215] = "INSERT INTO `imageTypes` (`imageTypeID`, `imageTypeName`) VALUES
+$dbschema[215] = "INSERT INTO `" . MYSQL_DATABASE . "`.`imageTypes` (`imageTypeID`, `imageTypeName`) VALUES
 (1, 'Single Partition (NTFS Only, Resizable)'),
 (2, 'Multiple Partition Image - Single Disk (Not Resizable)'),
 (3, 'Multiple Partition Image - All Disks  (Not Resizable)'),
@@ -1097,6 +1097,7 @@ $dbschema[216] = "UPDATE `" . MYSQL_DATABASE . "`.`schemaVersion` set vValue = '
 				// Blackout - 4:24 PM 23/09/2011
 				// We now assign a Schema count to $FOG_SCHEMA instead of using the config variable FOG_SCHEMA
 				// This means the amount of FOG Schema updates is automactically determined & users dont have to manually update their config file
+				// BUT!! The check that forwards the user to this file uses the config file value
 				
 				$FOG_SCHEMA = count($installPath);
 				

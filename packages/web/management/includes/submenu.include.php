@@ -265,12 +265,23 @@ if ($currentUser != null && $currentUser->isLoggedIn())
 	// Storage Management
 	if ($node == "storage")
 	{
-		$FOGSubMenu->addItems('storage', array(	_('All Storage Groups')		=> 'groups',
-							_('Add Storage Group')		=> 'addgroup',
-							_('All Storage Nodes')		=> 'nodes',
-							_('Add Storage Nodes')		=> 'addnode',
-					));
-		
+		if (preg_match('#pagetest#', $_SERVER['PHP_SELF']))
+		{
+			$FOGSubMenu->addItems('storage', array(	_('All Storage Nodes')		=> "$_SERVER[PHP_SELF]?node=$node&sub=edit&id=$id#storage-nodes",
+								_('Add Storage Nodes')		=> "$_SERVER[PHP_SELF]?node=$node&sub=edit&id=$id#storage-add-node",
+								_('All Storage Groups')		=> "$_SERVER[PHP_SELF]?node=$node&sub=edit&id=$id#storage-groups",
+								_('Add Storage Group')		=> "$_SERVER[PHP_SELF]?node=$node&sub=edit&id=$id#storage-add-group",
+						));
+		}
+		else
+		{
+			$FOGSubMenu->addItems('storage', array(	_('All Storage Groups')		=> 'groups',
+								_('Add Storage Group')		=> 'addgroup',
+								_('All Storage Nodes')		=> 'nodes',
+								_('Add Storage Nodes')		=> 'addnode',
+						));
+		}
+			
 		if ($storagegroupid)
 		{
 			$FOGSubMenu->addItems('storage', array(	_('General')			=> 'gen',
