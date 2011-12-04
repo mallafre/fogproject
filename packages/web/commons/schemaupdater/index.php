@@ -61,9 +61,9 @@ $installPath[25] = array( 195, 196, 197, 198 );
 $installPath[26] = array( 199, 200, 201, 202, 203, 204, 205, 206, 207, 208, 209, 210, 211, 212, 213 );
 $installPath[27] = array( 214, 215, 216 );
 
-$dbschema[0] = "CREATE DATABASE " . MYSQL_DATABASE ;
+$dbschema[0] = "CREATE DATABASE " . DATABASE_NAME ;
 
-$dbschema[1] = "CREATE TABLE  `" . MYSQL_DATABASE . "`.`groupMembers` (
+$dbschema[1] = "CREATE TABLE  `" . DATABASE_NAME . "`.`groupMembers` (
   `gmID` int(11) NOT NULL auto_increment,
   `gmHostID` int(11) NOT NULL,
   `gmGroupID` int(11) NOT NULL,
@@ -72,7 +72,7 @@ $dbschema[1] = "CREATE TABLE  `" . MYSQL_DATABASE . "`.`groupMembers` (
   KEY `new_index1` (`gmGroupID`)
 ) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=latin1 ROW_FORMAT=DYNAMIC";
 
-$dbschema[2] = "CREATE TABLE  `" . MYSQL_DATABASE . "`.`groups` (
+$dbschema[2] = "CREATE TABLE  `" . DATABASE_NAME . "`.`groups` (
   `groupID` int(11) NOT NULL auto_increment,
   `groupName` varchar(50) NOT NULL,
   `groupDesc` longtext NOT NULL,
@@ -83,7 +83,7 @@ $dbschema[2] = "CREATE TABLE  `" . MYSQL_DATABASE . "`.`groups` (
   KEY `new_index` (`groupName`)
 ) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=latin1";
 
-$dbschema[3] = "CREATE TABLE  `" . MYSQL_DATABASE . "`.`history` (
+$dbschema[3] = "CREATE TABLE  `" . DATABASE_NAME . "`.`history` (
   `hID` int(11) NOT NULL auto_increment,
   `hText` longtext NOT NULL,
   `hUser` varchar(200) NOT NULL,
@@ -92,7 +92,7 @@ $dbschema[3] = "CREATE TABLE  `" . MYSQL_DATABASE . "`.`history` (
   PRIMARY KEY  (`hID`)
 ) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=latin1";
 
-$dbschema[4] = "CREATE TABLE  `" . MYSQL_DATABASE . "`.`hosts` (
+$dbschema[4] = "CREATE TABLE  `" . DATABASE_NAME . "`.`hosts` (
   `hostID` int(11) NOT NULL auto_increment,
   `hostName` varchar(16) NOT NULL,
   `hostDesc` longtext NOT NULL,
@@ -110,7 +110,7 @@ $dbschema[4] = "CREATE TABLE  `" . MYSQL_DATABASE . "`.`hosts` (
   KEY `new_index3` (`hostOS`)
 ) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=latin1";
 
-$dbschema[5] = "CREATE TABLE  `" . MYSQL_DATABASE . "`.`images` (
+$dbschema[5] = "CREATE TABLE  `" . DATABASE_NAME . "`.`images` (
   `imageID` int(11) NOT NULL auto_increment,
   `imageName` varchar(40) NOT NULL,
   `imageDesc` longtext NOT NULL,
@@ -124,13 +124,13 @@ $dbschema[5] = "CREATE TABLE  `" . MYSQL_DATABASE . "`.`images` (
   KEY `new_index1` (`imageBuilding`)
 ) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=latin1";
 
-$dbschema[6] = "CREATE TABLE  `" . MYSQL_DATABASE . "`.`schemaVersion` (
+$dbschema[6] = "CREATE TABLE  `" . DATABASE_NAME . "`.`schemaVersion` (
   `vID` int(11) NOT NULL auto_increment,
   `vValue` int(11) NOT NULL,
   PRIMARY KEY  (`vID`)
 ) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=latin1 ROW_FORMAT=DYNAMIC";
 
-$dbschema[7] = "CREATE TABLE  `" . MYSQL_DATABASE . "`.`supportedOS` (
+$dbschema[7] = "CREATE TABLE  `" . DATABASE_NAME . "`.`supportedOS` (
   `osID` int(10) unsigned NOT NULL auto_increment,
   `osName` varchar(150) NOT NULL,
   `osValue` int(10) unsigned NOT NULL,
@@ -138,7 +138,7 @@ $dbschema[7] = "CREATE TABLE  `" . MYSQL_DATABASE . "`.`supportedOS` (
   KEY `new_index` (`osValue`)
 ) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=latin1";
 
-$dbschema[8] = "CREATE TABLE  `" . MYSQL_DATABASE . "`.`tasks` (
+$dbschema[8] = "CREATE TABLE  `" . DATABASE_NAME . "`.`tasks` (
   `taskID` int(11) NOT NULL auto_increment,
   `taskName` varchar(250) NOT NULL,
   `taskCreateTime` datetime NOT NULL,
@@ -158,7 +158,7 @@ $dbschema[8] = "CREATE TABLE  `" . MYSQL_DATABASE . "`.`tasks` (
   KEY `new_index4` (`taskType`)
 ) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=latin1";
 
-$dbschema[9] = "CREATE TABLE  `" . MYSQL_DATABASE . "`.`users` (
+$dbschema[9] = "CREATE TABLE  `" . DATABASE_NAME . "`.`users` (
   `uId` int(11) NOT NULL auto_increment,
   `uName` varchar(40) NOT NULL,
   `uPass` varchar(50) NOT NULL,
@@ -169,21 +169,21 @@ $dbschema[9] = "CREATE TABLE  `" . MYSQL_DATABASE . "`.`users` (
   KEY `new_index1` (`uPass`)
 ) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=latin1";
 
-$dbschema[10] = "INSERT INTO `" . MYSQL_DATABASE . "`.`users` VALUES  ('','fog', MD5('password'),'0000-00-00 00:00:00','')";
+$dbschema[10] = "INSERT INTO `" . DATABASE_NAME . "`.`users` VALUES  ('','fog', MD5('password'),'0000-00-00 00:00:00','')";
 
-$dbschema[11] = "INSERT INTO `" . MYSQL_DATABASE . "`.`supportedOS` VALUES  ('','"._("Windows XP")."', '1')";
+$dbschema[11] = "INSERT INTO `" . DATABASE_NAME . "`.`supportedOS` VALUES  ('','"._("Windows XP")."', '1')";
 
-$dbschema[12] = "INSERT INTO `" . MYSQL_DATABASE . "`.`schemaVersion` VALUES  ('','1')";
+$dbschema[12] = "INSERT INTO `" . DATABASE_NAME . "`.`schemaVersion` VALUES  ('','1')";
 
 // Schema version 2
 
-$dbschema[13] = "INSERT INTO `" . MYSQL_DATABASE . "`.`supportedOS` VALUES  ('','"._("Windows Vista")."', '2')";
+$dbschema[13] = "INSERT INTO `" . DATABASE_NAME . "`.`supportedOS` VALUES  ('','"._("Windows Vista")."', '2')";
 
-$dbschema[14] = "UPDATE `" . MYSQL_DATABASE . "`.`schemaVersion` set vValue = '2'";
+$dbschema[14] = "UPDATE `" . DATABASE_NAME . "`.`schemaVersion` set vValue = '2'";
 
 // Schema Version 3
 
-$dbschema[15] = "ALTER TABLE `" . MYSQL_DATABASE . "`.`hosts`
+$dbschema[15] = "ALTER TABLE `" . DATABASE_NAME . "`.`hosts`
 		 ADD COLUMN `hostUseAD` char  NOT NULL AFTER `hostOS`,
 		 ADD COLUMN `hostADDomain` VARCHAR(250)  NOT NULL AFTER `hostUseAD`,
 		 ADD COLUMN `hostADOU` longtext  NOT NULL AFTER `hostADDomain`,
@@ -195,7 +195,7 @@ $dbschema[15] = "ALTER TABLE `" . MYSQL_DATABASE . "`.`hosts`
 		 ADD COLUMN `hostAnon4` VARCHAR(250)  NOT NULL AFTER `hostAnon3`,
 		 ADD INDEX `new_index4`(`hostUseAD`)";
 
-$dbschema[16] = "CREATE TABLE  `" . MYSQL_DATABASE . "`.`snapinAssoc` (
+$dbschema[16] = "CREATE TABLE  `" . DATABASE_NAME . "`.`snapinAssoc` (
 		  `saID` int(11) NOT NULL auto_increment,
 		  `saHostID` int(11) NOT NULL,
 		  `saSnapinID` int(11) NOT NULL,
@@ -204,7 +204,7 @@ $dbschema[16] = "CREATE TABLE  `" . MYSQL_DATABASE . "`.`snapinAssoc` (
 		  KEY `new_index1` (`saSnapinID`)
 		) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=latin1";
 
-$dbschema[17] = "CREATE TABLE  `" . MYSQL_DATABASE . "`.`snapinJobs` (
+$dbschema[17] = "CREATE TABLE  `" . DATABASE_NAME . "`.`snapinJobs` (
 		  `sjID` int(11) NOT NULL auto_increment,
 		  `sjHostID` int(11) NOT NULL,
 		  `sjCreateTime` datetime NOT NULL,
@@ -212,7 +212,7 @@ $dbschema[17] = "CREATE TABLE  `" . MYSQL_DATABASE . "`.`snapinJobs` (
 		  KEY `new_index` (`sjHostID`)
 		) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=latin1";
 
-$dbschema[18] = "CREATE TABLE  `" . MYSQL_DATABASE . "`.`snapinTasks` (
+$dbschema[18] = "CREATE TABLE  `" . DATABASE_NAME . "`.`snapinTasks` (
 		  `stID` int(11) NOT NULL auto_increment,
 		  `stJobID` int(11) NOT NULL,
 		  `stState` int(11) NOT NULL,
@@ -225,7 +225,7 @@ $dbschema[18] = "CREATE TABLE  `" . MYSQL_DATABASE . "`.`snapinTasks` (
 		  KEY `new_index2` (`stSnapinID`)
 		) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=latin1";
 
-$dbschema[19] = "CREATE TABLE  `" . MYSQL_DATABASE . "`.`snapins` (
+$dbschema[19] = "CREATE TABLE  `" . DATABASE_NAME . "`.`snapins` (
 		  `sID` int(11) NOT NULL auto_increment,
 		  `sName` varchar(200) NOT NULL,
 		  `sDesc` longtext NOT NULL,
@@ -241,9 +241,9 @@ $dbschema[19] = "CREATE TABLE  `" . MYSQL_DATABASE . "`.`snapins` (
 		  KEY `new_index` (`sName`)
 		) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=latin1";
 
-$dbschema[20] = "UPDATE `" . MYSQL_DATABASE . "`.`schemaVersion` set vValue = '3'";
+$dbschema[20] = "UPDATE `" . DATABASE_NAME . "`.`schemaVersion` set vValue = '3'";
 
-$dbschema[21] = "CREATE TABLE  `" . MYSQL_DATABASE . "`.`multicastSessions` (
+$dbschema[21] = "CREATE TABLE  `" . DATABASE_NAME . "`.`multicastSessions` (
 		  `msID` int(11) NOT NULL auto_increment,
 		  `msName` varchar(250) NOT NULL,
 		  `msBasePort` int(11) NOT NULL,
@@ -263,7 +263,7 @@ $dbschema[21] = "CREATE TABLE  `" . MYSQL_DATABASE . "`.`multicastSessions` (
 		  PRIMARY KEY  (`msID`)
 		) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=latin1";
 
-$dbschema[22] = "CREATE TABLE  `" . MYSQL_DATABASE . "`.`multicastSessionsAssoc` (
+$dbschema[22] = "CREATE TABLE  `" . DATABASE_NAME . "`.`multicastSessionsAssoc` (
 		  `msaID` int(11) NOT NULL auto_increment,
 		  `msID` int(11) NOT NULL,
 		  `tID` int(11) NOT NULL,
@@ -272,21 +272,21 @@ $dbschema[22] = "CREATE TABLE  `" . MYSQL_DATABASE . "`.`multicastSessionsAssoc`
 		  KEY `new_index1` (`tID`)
 		) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=latin1";
 
-$dbschema[23] = "UPDATE `" . MYSQL_DATABASE . "`.`schemaVersion` set vValue = '4'";
+$dbschema[23] = "UPDATE `" . DATABASE_NAME . "`.`schemaVersion` set vValue = '4'";
 
-$dbschema[24] = "ALTER TABLE `" . MYSQL_DATABASE . "`.`images`
+$dbschema[24] = "ALTER TABLE `" . DATABASE_NAME . "`.`images`
 		 ADD COLUMN `imageDD` VARCHAR(1)  NOT NULL AFTER `imageSize`,
 		 ADD INDEX `new_index2`(`imageDD`)";
 
-$dbschema[25] = "UPDATE `" . MYSQL_DATABASE . "`.`supportedOS` set osName = 'Windows 2000/XP' where osValue = '1'";
+$dbschema[25] = "UPDATE `" . DATABASE_NAME . "`.`supportedOS` set osName = 'Windows 2000/XP' where osValue = '1'";
 
-$dbschema[26] = "INSERT INTO `" . MYSQL_DATABASE . "`.`supportedOS` VALUES  ('','Other', '99')";
+$dbschema[26] = "INSERT INTO `" . DATABASE_NAME . "`.`supportedOS` VALUES  ('','Other', '99')";
 
-$dbschema[27] = "ALTER TABLE `" . MYSQL_DATABASE . "`.`multicastSessions` CHANGE COLUMN `msAnon1` `msIsDD` VARCHAR(1)  CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL";
+$dbschema[27] = "ALTER TABLE `" . DATABASE_NAME . "`.`multicastSessions` CHANGE COLUMN `msAnon1` `msIsDD` VARCHAR(1)  CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL";
 
-$dbschema[28] = "UPDATE `" . MYSQL_DATABASE . "`.`schemaVersion` set vValue = '5'";
+$dbschema[28] = "UPDATE `" . DATABASE_NAME . "`.`schemaVersion` set vValue = '5'";
 
-$dbschema[29] = "CREATE TABLE `" . MYSQL_DATABASE . "`.`virus` (
+$dbschema[29] = "CREATE TABLE `" . DATABASE_NAME . "`.`virus` (
 		  `vID` integer  NOT NULL AUTO_INCREMENT,
 		  `vName` varchar(250)  NOT NULL,
 		  `vHostMAC` varchar(50)  NOT NULL,
@@ -299,9 +299,9 @@ $dbschema[29] = "CREATE TABLE `" . MYSQL_DATABASE . "`.`virus` (
 		  INDEX `new_index2`(`vDateTime`)
 		)
 		ENGINE = MyISAM";
-$dbschema[30] = "UPDATE `" . MYSQL_DATABASE . "`.`schemaVersion` set vValue = '6'";
+$dbschema[30] = "UPDATE `" . DATABASE_NAME . "`.`schemaVersion` set vValue = '6'";
 
-$dbschema[31] = "CREATE TABLE `" . MYSQL_DATABASE . "`.`userTracking` (
+$dbschema[31] = "CREATE TABLE `" . DATABASE_NAME . "`.`userTracking` (
 		  `utID` integer  NOT NULL AUTO_INCREMENT,
 		  `utHostID` integer  NOT NULL,
 		  `utUserName` varchar(50)  NOT NULL,
@@ -318,9 +318,9 @@ $dbschema[31] = "CREATE TABLE `" . MYSQL_DATABASE . "`.`userTracking` (
 		)
 		ENGINE = MyISAM";
 
-$dbschema[32] = "ALTER TABLE `" . MYSQL_DATABASE . "`.`hosts` CHANGE COLUMN `hostAnon1` `hostPrinterLevel` VARCHAR(2)  CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL";
+$dbschema[32] = "ALTER TABLE `" . DATABASE_NAME . "`.`hosts` CHANGE COLUMN `hostAnon1` `hostPrinterLevel` VARCHAR(2)  CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL";
 
-$dbschema[33] = "CREATE TABLE `" . MYSQL_DATABASE . "`.`printers` (
+$dbschema[33] = "CREATE TABLE `" . DATABASE_NAME . "`.`printers` (
 		  `pID` integer  NOT NULL AUTO_INCREMENT,
 		  `pPort` longtext  NOT NULL,
 		  `pDefFile` longtext  NOT NULL,
@@ -339,7 +339,7 @@ $dbschema[33] = "CREATE TABLE `" . MYSQL_DATABASE . "`.`printers` (
 		ENGINE = MyISAM";
 
 
-$dbschema[34] = "CREATE TABLE `" . MYSQL_DATABASE . "`.`printerAssoc` (
+$dbschema[34] = "CREATE TABLE `" . DATABASE_NAME . "`.`printerAssoc` (
 		  `paID` integer  NOT NULL AUTO_INCREMENT,
 		  `paHostID` integer  NOT NULL,
 		  `paPrinterID` integer  NOT NULL,
@@ -355,7 +355,7 @@ $dbschema[34] = "CREATE TABLE `" . MYSQL_DATABASE . "`.`printerAssoc` (
 		)
 		ENGINE = MyISAM";
 
-$dbschema[35] = "CREATE TABLE  `" . MYSQL_DATABASE . "`.`inventory` (
+$dbschema[35] = "CREATE TABLE  `" . DATABASE_NAME . "`.`inventory` (
 		  `iID` int(11) NOT NULL auto_increment,
 		  `iHostID` int(11) NOT NULL,
 		  `iPrimaryUser` varchar(50) NOT NULL,
@@ -390,7 +390,7 @@ $dbschema[35] = "CREATE TABLE  `" . MYSQL_DATABASE . "`.`inventory` (
 		  PRIMARY KEY  (`iID`)
 		) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=latin1";
 
-$dbschema[36] = "CREATE TABLE `" . MYSQL_DATABASE . "`.`clientUpdates` (
+$dbschema[36] = "CREATE TABLE `" . DATABASE_NAME . "`.`clientUpdates` (
 		  `cuID` integer  NOT NULL AUTO_INCREMENT,
 		  `cuName` varchar(200)  NOT NULL,
 		  `cuMD5` varchar(100)  NOT NULL,
@@ -402,19 +402,19 @@ $dbschema[36] = "CREATE TABLE `" . MYSQL_DATABASE . "`.`clientUpdates` (
 		)
 		ENGINE = MyISAM";
 
-$dbschema[37] = "UPDATE `" . MYSQL_DATABASE . "`.`schemaVersion` set vValue = '7'";
+$dbschema[37] = "UPDATE `" . DATABASE_NAME . "`.`schemaVersion` set vValue = '7'";
 
-$dbschema[38] = "INSERT INTO " . MYSQL_DATABASE . ".supportedOS(osName, osValue) values( '"._("Windows 98")."', '3' )";
+$dbschema[38] = "INSERT INTO " . DATABASE_NAME . ".supportedOS(osName, osValue) values( '"._("Windows 98")."', '3' )";
 
-$dbschema[39] = "INSERT INTO " . MYSQL_DATABASE . ".supportedOS(osName, osValue) values( '"._("Windows (other)")."', '4' )";
+$dbschema[39] = "INSERT INTO " . DATABASE_NAME . ".supportedOS(osName, osValue) values( '"._("Windows (other)")."', '4' )";
 
-$dbschema[40] = "INSERT INTO " . MYSQL_DATABASE . ".supportedOS(osName, osValue) values( '"._("Linux")."', '50' )";
+$dbschema[40] = "INSERT INTO " . DATABASE_NAME . ".supportedOS(osName, osValue) values( '"._("Linux")."', '50' )";
 
-$dbschema[41] = "ALTER TABLE `" . MYSQL_DATABASE . "`.`multicastSessions` MODIFY COLUMN `msIsDD` integer  NOT NULL";
+$dbschema[41] = "ALTER TABLE `" . DATABASE_NAME . "`.`multicastSessions` MODIFY COLUMN `msIsDD` integer  NOT NULL";
 
-$dbschema[42] = "UPDATE `" . MYSQL_DATABASE . "`.`schemaVersion` set vValue = '8'";
+$dbschema[42] = "UPDATE `" . DATABASE_NAME . "`.`schemaVersion` set vValue = '8'";
 
-$dbschema[43] = "CREATE TABLE `" . MYSQL_DATABASE . "`.`globalSettings` (
+$dbschema[43] = "CREATE TABLE `" . DATABASE_NAME . "`.`globalSettings` (
 		  `settingID` INTEGER  NOT NULL AUTO_INCREMENT,
 		  `settingKey` VARCHAR(254)  NOT NULL,
 		  `settingDesc` longtext  NOT NULL,
@@ -425,118 +425,118 @@ $dbschema[43] = "CREATE TABLE `" . MYSQL_DATABASE . "`.`globalSettings` (
 		)
 		ENGINE = MyISAM;";
 
-$dbschema[44] = "INSERT INTO `" . MYSQL_DATABASE . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
+$dbschema[44] = "INSERT INTO `" . DATABASE_NAME . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
                              values('FOG_TFTP_HOST', '"._("Hostname or IP address of the TFTP Server.")."', '" . TFTP_HOST . "', 'TFTP Server')";
 
-$dbschema[45] = "INSERT INTO `" . MYSQL_DATABASE . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
+$dbschema[45] = "INSERT INTO `" . DATABASE_NAME . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
                              values('FOG_TFTP_FTP_USERNAME', '"._("Username used to access the tftp server via ftp.")."', '" . TFTP_FTP_USERNAME . "', 'TFTP Server')";
 
-$dbschema[46] = "INSERT INTO `" . MYSQL_DATABASE . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
+$dbschema[46] = "INSERT INTO `" . DATABASE_NAME . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
                              values('FOG_TFTP_FTP_PASSWORD', '"._("Password used to access the tftp server via ftp.")."', '" . TFTP_FTP_PASSWORD . "', 'TFTP Server')";
 
-$dbschema[47] = "INSERT INTO `" . MYSQL_DATABASE . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
+$dbschema[47] = "INSERT INTO `" . DATABASE_NAME . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
                              values('FOG_TFTP_PXE_CONFIG_DIR', '"._("Location of pxe boot files on the PXE server.")."', '" . TFTP_PXE_CONFIG_DIR . "', 'TFTP Server')";
 
-$dbschema[48] = "INSERT INTO `" . MYSQL_DATABASE . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
+$dbschema[48] = "INSERT INTO `" . DATABASE_NAME . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
                              values('FOG_TFTP_PXE_KERNEL_DIR', '"._("Location of kernel files on the PXE server.")."', '" . TFTP_PXE_KERNEL_DIR . "', 'TFTP Server')";
 
-$dbschema[49] = "INSERT INTO `" . MYSQL_DATABASE . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
+$dbschema[49] = "INSERT INTO `" . DATABASE_NAME . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
                              values('FOG_TFTP_PXE_KERNEL', '"._("Location of kernel file on the PXE server, this should point to the kernel itself.")."', '" . PXE_KERNEL . "', 'TFTP Server')";
 
-$dbschema[50] = "INSERT INTO `" . MYSQL_DATABASE . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
+$dbschema[50] = "INSERT INTO `" . DATABASE_NAME . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
                              values('FOG_KERNEL_RAMDISK_SIZE', '"._("This setting defines the amount of physical memory (in KB) you want to use for the boot image.  This setting needs to be larger than the boot image and smaller that the total physical memory on the client.")."', '" . PXE_KERNEL_RAMDISK . "', 'TFTP Server')";
 
-$dbschema[51] = "INSERT INTO `" . MYSQL_DATABASE . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
+$dbschema[51] = "INSERT INTO `" . DATABASE_NAME . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
                              values('FOG_USE_SLOPPY_NAME_LOOKUPS', '"._("The settings was added to workaround a partial implementation of DHCP in the boot image.  The boot image is unable to obtain a DNS server address from the DHCP server, so what this setting will do is resolve any hostnames to IP address on the FOG server before writing the config files.")."', '" . USE_SLOPPY_NAME_LOOKUPS . "', 'General Settings')";
 
-$dbschema[52] = "INSERT INTO `" . MYSQL_DATABASE . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
+$dbschema[52] = "INSERT INTO `" . DATABASE_NAME . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
                              values('FOG_MEMTEST_KERNEL', '"._("The settings defines where the memtest boot image/kernel is located.")."', '" . MEMTEST_KERNEL . "', 'General Settings')";
 
-$dbschema[53] = "INSERT INTO `" . MYSQL_DATABASE . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
+$dbschema[53] = "INSERT INTO `" . DATABASE_NAME . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
                              values('FOG_PXE_BOOT_IMAGE', '"._("The settings defines where the fog boot file system image is located.")."', '" . PXE_IMAGE . "', 'TFTP Server')";
 
-$dbschema[54] = "INSERT INTO `" . MYSQL_DATABASE . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
+$dbschema[54] = "INSERT INTO `" . DATABASE_NAME . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
                              values('FOG_PXE_IMAGE_DNSADDRESS', '"._("Since the fog boot image has an incomplete dhcp implementation, you can specify a dns address to be used with the boot image.  If you are going to use this settings, you should turn <b>FOG_USE_SLOPPY_NAME_LOOKUPS</b> off.")."', '" . PXE_IMAGE_DNSADDRESS . "', 'TFTP Server')";
 
-$dbschema[55] = "INSERT INTO `" . MYSQL_DATABASE . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
+$dbschema[55] = "INSERT INTO `" . DATABASE_NAME . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
                              values('FOG_NFS_HOST', '"._("This setting defines the hostname or ip address of the NFS server used with FOG.")."', '" . STORAGE_HOST . "', 'NFS Server')";
 
-$dbschema[56] = "INSERT INTO `" . MYSQL_DATABASE . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
+$dbschema[56] = "INSERT INTO `" . DATABASE_NAME . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
                              values('FOG_NFS_FTP_USERNAME', '"._("This setting defines the username used to access files on the nfs server used with FOG.")."', '" . STORAGE_FTP_USERNAME . "', 'NFS Server')";
 
-$dbschema[57] = "INSERT INTO `" . MYSQL_DATABASE . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
+$dbschema[57] = "INSERT INTO `" . DATABASE_NAME . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
                              values('FOG_NFS_FTP_PASSWORD', '"._("This setting defines the password used to access flies on the nfs server used with FOG.")."', '" . STORAGE_FTP_PASSWORD . "', 'NFS Server')";
 
-$dbschema[58] = "INSERT INTO `" . MYSQL_DATABASE . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
+$dbschema[58] = "INSERT INTO `" . DATABASE_NAME . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
                              values('FOG_NFS_DATADIR', '"._("This setting defines the directory on the NFS server where images are stored.  ")."', '" . STORAGE_DATADIR . "', 'NFS Server')";
 
-$dbschema[59] = "INSERT INTO `" . MYSQL_DATABASE . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
+$dbschema[59] = "INSERT INTO `" . DATABASE_NAME . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
                              values('FOG_NFS_DATADIR_UPLOAD', '"._("This setting defines the directory on the NFS server where images are uploaded too.")."', '" . STORAGE_DATADIR_UPLOAD . "', 'NFS Server')";
 
-$dbschema[60] = "INSERT INTO `" . MYSQL_DATABASE . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
+$dbschema[60] = "INSERT INTO `" . DATABASE_NAME . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
                              values('FOG_NFS_BANDWIDTHPATH', '"._("This setting defines the web page used to acquire the bandwidth used by the nfs server.")."', '" . STORAGE_BANDWIDTHPATH . "', 'NFS Server')";
 
-$dbschema[61] = "INSERT INTO `" . MYSQL_DATABASE . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
+$dbschema[61] = "INSERT INTO `" . DATABASE_NAME . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
                              values('FOG_UPLOADRESIZEPCT', '"._("This setting defines the amount of padding applied to a partition before attempting resize the ntfs volume and upload it.")."', '" . UPLOADRESIZEPCT . "', 'General Settings')";
 
-$dbschema[62] = "INSERT INTO `" . MYSQL_DATABASE . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
+$dbschema[62] = "INSERT INTO `" . DATABASE_NAME . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
                              values('FOG_WEB_HOST', '"._("This setting defines the hostname or ip address of the web server used with fog.")."', '" . WEB_HOST . "', 'Web Server')";
 
-$dbschema[63] = "INSERT INTO `" . MYSQL_DATABASE . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
+$dbschema[63] = "INSERT INTO `" . DATABASE_NAME . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
                              values('FOG_WEB_ROOT', '"._("This setting defines the path to the fog webserver\'s root directory.")."', '" . WEB_ROOT . "', 'Web Server')";
 
-$dbschema[64] = "INSERT INTO `" . MYSQL_DATABASE . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
+$dbschema[64] = "INSERT INTO `" . DATABASE_NAME . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
                              values('FOG_WOL_HOST', '"._("This setting defines the ip address of hostname for the server hosting the Wake-on-lan service.")."', '" . WOL_HOST . "', 'General Settings')";
 
-$dbschema[65] = "INSERT INTO `" . MYSQL_DATABASE . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
+$dbschema[65] = "INSERT INTO `" . DATABASE_NAME . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
                              values('FOG_WOL_PATH', '"._("This setting defines the path to the files performing the WOL tasks.")."', '" . WOL_PATH . "', 'General Settings')";
 
-$dbschema[66] = "INSERT INTO `" . MYSQL_DATABASE . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
+$dbschema[66] = "INSERT INTO `" . DATABASE_NAME . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
                              values('FOG_WOL_INTERFACE', '"._("This setting defines the network interface used in the WOL process.")."', '" . WOL_INTERFACE . "', 'General Settings')";
 
-$dbschema[67] = "INSERT INTO `" . MYSQL_DATABASE . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
+$dbschema[67] = "INSERT INTO `" . DATABASE_NAME . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
                              values('FOG_SNAPINDIR', '"._("This setting defines the location of the snapin files.  These files must be hosted on the web server.")."', '" . SNAPINDIR . "', 'Web Server')";
 
-$dbschema[68] = "INSERT INTO `" . MYSQL_DATABASE . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
+$dbschema[68] = "INSERT INTO `" . DATABASE_NAME . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
                              values('FOG_QUEUESIZE', '"._("This setting defines how many unicast tasks to allow to be active at one time.")."', '" . QUEUESIZE . "', 'General Settings')";
 
-$dbschema[69] = "INSERT INTO `" . MYSQL_DATABASE . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
+$dbschema[69] = "INSERT INTO `" . DATABASE_NAME . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
                              values('FOG_CHECKIN_TIMEOUT', '"._("This setting defines the amount of time between client checks to determine if they are active clients.")."', '" . CHECKIN_TIMEOUT . "', 'General Settings')";
 
-$dbschema[70] = "INSERT INTO `" . MYSQL_DATABASE . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
+$dbschema[70] = "INSERT INTO `" . DATABASE_NAME . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
                              values('FOG_USER_MINPASSLENGTH', '"._("This setting defines the minimum number of characters in a user\'s password.")."', '" . USER_MINPASSLENGTH . "', 'User Management')";
 
-$dbschema[71] = "INSERT INTO `" . MYSQL_DATABASE . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
+$dbschema[71] = "INSERT INTO `" . DATABASE_NAME . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
                              values('FOG_USER_VALIDPASSCHARS', '"._("This setting defines the valid characters used in a password.")."', '" . USER_VALIDPASSCHARS . "', 'User Management')";
 
-$dbschema[72] = "INSERT INTO `" . MYSQL_DATABASE . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
+$dbschema[72] = "INSERT INTO `" . DATABASE_NAME . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
                              values('FOG_NFS_ETH_MONITOR', '"._("This setting defines which interface is monitored for traffic summaries.")."', '" . NFS_ETH_MONITOR . "', 'NFS Server')";
 
-$dbschema[73] = "INSERT INTO `" . MYSQL_DATABASE . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
+$dbschema[73] = "INSERT INTO `" . DATABASE_NAME . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
                              values('FOG_UDPCAST_INTERFACE', '"._("This setting defines the interface used in multicast communications.")."', '" . UDPCAST_INTERFACE . "', 'Multicast Settings')";
 
-$dbschema[74] = "INSERT INTO `" . MYSQL_DATABASE . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
+$dbschema[74] = "INSERT INTO `" . DATABASE_NAME . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
                              values('FOG_UDPCAST_STARTINGPORT', '"._("This setting defines the starting port number used in multicast communications.  This starting port number must be an even number.")."', '" . UDPCAST_STARTINGPORT . "', 'Multicast Settings')";
 
-$dbschema[75] = "INSERT INTO `" . MYSQL_DATABASE . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
+$dbschema[75] = "INSERT INTO `" . DATABASE_NAME . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
                              values('FOG_MULTICAST_MAX_SESSIONS', '"._("This setting defines the maximum number of multicast sessions that can be running at one time.")."', '" . FOG_MULTICAST_MAX_SESSIONS . "', 'Multicast Settings')";
 
-$dbschema[76] = "INSERT INTO `" . MYSQL_DATABASE . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
+$dbschema[76] = "INSERT INTO `" . DATABASE_NAME . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
                              values('FOG_JPGRAPH_VERSION', '"._("This setting defines ")."', '" . FOG_JPGRAPH_VERSION . "', 'Web Server')";
 
-$dbschema[77] = "INSERT INTO `" . MYSQL_DATABASE . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
+$dbschema[77] = "INSERT INTO `" . DATABASE_NAME . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
                              values('FOG_REPORT_DIR', '"._("This setting defines the location on the web server of the FOG reports.")."', '" . FOG_REPORT_DIR . "', 'Web Server')";
 
-$dbschema[78] = "INSERT INTO `" . MYSQL_DATABASE . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
+$dbschema[78] = "INSERT INTO `" . DATABASE_NAME . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
                              values('FOG_THEME', '"._("This setting defines what css style sheet and theme to use for FOG.")."', '" . FOG_THEME . "', 'Web Server')";
 
-$dbschema[79] = "INSERT INTO `" . MYSQL_DATABASE . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
+$dbschema[79] = "INSERT INTO `" . DATABASE_NAME . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
                              values('FOG_UPLOADIGNOREPAGEHIBER', '"._("This setting defines if you would like to remove hibernate and swap files before uploading a Windows image.  ")."', '" . FOG_UPLOADIGNOREPAGEHIBER . "', 'General Settings')";
 
-$dbschema[80] = "INSERT INTO `" . MYSQL_DATABASE . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
+$dbschema[80] = "INSERT INTO `" . DATABASE_NAME . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
                              values('FOG_SERVICE_DIRECTORYCLEANER_ENABLED', '"._("This setting defines if the Windows Service module directory cleaner should be enabled on client computers. This service is clean out the contents of a directory on when a user logs out of the workstation. (Valid values: 0 or 1).")."', '1', 'FOG Service - Directory Cleaner')";
 
-$dbschema[81] = "CREATE TABLE `" . MYSQL_DATABASE . "`.`moduleStatusByHost` (
+$dbschema[81] = "CREATE TABLE `" . DATABASE_NAME . "`.`moduleStatusByHost` (
 			  `msID` integer  NOT NULL AUTO_INCREMENT,
 			  `msHostID` integer  NOT NULL,
 			  `msModuleID` varchar(50)  NOT NULL,
@@ -546,57 +546,57 @@ $dbschema[81] = "CREATE TABLE `" . MYSQL_DATABASE . "`.`moduleStatusByHost` (
 			  INDEX `new_index2`(`msModuleID`)
 			)
 			ENGINE = MyISAM;";
-$dbschema[82] = "CREATE TABLE `" . MYSQL_DATABASE . "`.`dirCleaner` (
+$dbschema[82] = "CREATE TABLE `" . DATABASE_NAME . "`.`dirCleaner` (
 			  `dcID` integer  NOT NULL AUTO_INCREMENT,
 			  `dcPath` longtext  NOT NULL,
 			  PRIMARY KEY (`dcID`)
 			)
 			ENGINE = MyISAM;";
 
-$dbschema[83] = "INSERT INTO `" . MYSQL_DATABASE . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
+$dbschema[83] = "INSERT INTO `" . DATABASE_NAME . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
                              values('FOG_USE_ANIMATION_EFFECTS', '"._("This setting defines if the FOG management portal uses animation effects on it.  Valid values are 0 or 1")."', '1', 'General Settings')";
 
-$dbschema[84] = "INSERT INTO `" . MYSQL_DATABASE . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
+$dbschema[84] = "INSERT INTO `" . DATABASE_NAME . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
                              values('FOG_SERVICE_USERCLEANUP_ENABLED', '"._("This setting defines if user cleanup should be enabled.  The User Cleanup module will remove all local windows users from the workstation on log off accept for users that are whitelisted.  (Valid values are 0 or 1)")."', '0', 'FOG Service - User Cleanup')";
 
-$dbschema[85] = "CREATE TABLE `" . MYSQL_DATABASE . "`.`userCleanup` (
+$dbschema[85] = "CREATE TABLE `" . DATABASE_NAME . "`.`userCleanup` (
 			  `ucID` integer  NOT NULL AUTO_INCREMENT,
 			  `ucName` varchar(254)  NOT NULL,
 			  PRIMARY KEY (`ucID`)
 			)
 			ENGINE = MyISAM";
 
-$dbschema[86] = "INSERT INTO `" . MYSQL_DATABASE . "`.userCleanup( ucName ) values( 'administrator' )";
+$dbschema[86] = "INSERT INTO `" . DATABASE_NAME . "`.userCleanup( ucName ) values( 'administrator' )";
 
-$dbschema[87] = "INSERT INTO `" . MYSQL_DATABASE . "`.userCleanup( ucName ) values( 'admin' )";
+$dbschema[87] = "INSERT INTO `" . DATABASE_NAME . "`.userCleanup( ucName ) values( 'admin' )";
 
-$dbschema[88] = "INSERT INTO `" . MYSQL_DATABASE . "`.userCleanup( ucName ) values( 'guest' )";
+$dbschema[88] = "INSERT INTO `" . DATABASE_NAME . "`.userCleanup( ucName ) values( 'guest' )";
 
-$dbschema[89] = "INSERT INTO `" . MYSQL_DATABASE . "`.userCleanup( ucName ) values( 'HelpAssistant' )";
+$dbschema[89] = "INSERT INTO `" . DATABASE_NAME . "`.userCleanup( ucName ) values( 'HelpAssistant' )";
 
-$dbschema[90] = "INSERT INTO `" . MYSQL_DATABASE . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
+$dbschema[90] = "INSERT INTO `" . DATABASE_NAME . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
                              values('FOG_SERVICE_GREENFOG_ENABLED', '"._("This setting defines if the green fog module should be enabled.  The green fog module will shutdown or restart a computer at a set time.  (Valid values are 0 or 1)")."', '1', 'FOG Service - Green Fog')";
 
-$dbschema[91] = "INSERT INTO `" . MYSQL_DATABASE . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
+$dbschema[91] = "INSERT INTO `" . DATABASE_NAME . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
                              values('FOG_SERVICE_AUTOLOGOFF_ENABLED', '"._("This setting defines if the auto log off module should be enabled.  This module will log off any active user after X minutes of inactivity.  (Valid values are 0 or 1)")."', '1', 'FOG Service - Auto Log Off')";
 
-$dbschema[92] = "INSERT INTO `" . MYSQL_DATABASE . "`.userCleanup( ucName ) values( 'ASPNET' )";
+$dbschema[92] = "INSERT INTO `" . DATABASE_NAME . "`.userCleanup( ucName ) values( 'ASPNET' )";
 
-$dbschema[93] = "INSERT INTO `" . MYSQL_DATABASE . "`.userCleanup( ucName ) values( 'SUPPORT_' )";
+$dbschema[93] = "INSERT INTO `" . DATABASE_NAME . "`.userCleanup( ucName ) values( 'SUPPORT_' )";
 
-$dbschema[94] = "INSERT INTO `" . MYSQL_DATABASE . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
+$dbschema[94] = "INSERT INTO `" . DATABASE_NAME . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
                              values('FOG_SERVICE_DISPLAYMANAGER_ENABLED', '"._("This setting defines if the fog display manager should be active.  The fog display manager will reset the clients screen resolution to a fixed size on log off and on computer start up.  (Valid values are 0 or 1)")."', '0', 'FOG Service - Display Manager')";
 
-$dbschema[95] = "INSERT INTO `" . MYSQL_DATABASE . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
+$dbschema[95] = "INSERT INTO `" . DATABASE_NAME . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
                              values('FOG_SERVICE_DISPLAYMANAGER_X', '"._("This setting defines the default width in pixels to reset the computer display to with the fog display manager service.")."', '1024', 'FOG Service - Display Manager')";
 
-$dbschema[96] = "INSERT INTO `" . MYSQL_DATABASE . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
+$dbschema[96] = "INSERT INTO `" . DATABASE_NAME . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
                              values('FOG_SERVICE_DISPLAYMANAGER_Y', '"._("This setting defines the default height in pixels to reset the computer display to with the fog display manager service.")."', '768', 'FOG Service - Display Manager')";
 
-$dbschema[97] = "INSERT INTO `" . MYSQL_DATABASE . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
+$dbschema[97] = "INSERT INTO `" . DATABASE_NAME . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
                              values('FOG_SERVICE_DISPLAYMANAGER_R', '"._("This setting defines the default refresh rate to reset the computer display to with the fog display manager service.")."', '60', 'FOG Service - Display Manager')";
 
-$dbschema[98] = "CREATE TABLE `" . MYSQL_DATABASE . "`.`hostScreenSettings` (
+$dbschema[98] = "CREATE TABLE `" . DATABASE_NAME . "`.`hostScreenSettings` (
 			  `hssID` integer  NOT NULL AUTO_INCREMENT,
 			  `hssHostID` integer  NOT NULL,
 			  `hssWidth` integer  NOT NULL,
@@ -610,10 +610,10 @@ $dbschema[98] = "CREATE TABLE `" . MYSQL_DATABASE . "`.`hostScreenSettings` (
 			)
 			ENGINE = MyISAM";
 
-$dbschema[99] = "INSERT INTO `" . MYSQL_DATABASE . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
+$dbschema[99] = "INSERT INTO `" . DATABASE_NAME . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
                              values('FOG_SERVICE_AUTOLOGOFF_MIN', '"._("This setting defines the number of minutes to wait before logging a user off of a PC. (Value of 0 will disable this module.)")."', '0', 'FOG Service - Auto Log Off')";
 
-$dbschema[100] = "CREATE TABLE `" . MYSQL_DATABASE . "`.`hostAutoLogOut` (
+$dbschema[100] = "CREATE TABLE `" . DATABASE_NAME . "`.`hostAutoLogOut` (
 			  `haloID` integer  NOT NULL AUTO_INCREMENT,
 			  `haloHostID` integer  NOT NULL,
 			  `haloTime` varchar(10) NOT NULL,
@@ -622,13 +622,13 @@ $dbschema[100] = "CREATE TABLE `" . MYSQL_DATABASE . "`.`hostAutoLogOut` (
 			)
 			ENGINE = MyISAM";
 
-$dbschema[101] = "INSERT INTO `" . MYSQL_DATABASE . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
+$dbschema[101] = "INSERT INTO `" . DATABASE_NAME . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
                              values('FOG_SERVICE_AUTOLOGOFF_BGIMAGE', '"._("This setting defines the location of the background image used in the auto log off module.  The image should be 300px x 300px.  This image can be located locally (such as c:\\\\images\\\\myimage.jpg) or on a web server (such as http://freeghost.sf.net/images/image.jpg)")."', 'c:\\\\program files\\\\fog\\\\images\\\\alo-bg.jpg', 'FOG Service - Auto Log Off')";
 
-$dbschema[102] = "INSERT INTO `" . MYSQL_DATABASE . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
+$dbschema[102] = "INSERT INTO `" . DATABASE_NAME . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
                              values('FOG_KEYMAP', '"._("This setting defines the keymap used on the client boot image.")."', '', 'General Settings')";
 
-$dbschema[103] = "CREATE TABLE `" . MYSQL_DATABASE . "`.`greenFog` (
+$dbschema[103] = "CREATE TABLE `" . DATABASE_NAME . "`.`greenFog` (
 			  `gfID` integer  NOT NULL AUTO_INCREMENT,
 			  `gfHostID` integer  NOT NULL,
 			  `gfHour` integer  NOT NULL,
@@ -640,10 +640,10 @@ $dbschema[103] = "CREATE TABLE `" . MYSQL_DATABASE . "`.`greenFog` (
 			)
 			ENGINE = MyISAM";
 
-$dbschema[104] = "INSERT INTO `" . MYSQL_DATABASE . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
+$dbschema[104] = "INSERT INTO `" . DATABASE_NAME . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
                              values('FOG_SERVICE_HOSTNAMECHANGER_ENABLED', '"._("This setting defines if the fog hostname changer should be globally active.  (Valid values are 0 or 1)")."', '1', 'FOG Service - Hostname Changer')";
 
-$dbschema[105] = "CREATE TABLE `" . MYSQL_DATABASE . "`.`aloLog` (
+$dbschema[105] = "CREATE TABLE `" . DATABASE_NAME . "`.`aloLog` (
 			  `alID` integer  NOT NULL AUTO_INCREMENT,
 			  `alUserName` varchar(254)  NOT NULL,
 			  `alHostID` integer  NOT NULL,
@@ -658,9 +658,9 @@ $dbschema[105] = "CREATE TABLE `" . MYSQL_DATABASE . "`.`aloLog` (
 			)
 			ENGINE = MyISAM";
 
-$dbschema[106] = "UPDATE `" . MYSQL_DATABASE . "`.`schemaVersion` set vValue = '9'";
+$dbschema[106] = "UPDATE `" . DATABASE_NAME . "`.`schemaVersion` set vValue = '9'";
 
-$dbschema[107] = "CREATE TABLE `" . MYSQL_DATABASE . "`.`imagingLog` (
+$dbschema[107] = "CREATE TABLE `" . DATABASE_NAME . "`.`imagingLog` (
 			  `ilID` integer  NOT NULL AUTO_INCREMENT,
 			  `ilHostID` integer  NOT NULL,
 			  `ilStartTime` datetime  NOT NULL,
@@ -671,70 +671,70 @@ $dbschema[107] = "CREATE TABLE `" . MYSQL_DATABASE . "`.`imagingLog` (
 			)
 			ENGINE = MyISAM";
 
-$dbschema[108] = "INSERT INTO `" . MYSQL_DATABASE . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
+$dbschema[108] = "INSERT INTO `" . DATABASE_NAME . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
                              values('FOG_SERVICE_SNAPIN_ENABLED', '"._("This setting defines if the fog snapin installer should be globally active.  (Valid values are 0 or 1)")."', '1', 'FOG Service - Snapins')";
 
-$dbschema[109] = "ALTER TABLE `" . MYSQL_DATABASE . "`.`snapins` CHANGE COLUMN `sAnon1` `sRunWith` VARCHAR(245) NOT NULL";
+$dbschema[109] = "ALTER TABLE `" . DATABASE_NAME . "`.`snapins` CHANGE COLUMN `sAnon1` `sRunWith` VARCHAR(245) NOT NULL";
 
-$dbschema[110] = "ALTER TABLE `" . MYSQL_DATABASE . "`.`snapinTasks` ADD COLUMN `stReturnCode` integer  NOT NULL AFTER `stSnapinID`,
+$dbschema[110] = "ALTER TABLE `" . DATABASE_NAME . "`.`snapinTasks` ADD COLUMN `stReturnCode` integer  NOT NULL AFTER `stSnapinID`,
 			 ADD COLUMN `stReturnDetails` varchar(250)  NOT NULL AFTER `stReturnCode`";
 
-$dbschema[111] = "ALTER TABLE `" . MYSQL_DATABASE . "`.`snapins` CHANGE COLUMN `sAnon2` `sRunWithArgs` VARCHAR(200)  CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL";
+$dbschema[111] = "ALTER TABLE `" . DATABASE_NAME . "`.`snapins` CHANGE COLUMN `sAnon2` `sRunWithArgs` VARCHAR(200)  CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL";
 
-$dbschema[112] = "UPDATE `" . MYSQL_DATABASE . "`.`schemaVersion` set vValue = '10'";
+$dbschema[112] = "UPDATE `" . DATABASE_NAME . "`.`schemaVersion` set vValue = '10'";
 
-$dbschema[113] = "ALTER TABLE `" . MYSQL_DATABASE . "`.`hosts` CHANGE COLUMN `hostAnon2` `hostKernelArgs` VARCHAR(250)  CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL";
+$dbschema[113] = "ALTER TABLE `" . DATABASE_NAME . "`.`hosts` CHANGE COLUMN `hostAnon2` `hostKernelArgs` VARCHAR(250)  CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL";
 
-$dbschema[114] = "INSERT INTO `" . MYSQL_DATABASE . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
+$dbschema[114] = "INSERT INTO `" . DATABASE_NAME . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
                              values('FOG_KERNEL_ARGS', '"._("This setting allows you to add additional kernel arguments to the client boot image.  This setting is global for all hosts.")."', '', 'General Settings')";
 
-$dbschema[115] = "UPDATE `" . MYSQL_DATABASE . "`.`schemaVersion` set vValue = '11'";
+$dbschema[115] = "UPDATE `" . DATABASE_NAME . "`.`schemaVersion` set vValue = '11'";
 
-$dbschema[116] = "INSERT INTO `" . MYSQL_DATABASE . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
+$dbschema[116] = "INSERT INTO `" . DATABASE_NAME . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
                              values('FOG_SERVICE_CLIENTUPDATER_ENABLED', '"._("This setting defines if the fog client updater should be globally active.  (Valid values are 0 or 1)")."', '1', 'FOG Service - Client Updater')";
 
-$dbschema[117] = "INSERT INTO `" . MYSQL_DATABASE . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
+$dbschema[117] = "INSERT INTO `" . DATABASE_NAME . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
                              values('FOG_SERVICE_HOSTREGISTER_ENABLED', '"._("This setting defines if the fog host register should be globally active.  (Valid values are 0 or 1)")."', '1', 'FOG Service - Host Register')";
 
-$dbschema[118] = "INSERT INTO `" . MYSQL_DATABASE . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
+$dbschema[118] = "INSERT INTO `" . DATABASE_NAME . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
                              values('FOG_SERVICE_PRINTERMANAGER_ENABLED', '"._("This setting defines if the fog printer maanger should be globally active.  (Valid values are 0 or 1)")."', '1', 'FOG Service - Printer Manager')";
 
-$dbschema[119] = "INSERT INTO `" . MYSQL_DATABASE . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
+$dbschema[119] = "INSERT INTO `" . DATABASE_NAME . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
                              values('FOG_SERVICE_TASKREBOOT_ENABLED', '"._("This setting defines if the fog task reboot should be globally active.  (Valid values are 0 or 1)")."', '1', 'FOG Service - Task Reboot')";
 
-$dbschema[120] = "INSERT INTO `" . MYSQL_DATABASE . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
+$dbschema[120] = "INSERT INTO `" . DATABASE_NAME . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
                              values('FOG_SERVICE_USERTRACKER_ENABLED', '"._("This setting defines if the fog user tracker should be globally active.  (Valid values are 0 or 1)")."', '1', 'FOG Service - User Tracker')";
 
-$dbschema[121] = "UPDATE `" . MYSQL_DATABASE . "`.`schemaVersion` set vValue = '12'";
+$dbschema[121] = "UPDATE `" . DATABASE_NAME . "`.`schemaVersion` set vValue = '12'";
 
-$dbschema[122] = "INSERT INTO `" . MYSQL_DATABASE . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
+$dbschema[122] = "INSERT INTO `" . DATABASE_NAME . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
                              values('FOG_AD_DEFAULT_DOMAINNAME', '"._("This setting defines the default value to populate the host\'s Active Directory domain name value.")."', '', 'Active Directory Defaults')";
 
-$dbschema[123] = "INSERT INTO `" . MYSQL_DATABASE . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
+$dbschema[123] = "INSERT INTO `" . DATABASE_NAME . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
                              values('FOG_AD_DEFAULT_OU', '"._("This setting defines the default value to populate the host\'s Active Directory OU value.")."', '', 'Active Directory Defaults')";
 
-$dbschema[124] = "INSERT INTO `" . MYSQL_DATABASE . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
+$dbschema[124] = "INSERT INTO `" . DATABASE_NAME . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
                              values('FOG_AD_DEFAULT_USER', '"._("This setting defines the default value to populate the host\'s Active Directory user name value.'").", '', 'Active Directory Defaults')";
 
-$dbschema[125] = "INSERT INTO `" . MYSQL_DATABASE . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
+$dbschema[125] = "INSERT INTO `" . DATABASE_NAME . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
                              values('FOG_AD_DEFAULT_PASSWORD', '"._("This setting defines the default value to populate the host\'s Active Directory password value.  This settings must be encrypted.")."', '', 'Active Directory Defaults')";
 
-$dbschema[126] = "UPDATE `" . MYSQL_DATABASE . "`.`schemaVersion` set vValue = '13'";
+$dbschema[126] = "UPDATE `" . DATABASE_NAME . "`.`schemaVersion` set vValue = '13'";
 
-$dbschema[127] = "INSERT INTO `" . MYSQL_DATABASE . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
+$dbschema[127] = "INSERT INTO `" . DATABASE_NAME . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
                              values('FOG_UTIL_DIR', '"._("This setting defines the location of the fog utility directory.")."', '/opt/fog/utils', 'FOG Utils')";
 
-$dbschema[128] = "ALTER TABLE `" . MYSQL_DATABASE . "`.`users` ADD COLUMN `uType` varchar(2)  NOT NULL AFTER `uCreateBy`";
+$dbschema[128] = "ALTER TABLE `" . DATABASE_NAME . "`.`users` ADD COLUMN `uType` varchar(2)  NOT NULL AFTER `uCreateBy`";
 
-$dbschema[129] = "UPDATE `" . MYSQL_DATABASE . "`.`schemaVersion` set vValue = '14'";
+$dbschema[129] = "UPDATE `" . DATABASE_NAME . "`.`schemaVersion` set vValue = '14'";
 
-$dbschema[130] = "INSERT INTO `" . MYSQL_DATABASE . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
+$dbschema[130] = "INSERT INTO `" . DATABASE_NAME . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
                              values('FOG_PLUGINSYS_ENABLED', '"._("This setting defines if the fog plugin system should be enabled.")."', '0', 'Plugin System')";
 
-$dbschema[131] = "INSERT INTO `" . MYSQL_DATABASE . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
+$dbschema[131] = "INSERT INTO `" . DATABASE_NAME . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
                              values('FOG_PLUGINSYS_DIR', '"._("This setting defines the base location of fog plugins.")."', './plugins', 'Plugin System')";
 
-$dbschema[132] = "CREATE TABLE `" . MYSQL_DATABASE . "`.`plugins` (
+$dbschema[132] = "CREATE TABLE `" . DATABASE_NAME . "`.`plugins` (
 			  `pID` INTEGER  NOT NULL AUTO_INCREMENT,
 			  `pName` VARCHAR(100)  NOT NULL,
 			  `pState` CHAR  NOT NULL,
@@ -753,19 +753,19 @@ $dbschema[132] = "CREATE TABLE `" . MYSQL_DATABASE . "`.`plugins` (
 			)
 			ENGINE = MyISAM";
 
-$dbschema[133] = "ALTER TABLE `" . MYSQL_DATABASE . "`.`hosts` CHANGE COLUMN `hostAnon3` `hostKernel` VARCHAR(250)  CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,
+$dbschema[133] = "ALTER TABLE `" . DATABASE_NAME . "`.`hosts` CHANGE COLUMN `hostAnon3` `hostKernel` VARCHAR(250)  CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,
 			 CHANGE COLUMN `hostAnon4` `hostDevice` VARCHAR(250)  CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL";
 
-$dbschema[134] = "UPDATE `" . MYSQL_DATABASE . "`.`schemaVersion` set vValue = '15'";
+$dbschema[134] = "UPDATE `" . DATABASE_NAME . "`.`schemaVersion` set vValue = '15'";
 
-$dbschema[135] = "ALTER TABLE `" . MYSQL_DATABASE . "`.`tasks` ADD COLUMN `taskBPM` varchar(250)  NOT NULL AFTER `taskPCT`,
+$dbschema[135] = "ALTER TABLE `" . DATABASE_NAME . "`.`tasks` ADD COLUMN `taskBPM` varchar(250)  NOT NULL AFTER `taskPCT`,
 			 ADD COLUMN `taskTimeElapsed` varchar(250)  NOT NULL AFTER `taskBPM`,
 			 ADD COLUMN `taskTimeRemaining` varchar(250)  NOT NULL AFTER `taskTimeElapsed`,
 			 ADD COLUMN `taskDataCopied` varchar(250)  NOT NULL AFTER `taskTimeRemaining`,
 			 ADD COLUMN `taskPercentText` varchar(250)  NOT NULL AFTER `taskDataCopied`,
 			 ADD COLUMN `taskDataTotal` VARCHAR(250)  NOT NULL AFTER `taskPercentText`";
 
-$dbschema[136] = "CREATE TABLE `" . MYSQL_DATABASE . "`.`nfsGroups` (
+$dbschema[136] = "CREATE TABLE `" . DATABASE_NAME . "`.`nfsGroups` (
 			  `ngID` integer  NOT NULL AUTO_INCREMENT,
 			  `ngName` varchar(250)  NOT NULL,
 			  `ngDesc` longtext  NOT NULL,
@@ -773,7 +773,7 @@ $dbschema[136] = "CREATE TABLE `" . MYSQL_DATABASE . "`.`nfsGroups` (
 			)
 			ENGINE = MyISAM";
 
-$dbschema[137] = "CREATE TABLE `" . MYSQL_DATABASE . "`.`nfsGroupMembers` (
+$dbschema[137] = "CREATE TABLE `" . DATABASE_NAME . "`.`nfsGroupMembers` (
 		  `ngmID` integer  NOT NULL AUTO_INCREMENT,
 		  `ngmMemberName` varchar(250)  NOT NULL,
 		  `ngmMemberDescription` longtext  NOT NULL,
@@ -794,10 +794,10 @@ $dbschema[137] = "CREATE TABLE `" . MYSQL_DATABASE . "`.`nfsGroupMembers` (
 		)
 		ENGINE = MyISAM";
 
-$dbschema[138] = "ALTER TABLE `" . MYSQL_DATABASE . "`.`images` ADD COLUMN `imageNFSGroupID` integer  NOT NULL AFTER `imageDD`,
+$dbschema[138] = "ALTER TABLE `" . DATABASE_NAME . "`.`images` ADD COLUMN `imageNFSGroupID` integer  NOT NULL AFTER `imageDD`,
 	 	ADD INDEX `new_index3`(`imageNFSGroupID`)";
  
-$dbschema[139] = "ALTER TABLE `" . MYSQL_DATABASE . "`.`tasks` ADD COLUMN `taskNFSGroupID` integer  NOT NULL AFTER `taskDataTotal`,
+$dbschema[139] = "ALTER TABLE `" . DATABASE_NAME . "`.`tasks` ADD COLUMN `taskNFSGroupID` integer  NOT NULL AFTER `taskDataTotal`,
 		 ADD COLUMN `taskNFSMemberID` integer  NOT NULL AFTER `taskNFSGroupID`,
 		 ADD COLUMN `taskNFSFailures` char  NOT NULL AFTER `taskNFSMemberID`,
 		 ADD COLUMN `taskLastMemberID` integer  NOT NULL AFTER `taskNFSFailures`,
@@ -806,7 +806,7 @@ $dbschema[139] = "ALTER TABLE `" . MYSQL_DATABASE . "`.`tasks` ADD COLUMN `taskN
 		 ADD INDEX `new_index7`(`taskNFSFailures`),
 		 ADD INDEX `new_index8`(`taskLastMemberID`)";
  
-$dbschema[140] = "CREATE TABLE `" . MYSQL_DATABASE . "`.`nfsFailures` (
+$dbschema[140] = "CREATE TABLE `" . DATABASE_NAME . "`.`nfsFailures` (
 		  `nfID` integer  NOT NULL AUTO_INCREMENT,
 		  `nfNodeID` integer  NOT NULL,
 		  `nfTaskID` integer  NOT NULL,
@@ -821,70 +821,70 @@ $dbschema[140] = "CREATE TABLE `" . MYSQL_DATABASE . "`.`nfsFailures` (
 		)
 		ENGINE = MyISAM";
 
-$dbschema[141] = "ALTER TABLE `" . MYSQL_DATABASE . "`.`nfsFailures` MODIFY COLUMN `nfDateTime` datetime  NOT NULL,
+$dbschema[141] = "ALTER TABLE `" . DATABASE_NAME . "`.`nfsFailures` MODIFY COLUMN `nfDateTime` datetime  NOT NULL,
 		 ADD INDEX `new_index4`(`nfDateTime`)";
  
-$dbschema[142] ="ALTER TABLE `" . MYSQL_DATABASE . "`.`multicastSessions` CHANGE COLUMN `msAnon2` `msNFSGroupID` integer  NOT NULL,
+$dbschema[142] ="ALTER TABLE `" . DATABASE_NAME . "`.`multicastSessions` CHANGE COLUMN `msAnon2` `msNFSGroupID` integer  NOT NULL,
 		 ADD INDEX `new_index`(`msNFSGroupID`)";
 
-$dbschema[143] = "INSERT INTO `" . MYSQL_DATABASE . "`.nfsGroups (ngName, ngDesc) values ('default', '"._("Auto generated fog nfs group")."' );";
+$dbschema[143] = "INSERT INTO `" . DATABASE_NAME . "`.nfsGroups (ngName, ngDesc) values ('default', '"._("Auto generated fog nfs group")."' );";
 
 $dbschema[144] =  "INSERT INTO 
-			`" . MYSQL_DATABASE . "`.nfsGroupMembers
+			`" . DATABASE_NAME . "`.nfsGroupMembers
 			(ngmMemberName, ngmMemberDescription, ngmIsMasterNode, ngmGroupID, ngmRootPath, ngmIsEnabled, ngmHostname, ngmMaxClients, ngmUser, ngmPass ) 
 			VALUES
 			('DefaultMember', '"._("Auto generated fog nfs group member")."', '1', '1', '/images/', '1', '" . STORAGE_HOST . "', '10', '" . STORAGE_FTP_USERNAME . "', '" . STORAGE_FTP_PASSWORD . "' )";
 
-$dbschema[145] = "UPDATE `" . MYSQL_DATABASE . "`.images set imageNFSGroupID = '1'";
+$dbschema[145] = "UPDATE `" . DATABASE_NAME . "`.images set imageNFSGroupID = '1'";
 
-$dbschema[146] ="DELETE FROM `" . MYSQL_DATABASE . "`.`globalSettings` WHERE settingKey = 'FOG_NFS_HOST'";
+$dbschema[146] ="DELETE FROM `" . DATABASE_NAME . "`.`globalSettings` WHERE settingKey = 'FOG_NFS_HOST'";
 
-$dbschema[147] ="DELETE FROM `" . MYSQL_DATABASE . "`.`globalSettings` WHERE settingKey = 'FOG_NFS_FTP_USERNAME'";
+$dbschema[147] ="DELETE FROM `" . DATABASE_NAME . "`.`globalSettings` WHERE settingKey = 'FOG_NFS_FTP_USERNAME'";
 
-$dbschema[148] ="DELETE FROM `" . MYSQL_DATABASE . "`.`globalSettings` WHERE settingKey = 'FOG_NFS_FTP_PASSWORD'";
+$dbschema[148] ="DELETE FROM `" . DATABASE_NAME . "`.`globalSettings` WHERE settingKey = 'FOG_NFS_FTP_PASSWORD'";
 
-$dbschema[149] ="DELETE FROM `" . MYSQL_DATABASE . "`.`globalSettings` WHERE settingKey = 'FOG_NFS_DATADIR'";
+$dbschema[149] ="DELETE FROM `" . DATABASE_NAME . "`.`globalSettings` WHERE settingKey = 'FOG_NFS_DATADIR'";
 
-$dbschema[150] ="DELETE FROM `" . MYSQL_DATABASE . "`.`globalSettings` WHERE settingKey = 'FOG_NFS_DATADIR_UPLOAD'";
+$dbschema[150] ="DELETE FROM `" . DATABASE_NAME . "`.`globalSettings` WHERE settingKey = 'FOG_NFS_DATADIR_UPLOAD'";
 
 $fogstoragenodeuser = "fogstorage";
 $fogstoragenodepass = "fs" . rand( 1000, 10000 );
 
-$dbschema[151] = "INSERT INTO `" . MYSQL_DATABASE . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
+$dbschema[151] = "INSERT INTO `" . DATABASE_NAME . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
                              values('FOG_STORAGENODE_MYSQLUSER', '"._("This setting defines the username the storage nodes should use to connect to the fog server.")."', '$fogstoragenodeuser', 'FOG Storage Nodes')";
 
-$dbschema[152] = "INSERT INTO `" . MYSQL_DATABASE . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
+$dbschema[152] = "INSERT INTO `" . DATABASE_NAME . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
                              values('FOG_STORAGENODE_MYSQLPASS', '"._("This setting defines the password the storage nodes should use to connect to the fog server.")."', '$fogstoragenodepass', 'FOG Storage Nodes')";
 
-$dbschema[153] = "GRANT ALL ON `" . MYSQL_DATABASE . "`.* TO '$fogstoragenodeuser'@'%' IDENTIFIED BY '$fogstoragenodepass'";
+$dbschema[153] = "GRANT ALL ON `" . DATABASE_NAME . "`.* TO '$fogstoragenodeuser'@'%' IDENTIFIED BY '$fogstoragenodepass'";
 
-$dbschema[154] = "UPDATE `" . MYSQL_DATABASE . "`.`schemaVersion` set vValue = '16'";
+$dbschema[154] = "UPDATE `" . DATABASE_NAME . "`.`schemaVersion` set vValue = '16'";
 
-$dbschema[155] = "INSERT INTO `" . MYSQL_DATABASE . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
+$dbschema[155] = "INSERT INTO `" . DATABASE_NAME . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
                              values('FOG_SSH_USERNAME', '"._("This setting defines the username used for the ssh client.")."', 'root', 'SSH Client')";
                              
-$dbschema[156] = "INSERT INTO `" . MYSQL_DATABASE . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
+$dbschema[156] = "INSERT INTO `" . DATABASE_NAME . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
                              values('FOG_SSH_PORT', '"._("This setting defines the port to use for the ssh client.")."', '22', 'SSH Client')";
 
-$dbschema[157] = "INSERT INTO `" . MYSQL_DATABASE . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
+$dbschema[157] = "INSERT INTO `" . DATABASE_NAME . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
                              values('FOG_VIEW_DEFAULT_SCREEN', '"._("This setting defines which page is displayed in each section, valid settings includes <b>LIST</b> and <b>SEARCH</b>.")."', 'SEARCH', 'FOG View Settings')";
 
-$dbschema[158] = "UPDATE `" . MYSQL_DATABASE . "`.`schemaVersion` set vValue = '17'";
+$dbschema[158] = "UPDATE `" . DATABASE_NAME . "`.`schemaVersion` set vValue = '17'";
 
-$dbschema[159] = "INSERT INTO " . MYSQL_DATABASE . ".supportedOS(osName, osValue) values( '"._("Windows 7")."', '5' )";
+$dbschema[159] = "INSERT INTO " . DATABASE_NAME . ".supportedOS(osName, osValue) values( '"._("Windows 7")."', '5' )";
 
-$dbschema[160] = "UPDATE `" . MYSQL_DATABASE . "`.`schemaVersion` set vValue = '18'";
+$dbschema[160] = "UPDATE `" . DATABASE_NAME . "`.`schemaVersion` set vValue = '18'";
 
-$dbschema[161] = "INSERT INTO `" . MYSQL_DATABASE . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
+$dbschema[161] = "INSERT INTO `" . DATABASE_NAME . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
                              values('FOG_PXE_MENU_TIMEOUT', '"._("This setting defines the default value for the pxe menu timeout.")."', '3', 'FOG PXE Settings')";
 
-$dbschema[162] = "INSERT INTO `" . MYSQL_DATABASE . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
+$dbschema[162] = "INSERT INTO `" . DATABASE_NAME . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
                              values('FOG_PROXY_IP', '"._("This setting defines the proxy ip address to use.")."', '', 'General Settings')";
 
-$dbschema[163] = "INSERT INTO `" . MYSQL_DATABASE . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
+$dbschema[163] = "INSERT INTO `" . DATABASE_NAME . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
                              values('FOG_PROXY_PORT', '"._("This setting defines the proxy port address to use.")."', '', 'General Settings')";
 
-$dbschema[164] = "CREATE TABLE `" . MYSQL_DATABASE . "`.`scheduledTasks` (
+$dbschema[164] = "CREATE TABLE `" . DATABASE_NAME . "`.`scheduledTasks` (
 			  `stID` integer  NOT NULL AUTO_INCREMENT,
 			  `stName` varchar(240)  NOT NULL,
 			  `stDesc` longtext  NOT NULL,
@@ -909,25 +909,25 @@ $dbschema[164] = "CREATE TABLE `" . MYSQL_DATABASE . "`.`scheduledTasks` (
 			)
 			ENGINE = MyISAM;";
 
-$dbschema[165] = "INSERT INTO `" . MYSQL_DATABASE . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
+$dbschema[165] = "INSERT INTO `" . DATABASE_NAME . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
                              values('FOG_UTIL_BASE', '"._("This setting defines the location of util base, which is typically /opt/fog/")."', '/opt/fog/', 'FOG Utils')";
 
-$dbschema[166] = "UPDATE `" . MYSQL_DATABASE . "`.`schemaVersion` set vValue = '19'";
+$dbschema[166] = "UPDATE `" . DATABASE_NAME . "`.`schemaVersion` set vValue = '19'";
 
-$dbschema[167] = "INSERT INTO `" . MYSQL_DATABASE . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
+$dbschema[167] = "INSERT INTO `" . DATABASE_NAME . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
                              values('FOG_PXE_MENU_HIDDEN', '"._("This setting defines if you would like the FOG pxe menu hidden or displayed")."', '0', 'FOG PXE Settings')";
 
-$dbschema[168] = "ALTER TABLE `" . MYSQL_DATABASE . "`.`globalSettings` MODIFY COLUMN `settingValue` LONGTEXT  CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL";
+$dbschema[168] = "ALTER TABLE `" . DATABASE_NAME . "`.`globalSettings` MODIFY COLUMN `settingValue` LONGTEXT  CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL";
 
-$dbschema[169] = "INSERT INTO `" . MYSQL_DATABASE . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
+$dbschema[169] = "INSERT INTO `" . DATABASE_NAME . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
                              values('FOG_PXE_ADVANCED', '"._("This setting defines if you would like to append any settings to the end of your PXE default file.")."', '', 'FOG PXE Settings')";
 
-$dbschema[170] = "INSERT INTO `" . MYSQL_DATABASE . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
+$dbschema[170] = "INSERT INTO `" . DATABASE_NAME . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
                              values('FOG_USE_LEGACY_TASKLIST', '"._("This setting defines if you would like to use the legacy active tasks window.  Note:  The legacy screen will no longer be updated.")."', '0', 'General Settings')";
 
-$dbschema[171] = "UPDATE `" . MYSQL_DATABASE . "`.`schemaVersion` set vValue = '20'";
+$dbschema[171] = "UPDATE `" . DATABASE_NAME . "`.`schemaVersion` set vValue = '20'";
 
-$dbschema[172] = "CREATE TABLE `" . MYSQL_DATABASE . "`.`hostMAC` (
+$dbschema[172] = "CREATE TABLE `" . DATABASE_NAME . "`.`hostMAC` (
 				  `hmID` integer  NOT NULL AUTO_INCREMENT,
 				  `hmHostID` integer  NOT NULL,
 				  `hmMAC` varchar(18)  NOT NULL,
@@ -938,7 +938,7 @@ $dbschema[172] = "CREATE TABLE `" . MYSQL_DATABASE . "`.`hostMAC` (
 				)
 				ENGINE = MyISAM";
 
-$dbschema[173] = "CREATE TABLE `" . MYSQL_DATABASE . "`.`oui` (
+$dbschema[173] = "CREATE TABLE `" . DATABASE_NAME . "`.`oui` (
 				  `ouiID` int(11) NOT NULL AUTO_INCREMENT,
 				  `ouiMACPrefix` varchar(8) NOT NULL,
 				  `ouiMan` varchar(254) NOT NULL,
@@ -946,7 +946,7 @@ $dbschema[173] = "CREATE TABLE `" . MYSQL_DATABASE . "`.`oui` (
 				  KEY `idxMac` (`ouiMACPrefix`)
 				) ENGINE=MyISAM";
 
-$dbschema[174] = "INSERT INTO `" . MYSQL_DATABASE . "`.`globalSettings` (`settingKey`, `settingDesc`, `settingValue`, `settingCategory`) VALUES
+$dbschema[174] = "INSERT INTO `" . DATABASE_NAME . "`.`globalSettings` (`settingKey`, `settingDesc`, `settingValue`, `settingCategory`) VALUES
 			('FOG_QUICKREG_AUTOPOP', 'Enable FOG Quick Registration auto population feature (0 = disabled, 1=enabled).  If this feature is enabled, FOG will auto populate the host settings and automatically image the computer without any user intervention.', '0', 'FOG Quick Registration'),
 			('FOG_QUICKREG_IMG_ID', 'FOG Quick Registration Image ID.', '-1', 'FOG Quick Registration'),
 			('FOG_QUICKREG_OS_ID', 'FOG Quick Registration OS ID.', '-1', 'FOG Quick Registration'),
@@ -956,7 +956,7 @@ $dbschema[174] = "INSERT INTO `" . MYSQL_DATABASE . "`.`globalSettings` (`settin
 			('FOG_HOST_LOCKUP', 'Should FOG attempt to see if a host is active and display it as part of the UI?', '1', 'General Settings'),
 			('FOG_UUID', 'This is a unique ID that is used to identify your installation.  In most cases you do not want to change this value.', '" . uniqid("", true) . "', 'General Settings')";
 
-$dbschema[175] = "CREATE TABLE `" . MYSQL_DATABASE . "`.`pendingMACS` (
+$dbschema[175] = "CREATE TABLE `" . DATABASE_NAME . "`.`pendingMACS` (
 				  `pmID` INTEGER  NOT NULL AUTO_INCREMENT,
 				  `pmAddress` varchar(18)  NOT NULL,
 				  `pmHostID` INTEGER  NOT NULL,
@@ -966,91 +966,91 @@ $dbschema[175] = "CREATE TABLE `" . MYSQL_DATABASE . "`.`pendingMACS` (
 				)
 				ENGINE = MyISAM;";
 
-$dbschema[176] = "INSERT INTO `" . MYSQL_DATABASE . "`.`globalSettings` (`settingKey`, `settingDesc`, `settingValue`, `settingCategory`) VALUES
+$dbschema[176] = "INSERT INTO `" . DATABASE_NAME . "`.`globalSettings` (`settingKey`, `settingDesc`, `settingValue`, `settingCategory`) VALUES
 			('FOG_QUICKREG_MAX_PENDING_MACS', 'This setting defines how many mac addresses will be stored in the pending mac address table for each host.', '4', 'FOG Service - Host Register'), 
 			('FOG_QUICKREG_PENDING_MAC_FILTER', 'This is a list of MAC address fragments that is used to filter out pending mac address requests.  For example, if you don\'t want to see pending mac address requests for VMWare NICs then you could filter by 00:05:69.  This filter is comma seperated, and is used like a *starts with* filter.', '', 'FOG Service - Host Register')";
 
-$dbschema[177] = "UPDATE `" . MYSQL_DATABASE . "`.`globalSettings` SET settingValue = '3.0.7' WHERE settingKey = 'FOG_JPGRAPH_VERSION'";
+$dbschema[177] = "UPDATE `" . DATABASE_NAME . "`.`globalSettings` SET settingValue = '3.0.7' WHERE settingKey = 'FOG_JPGRAPH_VERSION'";
 
-$dbschema[178] = "INSERT INTO `" . MYSQL_DATABASE . "`.`globalSettings` (`settingKey`, `settingDesc`, `settingValue`, `settingCategory`) VALUES
+$dbschema[178] = "INSERT INTO `" . DATABASE_NAME . "`.`globalSettings` (`settingKey`, `settingDesc`, `settingValue`, `settingCategory`) VALUES
 			('FOG_ADVANCED_STATISTICS', 'Enable the collection and display of advanced statistics.  This information WILL be sent to a remote server!  This information is used by the FOG team to see how FOG is being used.  The information that will be sent includes the server\'s UUID value, the number of hosts present in FOG, and number of images on your FOG server and well as total image space used. (0 = disabled, 1 = enabled).', '0', 'General Settings')";
 
-$dbschema[179] = "UPDATE `" . MYSQL_DATABASE . "`.`schemaVersion` set vValue = '21'";
+$dbschema[179] = "UPDATE `" . DATABASE_NAME . "`.`schemaVersion` set vValue = '21'";
 
-$dbschema[180] = "ALTER TABLE `" . MYSQL_DATABASE . "`.`inventory` ADD INDEX ( `iHostID` )";
+$dbschema[180] = "ALTER TABLE `" . DATABASE_NAME . "`.`inventory` ADD INDEX ( `iHostID` )";
 
-$dbschema[181] = "UPDATE `" . MYSQL_DATABASE . "`.`globalSettings` set settingKey = 'FOG_HOST_LOOKUP' WHERE settingKey = 'FOG_HOST_LOCKUP'";
+$dbschema[181] = "UPDATE `" . DATABASE_NAME . "`.`globalSettings` set settingKey = 'FOG_HOST_LOOKUP' WHERE settingKey = 'FOG_HOST_LOCKUP'";
 
-$dbschema[182] = "UPDATE `" . MYSQL_DATABASE . "`.`schemaVersion` set vValue = '22'";
+$dbschema[182] = "UPDATE `" . DATABASE_NAME . "`.`schemaVersion` set vValue = '22'";
 
-$dbschema[183] = "INSERT INTO `" . MYSQL_DATABASE . "`.`globalSettings` (`settingKey`, `settingDesc`, `settingValue`, `settingCategory`) VALUES
+$dbschema[183] = "INSERT INTO `" . DATABASE_NAME . "`.`globalSettings` (`settingKey`, `settingDesc`, `settingValue`, `settingCategory`) VALUES
 			('FOG_DISABLE_CHKDSK', 'This is an experimental feature that will can be used to not set the dirty flag on a NTFS partition after resizing it.  It is recommended to you run chkdsk. (0 = runs chkdsk, 1 = disables chkdsk).', '1', 'General Settings')";
 
-$dbschema[184] = "INSERT INTO `" . MYSQL_DATABASE . "`.`globalSettings` (`settingKey`, `settingDesc`, `settingValue`, `settingCategory`) VALUES
+$dbschema[184] = "INSERT INTO `" . DATABASE_NAME . "`.`globalSettings` (`settingKey`, `settingDesc`, `settingValue`, `settingCategory`) VALUES
 			('FOG_CHANGE_HOSTNAME_EARLY', 'This is an experimental feature that will can be used to change the computers hostname right after imaging the box, without the need for the FOG service.  (1 = enabled, 0 = disabled).', '1', 'General Settings')";
 
-$dbschema[185] = "UPDATE `" . MYSQL_DATABASE . "`.`schemaVersion` set vValue = '23'";
+$dbschema[185] = "UPDATE `" . DATABASE_NAME . "`.`schemaVersion` set vValue = '23'";
 
 // 24 - Blackout
 // Add Kernel, KernelArgs and PrimaryDisk to Group
-$dbschema[186] = "ALTER TABLE `" . MYSQL_DATABASE . "`.`groups` ADD `groupKernel` VARCHAR( 255 ) NOT NULL";
-$dbschema[187] = "ALTER TABLE `" . MYSQL_DATABASE . "`.`groups` ADD `groupKernelArgs` VARCHAR( 255 ) NOT NULL";
-$dbschema[188] = "ALTER TABLE `" . MYSQL_DATABASE . "`.`groups` ADD `groupPrimaryDisk` VARCHAR( 255 ) NOT NULL";
-$dbschema[189] = "UPDATE `" . MYSQL_DATABASE . "`.`schemaVersion` set vValue = '24'";
+$dbschema[186] = "ALTER TABLE `" . DATABASE_NAME . "`.`groups` ADD `groupKernel` VARCHAR( 255 ) NOT NULL";
+$dbschema[187] = "ALTER TABLE `" . DATABASE_NAME . "`.`groups` ADD `groupKernelArgs` VARCHAR( 255 ) NOT NULL";
+$dbschema[188] = "ALTER TABLE `" . DATABASE_NAME . "`.`groups` ADD `groupPrimaryDisk` VARCHAR( 255 ) NOT NULL";
+$dbschema[189] = "UPDATE `" . DATABASE_NAME . "`.`schemaVersion` set vValue = '24'";
 
 // 25 - Blackout - 8:39 AM 25/09/2011
 // Add 'os' Table & Data
 // Add 'imageOSID' field to 'images' table
-$dbschema[190] = "CREATE TABLE IF NOT EXISTS `" . MYSQL_DATABASE . "`.`os` (
+$dbschema[190] = "CREATE TABLE IF NOT EXISTS `" . DATABASE_NAME . "`.`os` (
   `osID` mediumint(9) NOT NULL AUTO_INCREMENT,
   `osName` varchar(30) NOT NULL,
   `osDescription` text NOT NULL,
   PRIMARY KEY (`osID`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1 ;";
-$dbschema[191] = "INSERT INTO `" . MYSQL_DATABASE . "`.`os` (`osID`, `osName`, `osDescription`) VALUES (1, 'Windows 2000/XP', ''), (3, 'Windows 98', ''), (2, 'Windows Vista', ''), (4, 'Windows Other', ''), (5, 'Windows 7', ''), (50, 'Linux', ''), (99, 'Other', '');";
-$dbschema[192] = "ALTER TABLE `" . MYSQL_DATABASE . "`.`images` ADD `imageOSID` MEDIUMINT NOT NULL ";
-$dbschema[193] = "ALTER TABLE `" . MYSQL_DATABASE . "`.`hosts` ADD UNIQUE (`hostMAC`)";
-$dbschema[194] = "UPDATE `" . MYSQL_DATABASE . "`.`schemaVersion` set vValue = '25'";
+$dbschema[191] = "INSERT INTO `" . DATABASE_NAME . "`.`os` (`osID`, `osName`, `osDescription`) VALUES (1, 'Windows 2000/XP', ''), (3, 'Windows 98', ''), (2, 'Windows Vista', ''), (4, 'Windows Other', ''), (5, 'Windows 7', ''), (50, 'Linux', ''), (99, 'Other', '');";
+$dbschema[192] = "ALTER TABLE `" . DATABASE_NAME . "`.`images` ADD `imageOSID` MEDIUMINT NOT NULL ";
+$dbschema[193] = "ALTER TABLE `" . DATABASE_NAME . "`.`hosts` ADD UNIQUE (`hostMAC`)";
+$dbschema[194] = "UPDATE `" . DATABASE_NAME . "`.`schemaVersion` set vValue = '25'";
 
 // 26 - Blackout - 10:05 AM 30/09/2011
 // Change `images`.`imageSize` from VARCHAR(200) -> MEDIUMINT(9)
-$dbschema[195] = "ALTER TABLE `" . MYSQL_DATABASE . "`.`images` CHANGE `imageSize` `imageSize` MEDIUMINT NOT NULL";
+$dbschema[195] = "ALTER TABLE `" . DATABASE_NAME . "`.`images` CHANGE `imageSize` `imageSize` MEDIUMINT NOT NULL";
 // Add 'ngmInterface' to Storage Node table
-$dbschema[196] = "ALTER TABLE `" . MYSQL_DATABASE . "`.`nfsGroupMembers` ADD `ngmInterface` VARCHAR( 10 ) NOT NULL DEFAULT 'eth0'";
-$dbschema[197] = "ALTER TABLE `" . MYSQL_DATABASE . "`.`nfsGroupMembers` ADD `ngmGraphEnabled` ENUM( '0', '1' ) NOT NULL DEFAULT '0'";
-$dbschema[198] = "UPDATE `" . MYSQL_DATABASE . "`.`schemaVersion` set vValue = '26'";
+$dbschema[196] = "ALTER TABLE `" . DATABASE_NAME . "`.`nfsGroupMembers` ADD `ngmInterface` VARCHAR( 10 ) NOT NULL DEFAULT 'eth0'";
+$dbschema[197] = "ALTER TABLE `" . DATABASE_NAME . "`.`nfsGroupMembers` ADD `ngmGraphEnabled` ENUM( '0', '1' ) NOT NULL DEFAULT '0'";
+$dbschema[198] = "UPDATE `" . DATABASE_NAME . "`.`schemaVersion` set vValue = '26'";
 
 // 27 - Blackout - 2:16 PM 3/10/2011
 // Convert DATETIME 'createdTime' fields to TIMESTAMP with DEFAULT of CURRENT_TIMESTAMP
-$dbschema[199] = "ALTER TABLE `" . MYSQL_DATABASE . "`.`tasks` CHANGE `taskCreateTime` `taskCreateTime` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP";
-$dbschema[200] = "ALTER TABLE `" . MYSQL_DATABASE . "`.`groups` CHANGE `groupDateTime` `groupDateTime` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP";
-$dbschema[201] = "ALTER TABLE `" . MYSQL_DATABASE . "`.`hosts` CHANGE `hostCreateDate` `hostCreateDate` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP";
-$dbschema[202] = "ALTER TABLE `" . MYSQL_DATABASE . "`.`history` CHANGE `hTime` `hTime` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP";
-$dbschema[203] = "ALTER TABLE `" . MYSQL_DATABASE . "`.`aloLog` CHANGE `alDateTime` `alDateTime` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP";
-$dbschema[204] = "ALTER TABLE `" . MYSQL_DATABASE . "`.`images` CHANGE `imageDateTime` `imageDateTime` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP";
-$dbschema[205] = "ALTER TABLE `" . MYSQL_DATABASE . "`.`inventory` CHANGE `iCreateDate` `iCreateDate` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP";
-$dbschema[206] = "ALTER TABLE `" . MYSQL_DATABASE . "`.`nfsFailures` CHANGE `nfDateTime` `nfDateTime` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP";
-$dbschema[207] = "ALTER TABLE `" . MYSQL_DATABASE . "`.`snapinJobs` CHANGE `sjCreateTime` `sjCreateTime` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP";
-$dbschema[208] = "ALTER TABLE `" . MYSQL_DATABASE . "`.`snapins` CHANGE `sCreateDate` `sCreateDate` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP";
-$dbschema[209] = "ALTER TABLE `" . MYSQL_DATABASE . "`.`snapinTasks` CHANGE `stCheckinDate` `stCheckinDate` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP";
-$dbschema[210] = "ALTER TABLE `" . MYSQL_DATABASE . "`.`users` CHANGE `uCreateDate` `uCreateDate` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP";
-$dbschema[211] = "ALTER TABLE `" . MYSQL_DATABASE . "`.`userTracking` CHANGE `utDateTime` `utDateTime` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP";
-$dbschema[212] = "ALTER TABLE `" . MYSQL_DATABASE . "`.`virus` CHANGE `vDateTime` `vDateTime` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP";
-$dbschema[213] = "UPDATE `" . MYSQL_DATABASE . "`.`schemaVersion` set vValue = '27'";
+$dbschema[199] = "ALTER TABLE `" . DATABASE_NAME . "`.`tasks` CHANGE `taskCreateTime` `taskCreateTime` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP";
+$dbschema[200] = "ALTER TABLE `" . DATABASE_NAME . "`.`groups` CHANGE `groupDateTime` `groupDateTime` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP";
+$dbschema[201] = "ALTER TABLE `" . DATABASE_NAME . "`.`hosts` CHANGE `hostCreateDate` `hostCreateDate` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP";
+$dbschema[202] = "ALTER TABLE `" . DATABASE_NAME . "`.`history` CHANGE `hTime` `hTime` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP";
+$dbschema[203] = "ALTER TABLE `" . DATABASE_NAME . "`.`aloLog` CHANGE `alDateTime` `alDateTime` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP";
+$dbschema[204] = "ALTER TABLE `" . DATABASE_NAME . "`.`images` CHANGE `imageDateTime` `imageDateTime` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP";
+$dbschema[205] = "ALTER TABLE `" . DATABASE_NAME . "`.`inventory` CHANGE `iCreateDate` `iCreateDate` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP";
+$dbschema[206] = "ALTER TABLE `" . DATABASE_NAME . "`.`nfsFailures` CHANGE `nfDateTime` `nfDateTime` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP";
+$dbschema[207] = "ALTER TABLE `" . DATABASE_NAME . "`.`snapinJobs` CHANGE `sjCreateTime` `sjCreateTime` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP";
+$dbschema[208] = "ALTER TABLE `" . DATABASE_NAME . "`.`snapins` CHANGE `sCreateDate` `sCreateDate` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP";
+$dbschema[209] = "ALTER TABLE `" . DATABASE_NAME . "`.`snapinTasks` CHANGE `stCheckinDate` `stCheckinDate` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP";
+$dbschema[210] = "ALTER TABLE `" . DATABASE_NAME . "`.`users` CHANGE `uCreateDate` `uCreateDate` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP";
+$dbschema[211] = "ALTER TABLE `" . DATABASE_NAME . "`.`userTracking` CHANGE `utDateTime` `utDateTime` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP";
+$dbschema[212] = "ALTER TABLE `" . DATABASE_NAME . "`.`virus` CHANGE `vDateTime` `vDateTime` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP";
+$dbschema[213] = "UPDATE `" . DATABASE_NAME . "`.`schemaVersion` set vValue = '27'";
 
 // 28 - Blackout - 1:48 PM 1/12/2011
 // Add 'imageTypes' table and data
-$dbschema[214] = "CREATE TABLE IF NOT EXISTS `" . MYSQL_DATABASE . "`.`imageTypes` (
+$dbschema[214] = "CREATE TABLE IF NOT EXISTS `" . DATABASE_NAME . "`.`imageTypes` (
   `imageTypeID` mediumint(9) NOT NULL auto_increment,
   `imageTypeName` varchar(100) NOT NULL,
   PRIMARY KEY  (`imageTypeID`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=5 ;";
-$dbschema[215] = "INSERT INTO `" . MYSQL_DATABASE . "`.`imageTypes` (`imageTypeID`, `imageTypeName`) VALUES
+$dbschema[215] = "INSERT INTO `" . DATABASE_NAME . "`.`imageTypes` (`imageTypeID`, `imageTypeName`) VALUES
 (1, 'Single Partition (NTFS Only, Resizable)'),
 (2, 'Multiple Partition Image - Single Disk (Not Resizable)'),
 (3, 'Multiple Partition Image - All Disks  (Not Resizable)'),
 (4, 'Raw Image (Sector By Sector, DD, Slow)');";
-$dbschema[216] = "UPDATE `" . MYSQL_DATABASE . "`.`schemaVersion` set vValue = '28'";
+$dbschema[216] = "UPDATE `" . DATABASE_NAME . "`.`schemaVersion` set vValue = '28'";
 
 
 
@@ -1103,7 +1103,7 @@ $dbschema[216] = "UPDATE `" . MYSQL_DATABASE . "`.`schemaVersion` set vValue = '
 				
 				if ( $_POST["confirm"] == "yes" )
 				{
-					//$conn = mysql_connect( MYSQL_HOST, MYSQL_USERNAME, MYSQL_PASSWORD);
+					//$conn = mysql_connect( DATABASE_HOST, DATABASE_USERNAME, DATABASE_PASSWORD);
 					if ($DatabaseManager && $db)
 					{
 						$currentSchema = $DatabaseManager->getVersion();
@@ -1120,7 +1120,7 @@ $dbschema[216] = "UPDATE `" . MYSQL_DATABASE . "`.`schemaVersion` set vValue = '
 											echo ( "<p class=\"installConfirm\">Database SQL: " . $sql . "<br>\n" ._("Database error").": (ID# ".	 $currentSchema . "-" . $i . ")</p><p>"._("Database Error").": <br /><pre class=\"shellcommand\">"  . mysql_error() . "</pre></p>" );
 											exit;
 									}
-									//$conn = @mysql_connect( MYSQL_HOST, MYSQL_USERNAME, MYSQL_PASSWORD);
+									//$conn = @mysql_connect( DATABASE_HOST, DATABASE_USERNAME, DATABASE_PASSWORD);
 								}
 								$currentSchema++;
 							}

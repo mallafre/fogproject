@@ -3,8 +3,8 @@
  * FOG Initialization
  *	Author:		Blackout
  *	Created:	3:15 PM 1/05/2011
- *	Revision:	$Revision: 711 $
- *	Last Update:	$LastChangedDate: 2011-06-23 11:09:04 +1000 (Thu, 23 Jun 2011) $
+ *	Revision:	$Revision$
+ *	Last Update:	$LastChangedDate$
  ***/
 
 // Init
@@ -60,7 +60,6 @@ if (!function_exists('__autoload'))
 require_once(BASEPATH . '/commons/functions.include.php');
 
 // Core
-$core = new Core($db);
 $FOGCore = new FOGCore($conn);
 
 // Hook Manager - Init & Load Hooks
