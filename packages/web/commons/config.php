@@ -26,8 +26,8 @@ define( "MYSQL_DATABASE", "fog" );
 define( "MYSQL_USERNAME", "root" );
 define( "MYSQL_PASSWORD", "password" );
 
-define( "FOG_VERSION", "0.32" );
-define( "FOG_SCHEMA", 27);
+define( "FOG_VERSION", "0.33B" );
+define( "FOG_SCHEMA", 28);
 
 
 define( "DB_TYPE", "mysql" );
