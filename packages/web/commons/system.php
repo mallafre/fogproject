@@ -15,6 +15,16 @@ define('FOG_VERSION', '0.33B');
 define('FOG_SCHEMA', 28);
 define('BASEPATH', DetermineBasePath());
 
+// LEGACY - Database
+if (defined('MYSQL_HOST') && !defined('DATABASE_HOST'))
+{
+	define('DATABASE_TYPE', (define('DB_TYPE') ? DB_TYPE : 'mysql'));
+	define('DATABASE_HOST', MYSQL_HOST);
+	define('DATABASE_USERNAME', MYSQL_USERNAME);
+	define('DATABASE_PASSWORD', MYSQL_PASSWORD);
+	define('DATABASE_NAME', MYSQL_DATABASE);
+}
+
 function DetermineBasePath()
 {
 	// Find the name of the first directory in the files path
