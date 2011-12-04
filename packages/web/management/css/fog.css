@@ -45,7 +45,9 @@ fieldset { margin: 0; padding: 0; border: none; }
 legend { display: none; }
 input { width: 200px; }
 input, textarea, select { font-family: "Trebuchet MS", Arial, Helvetica, sans-serif; font-size: 13px; color: #333333; border: 1px solid #94c3d3; border-radius: 3px; background-color: #fff; vertical-align: top; padding: 4px 8px; }
-input:focus, textarea:focus, select:focus { border-color: #5372af; }
+input:focus, textarea:focus { border-color: #5372af; background-image: url('../images/icon_pencil.png'); background-repeat: no-repeat; background-position: 95% center; }
+textarea:focus { background-position: 95% 90%; }
+input:hover, textarea:hover, select:hover { border-color: #5372af; }
 input[type="submit"] { background: none repeat scroll 0 0 #4C68A0; border-radius: 5px 5px 5px 5px; color: #FFFFFF; font-size: 16px; font-variant: small-caps; letter-spacing: 1px; padding: 2px; width: 220px; cursor: pointer; }
 input[type="radio"] { width: 30px; }
 .placeholder { font-style: italic; color: #bbb; text-align: center; }
