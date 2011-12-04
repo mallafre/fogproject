@@ -21,7 +21,7 @@
 
 if ( IS_INCLUDED !== true ) die( _("Unable to load system configuration information.") );
 
-$uMan = $core->getUserManager();
+$uMan = $FOGCore->getClass('UserManager');
 
 if ( $_POST["add"] != null )
 {

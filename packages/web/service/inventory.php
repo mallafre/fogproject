@@ -43,7 +43,7 @@ if ( isset( $_POST["mac"] ) )
 		$arIfconfig = explode( "HWaddr", $ifconfig  );
 		if ( count( $arIfconfig ) == 2 )
 		{
-			$conn = @mysql_connect( MYSQL_HOST, MYSQL_USERNAME, MYSQL_PASSWORD);
+			$conn = @mysql_connect( DATABASE_HOST, DATABASE_USERNAME, DATABASE_PASSWORD);
 			$mac =  mysql_real_escape_string( strtolower( trim($arIfconfig[1]) ) );
 			if ( strlen( trim($mac) ) == 17 )
 			{
@@ -51,7 +51,7 @@ if ( isset( $_POST["mac"] ) )
 				{			
 					if ( $conn )
 					{	
-						if ( ! @mysql_select_db( MYSQL_DATABASE, $conn ) ) die( mysql_error() );
+						if ( ! @mysql_select_db( DATABASE_NAME, $conn ) ) die( mysql_error() );
 						
 						$sysman=mysql_real_escape_string(trim(base64_decode( $_POST["sysman"] )));
 						$sysproduct=mysql_real_escape_string(trim(base64_decode( $_POST["sysproduct"] )));

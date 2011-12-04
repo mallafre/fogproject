@@ -2,8 +2,8 @@
 
 if (IS_INCLUDED !== true) die(_('Unable to load system configuration information.'));
 
-$hostMan = $core->getHostManager();
-$groupMan = $core->getGroupManager();
+$hostMan = $FOGCore->getClass('HostManager');
+$groupMan = $FOGCore->getClass('GroupManager');
 
 if ($currentUser != null && $currentUser->isLoggedIn())
 {

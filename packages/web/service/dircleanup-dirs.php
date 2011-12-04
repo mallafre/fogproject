@@ -24,10 +24,10 @@ require(BASEPATH . '/commons/init.php');
 require(BASEPATH . '/commons/init.database.php');
 
 
-$conn = mysql_connect( MYSQL_HOST, MYSQL_USERNAME, MYSQL_PASSWORD);
+$conn = mysql_connect( DATABASE_HOST, DATABASE_USERNAME, DATABASE_PASSWORD);
 if ( $conn )
 {
-	if ( ! mysql_select_db( MYSQL_DATABASE, $conn ) ) die( "#!db" );
+	if ( ! mysql_select_db( DATABASE_NAME, $conn ) ) die( "#!db" );
 }
 else
 {

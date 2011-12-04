@@ -94,7 +94,7 @@ else
 $isHomepage = ($includePage == 'dashboard' ? true : false);
 
 // Determine the current page's title
-$pageTitles = array(
+$sectionTitles = array(
 		'users'		=> _('User Management'),
 		'host'		=> _('Host Management'),
 		'group'		=> _('Group Management'),
@@ -110,11 +110,14 @@ $pageTitles = array(
 		'logout'	=> _('Logout'),
 		);
 // TODO: Include ID / Name of each item under each section
-$pageTitle = (isset($pageTitles[$node]) ? $pageTitles[$node] : 'Dashboard');
+$sectionTitle = (isset($sectionTitles[$node]) ? $sectionTitles[$node] : 'Dashboard');
 
-// Render content - must be done before anything is outputted
+// Render content - must be done before anything is outputted so classes can change HTTP headers
 $FOGPageManager = new FOGPageManager();
+// Load Page Classes -> Render content based on incoming node variables
 $content = $FOGPageManager->load()->render();
+// Page Title - should be set after page has been rendered
+$pageTitle = $FOGPageManager->getFOGPageTitle();
 
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -123,7 +126,7 @@ $content = $FOGPageManager->load()->render();
 	<meta http-equiv="X-UA-Compatible" content="IE=Edge"/>
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	
-	<title><?php print $pageTitle; ?> &gt; FOG &gt; Open Source Computer Cloning Solution</title>
+	<title><?php print ($pageTitle ? $pageTitle . ' &gt; ' : '') . $sectionTitle; ?> &gt; FOG &gt; Open Source Computer Cloning Solution</title>
 	
 	<link rel="stylesheet" type="text/css" href="css/calendar/calendar-win2k-1.css"  />
 	<link rel="stylesheet" type="text/css" href="css/jquery.organicTabs.css" />
@@ -147,7 +150,7 @@ $HookManager->processEvent('CSS');
 	<!-- Header -->
 	<div id="header">
 		<div id="logo">
-			<h1><a href="#"><img src="images/fog.png" alt="FOG" /><sup><?php echo FOG_VERSION; ?></sup></a></h1>
+			<h1><a href="<?php print $_SERVER['PHP_SELF']; ?>"><img src="images/fog-logo.png" title="Home" /><sup><?php echo FOG_VERSION; ?></sup></a></h1>
 			<h2>Open Source Computer Cloning Solution</h2>
 		</div>
 		<div id="menu">
@@ -158,10 +161,14 @@ $HookManager->processEvent('CSS');
 	</div>
 	<!-- Content -->
 	<div id="content"<?php print ($isHomepage ? ' class="dashboard"' : ''); ?>>
-		<h1><?php print $pageTitle; ?></h1>
+		<h1><?php print $sectionTitle; ?></h1>
 		<div id="content-inner">
 			<?php
 			
+			if ($FOGPageManager->isFOGPageTitleDisplayEnabled())
+			{
+				printf('<h2>%s</h2>', $FOGPageManager->getFOGPageTitle());
+			}
 			print $content;
 
 			//exit;

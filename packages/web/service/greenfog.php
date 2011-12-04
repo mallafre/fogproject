@@ -24,7 +24,7 @@ require_once('../commons/config.php');
 require_once(BASEPATH . '/commons/init.php');
 require_once(BASEPATH . '/commons/init.database.php');
 
-$serviceManager = $core->getClientServiceManager();
+$serviceManager = $FOGCore->getClass('ClientServiceManager');
 
 $gfs = $serviceManager->getGreenFOGActions();
 

@@ -83,10 +83,13 @@ class GroupManagementPage extends FOGPage
 	public function search()
 	{
 		// Set title
-		$this->title = _('Group Search');
+		$this->title = _('Search');
 		
 		// Set search form
 		$this->searchFormURL = 'ajax/group.search.php';
+		
+		// Hook
+		$this->HookManager->processEvent('GROUP_SEARCH');
 
 		// Output
 		$this->render();
@@ -94,13 +97,15 @@ class GroupManagementPage extends FOGPage
 	
 	public function add()
 	{
+		// Set title
+		$this->title = _('New Group');
+		
 		// Hook
 		$this->HookManager->processEvent('GROUP_ADD');
 		
 		// TODO: Put table rows into variables -> Add hooking
 		// TODO: Add tabs with other options
 		?>
-		<h2><?php print _('Add new Group'); ?></h2>
 		<form method="POST" action="<?php print $this->formAction; ?>">
 			<table cellpadding=0 cellspacing=0 border=0 width=100%>
 				<tr><td><?php print _("Group Name"); ?>:</td><td><input type="text" name="name" value="<?php print $_POST['name']; ?>" /></td></tr>
@@ -179,6 +184,11 @@ class GroupManagementPage extends FOGPage
 	{
 		// Find
 		$Group = new Group($this->request['id']);
+		
+		// Title - set title for page title in window
+		$this->title = sprintf('%s: %s', _('Edit'), $Group->get('name'));
+		// But disable displaying in content
+		$this->titleDisplay = false;
 		
 		// Hook
 		$this->HookManager->processEvent('GROUP_EDIT', array('Group' => &$Group));
@@ -478,6 +488,9 @@ class GroupManagementPage extends FOGPage
 	{
 		// Find
 		$Group = new Group($this->request['id']);
+		
+		// Title
+		$this->title = sprintf('%s: %s', _('Remove'), $Group->get('name'));
 		
 		// Hook
 		$this->HookManager->processEvent('GROUP_ADD', array('Group' => &$Group));

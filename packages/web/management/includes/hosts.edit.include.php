@@ -5,7 +5,7 @@ if (IS_INCLUDED !== true) die(_('Unable to load system configuration information
 
 if ($currentUser != null && $currentUser->isLoggedIn())
 {
-	$hostMan = $core->getHostManager();
+	$hostMan = $FOGCore->getClass('HostManager');
 	
 	if (!empty($id))
 	{

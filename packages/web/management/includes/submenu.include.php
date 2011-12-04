@@ -74,12 +74,25 @@ if ($currentUser != null && $currentUser->isLoggedIn())
 	// Host Management
 	if ($node == "host")
 	{
-		$FOGSubMenu->addItems('host', array(	_('New Search')		=> 'newsearch',
-							_('List All Hosts')	=> 'list',
-							_('Add New Host')	=> 'add',
-							_('Upload Hosts')	=> 'upload',
-					));
-		
+		if (preg_match('#pagetest#', $_SERVER['PHP_SELF']))
+		{
+			$FOGSubMenu->addItems('host', array(	_('New Search')		=> 'newsearch',
+								_('List All Hosts')	=> 'list',
+								_('Add New Host')	=> 'add',
+								_('Export Hosts')	=> 'export',
+								_('Import Hosts')	=> 'import',
+						));
+		}
+		else
+		{
+			$FOGSubMenu->addItems('host', array(	_('New Search')		=> 'newsearch',
+								_('List All Hosts')	=> 'list',
+								_('Add New Host')	=> 'add',
+								_('Export Hosts')	=> 'export',
+								_('Import Hosts')	=> 'upload',
+						));
+		}
+			
 		if ($id)
 		{
 			$Host = new Host($id);
@@ -338,7 +351,7 @@ if ($currentUser != null && $currentUser->isLoggedIn())
 						), 'id', 'User Menu');
 			
 			// User Management: Notes
-			$userMan = $core->getUserManager();
+			$userMan = $FOGCore->getClass('UserManager');
 			$user = new User($id);
 			
 			if ( $user != null )

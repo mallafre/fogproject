@@ -2,7 +2,7 @@
 
 if ( IS_INCLUDED !== true ) die( _("Unable to load system configuration information.") );
 
-$userMan = $core->getUserManager();
+$userMan = $FOGCore->getClass('UserManager');
 
 if( isset($_POST["ulang"]) && strlen(trim($_POST["ulang"])) > 0 )
 {

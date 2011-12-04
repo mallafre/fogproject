@@ -160,7 +160,7 @@ else
 	echo ( "<p class=\"titleBottomLeft\">Plugin Installation</p>" );
 	if ( $_POST["install"] == "1" )
 	{
-		$sql = "CREATE TABLE `" . MYSQL_DATABASE . "`.`capone` (
+		$sql = "CREATE TABLE `" . DATABASE_NAME . "`.`capone` (
 			  `cID` integer  NOT NULL AUTO_INCREMENT,
 			  `cImageID` integer  NOT NULL,
 			  `cOSID` integer  NOT NULL,
@@ -173,11 +173,11 @@ else
 			ENGINE = MyISAM";
 		if ( mysql_query( $sql, $conn ) )
 		{
-			$sql = "INSERT INTO `" . MYSQL_DATABASE . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
+			$sql = "INSERT INTO `" . DATABASE_NAME . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
 						values('FOG_PLUGIN_CAPONE_DMI', 'This setting is used for the capone module to set the DMI field used.', '', 'Plugin: " . mysql_real_escape_string($plugin->getName()) . "')";
 			mysql_query( $sql, $conn ) or die ( mysql_error() );
 
-			$sql = "INSERT INTO `" . MYSQL_DATABASE . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
+			$sql = "INSERT INTO `" . DATABASE_NAME . "`.globalSettings(settingKey, settingDesc, settingValue, settingCategory)
 						values('FOG_PLUGIN_CAPONE_REGEX', 'This setting is used for the capone module to set the reg ex used.', '', 'Plugin: " . mysql_real_escape_string($plugin->getName()) . "')";
 			mysql_query( $sql, $conn ) or die ( mysql_error() );
 

@@ -47,6 +47,7 @@ $(function()
 	});
 	
 	// Tooltips
+	$('#logo > h1 > a > img').tipsy({'gravity': 's'});
 	HookTooltips();
 
 	// Host Search

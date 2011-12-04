@@ -105,13 +105,13 @@ if ( $currentUser != null && $currentUser->isLoggedIn() )
 					
 		echo ( "<div class=\"hostgroup\">" );
 			echo("<p>"._("Add new printer to all hosts in this group.")."</p>");
-			print $this->FOGCore->getClass('PrinterManager')->buildSelectBox('', 'prntadd');
+			print $FOGCore->getClass('PrinterManager')->buildSelectBox('', 'prntadd');
 			echo ( "<br /><br />" );
 		echo ( "</div>" );
 		
 		echo ( "<div class=\"hostgroup\">" );
 			echo("<p>"._("Remove printer from all hosts in this group.")."</p>");
-			print $this->FOGCore->getClass('PrinterManager')->buildSelectBox('', 'prntdel');
+			print $FOGCore->getClass('PrinterManager')->buildSelectBox('', 'prntdel');
 			echo ( "<br /><br />" );
 		echo ( "</div>" );
 		

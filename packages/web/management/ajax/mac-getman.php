@@ -32,13 +32,13 @@ if (!$_SESSION['AllowAJAXTasks'])
 
 if ( $_GET["prefix"] != null && strlen($_GET["prefix"]) >= 8 )
 {
-	if ( $core->getMACLookupCount() > 0 )
+	if ( $FOGCore->getMACLookupCount() > 0 )
 	{
 		$mac = new MACAddress( $_GET["prefix"] );
 		if ( $mac != null )
 		{
-			$mac = $core->getMACManufacturer($mac->getMACPrefix());
-			echo ($mac == 'n/a' ? 'Unknown' : $mac);
+			$mac = $FOGCore->getMACManufacturer($mac->getMACPrefix());
+			echo ($mac == 'n/a' ? _('Unknown') : $mac);
 		}
 	}
 	else
@@ -46,5 +46,5 @@ if ( $_GET["prefix"] != null && strlen($_GET["prefix"]) >= 8 )
 }
 else
 {
-	echo "n/a";
+	echo _('Unknown');
 }

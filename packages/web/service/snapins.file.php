@@ -24,9 +24,9 @@ require_once('../commons/config.php');
 require_once(BASEPATH . '/commons/init.php');
 require_once(BASEPATH . '/commons/init.database.php');
 
-$hostManager = $core->getHostManager();
-$serviceManager = $core->getClientServiceManager();
-$taskMan = $core->getTaskManager();
+$hostManager = $FOGCore->getClass('HostManager');
+$serviceManager = $FOGCore->getClass('ClientServiceManager');
+$taskMan = $FOGCore->getClass('TaskManager');
 
 $tmpMac = strtolower($_GET["mac"]);
 $arMacs = HostManager::parseMacList($tmpMac);

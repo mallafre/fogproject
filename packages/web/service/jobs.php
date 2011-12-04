@@ -40,8 +40,8 @@ $arMacs 	= HostManager::parseMacList($mac);
 if ( $arMacs == null || count( $arMacs ) == 0 )
 	die( "#!im" );
 	
-$taskMan = $core->getTaskManager();
-$hostMan = $core->getHostManager();
+$taskMan = $FOGCore->getClass('TaskManager');
+$hostMan = $FOGCore->getClass('HostManager');
 
 try
 {

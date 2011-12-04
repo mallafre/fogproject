@@ -45,7 +45,7 @@ class UserManagementPage extends FOGPage
 	public function index()
 	{
 		// Set title
-		$this->title = _('All Current Users');
+		$this->title = _('All Users');
 		
 		// Find data
 		$Users = $this->FOGCore->getClass('UserManager')->find();
@@ -75,10 +75,13 @@ class UserManagementPage extends FOGPage
 	public function search()
 	{
 		// Set title
-		$this->title = _('Search Current Users');
+		$this->title = _('Search');
 		
 		// Set search form
 		$this->searchFormURL = 'ajax/users.search.php';
+		
+		// Hook
+		$this->HookManager->processEvent('USER_SEARCH');
 
 		// Output
 		$this->render();
@@ -86,6 +89,9 @@ class UserManagementPage extends FOGPage
 	
 	public function add()
 	{
+		// Set title
+		$this->title = _('New User');
+		
 		// Hook
 		$this->HookManager->processEvent('USER_ADD');
 		
@@ -131,7 +137,7 @@ class UserManagementPage extends FOGPage
 				'name'		=> $_POST['name'],
 				'type'		=> ($_POST['isGuest'] == 'on' ? '1' : '0'),
 				'password'	=> $_POST['password'],
-				'createdBy'	=> $this->currentUser->get('name')
+				'createdBy'	=> $this->FOGCore->get('name')
 			));
 			
 			// Save
@@ -172,6 +178,11 @@ class UserManagementPage extends FOGPage
 	{
 		// Find
 		$User = new User($this->request['id']);
+		
+		// Title - set title for page title in window
+		$this->title = sprintf('%s: %s', _('Edit'), $User->get('name'));
+		// But disable displaying in content
+		$this->titleDisplay = false;
 		
 		// Hook
 		$this->HookManager->processEvent('USER_ADD', array('User' => &$User));
@@ -266,6 +277,9 @@ class UserManagementPage extends FOGPage
 	{
 		// Find
 		$User = new User($this->request['id']);
+		
+		// Title
+		$this->title = sprintf('%s: %s', _('Remove'), $User->get('name'));
 		
 		// Hook
 		$this->HookManager->processEvent('USER_DELETE', array('User' => &$User));

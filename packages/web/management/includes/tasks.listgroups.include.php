@@ -65,7 +65,7 @@ if ($currentUser != null && $currentUser->isLoggedIn())
 				
 				$data = array();
 
-				$groups = $core->getGroupManager()->find();
+				$groups = $FOGCore->getClass('GroupManager')->find();
 				if (count($groups))
 				{
 					foreach ($groups as $group)

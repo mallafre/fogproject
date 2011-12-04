@@ -25,10 +25,10 @@ require(BASEPATH . '/commons/init.database.php');
 
 if ( isset( $_GET["action"] ) )
 {
-	$conn = @mysql_connect( MYSQL_HOST, MYSQL_USERNAME, MYSQL_PASSWORD);
+	$conn = @mysql_connect( DATABASE_HOST, DATABASE_USERNAME, DATABASE_PASSWORD);
 	if ( $conn )
 	{
-		if ( ! @mysql_select_db( MYSQL_DATABASE, $conn ) ) die( "#!db" );
+		if ( ! @mysql_select_db( DATABASE_NAME, $conn ) ) die( "#!db" );
 		
 		$file = mysql_real_escape_string( base64_decode( $_GET["file"] ) );
 		$action = $_GET["action"];

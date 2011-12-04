@@ -89,10 +89,13 @@ class HostManagementPage extends FOGPage
 	public function search()
 	{
 		// Set title
-		$this->title = _('Host Search');
+		$this->title = _('Search');
 		
 		// Set search form
 		$this->searchFormURL = 'ajax/host.search.php';
+		
+		// Hook
+		$this->HookManager->processEvent('HOST_SEARCH');
 
 		// Output
 		$this->render();
@@ -100,6 +103,9 @@ class HostManagementPage extends FOGPage
 	
 	public function add()
 	{
+		// Set title
+		$this->title = _('New Host');
+		
 		// Hook
 		$this->HookManager->processEvent('HOST_ADD');
 		
@@ -115,7 +121,6 @@ class HostManagementPage extends FOGPage
 				<tr><td><?php print _("Primary MAC"); ?>:*</td><td><input type="text" id="mac" name="mac" value="<?php print $_POST['mac']; ?>" /> &nbsp; <span id="priMaker"></span> </td></tr>
 				<tr><td><?php print _("Host Description"); ?>:</td><td><textarea name="description" rows="5" cols="40"><?php print $_POST['description']; ?></textarea></td></tr>
 				<tr><td><?php print _("Host Image"); ?>:</td><td><?php print $this->FOGCore->getClass('ImageManager')->buildSelectBox($_POST['image']);  ?></td></tr>
-				<tr><td><?php print _("Host OS"); ?>:</td><td><?php print $this->FOGCore->getClass('OSManager')->buildSelectBox($_POST['os']); ?></td></tr>
 				<tr><td><?php print _("Host Kernel"); ?>:</td><td><input type="text" name="kern" value="<?php print $_POST['kern']; ?>" /></td></tr>		
 				<tr><td><?php print _("Host Kernel Arguments"); ?>:</td><td><input type="text" name="args" value="<?php print $_POST['args']; ?>" /></td></tr>	
 				<tr><td><?php print _("Host Primary Disk"); ?>:</td><td><input type="text" name="dev" value="<?php print $_POST['dev']; ?>" /></td></tr>		
@@ -210,6 +215,11 @@ class HostManagementPage extends FOGPage
 		// Find
 		$Host = new Host($this->request['id']);
 		
+		// Title - set title for page title in window
+		$this->title = sprintf('%s: %s', _('Edit'), $Host->get('name'));
+		// But disable displaying in content
+		$this->titleDisplay = false;
+		
 		// Hook
 		$this->HookManager->processEvent('HOST_EDIT', array('Host' => &$Host));
 		
@@ -229,7 +239,6 @@ class HostManagementPage extends FOGPage
 						<tr><td><?php print _("Primary MAC"); ?>:*</td><td><input type="text" id="mac" name="mac" value="<?php print $Host->get('mac'); ?>" /> &nbsp; <span id="priMaker"></span> </td></tr>
 						<tr><td><?php print _("Host Description"); ?>:</td><td><textarea name="description" rows="5" cols="40"><?php print $Host->get('description'); ?></textarea></td></tr>
 						<tr><td><?php print _("Host Image"); ?>:</td><td><?php print $this->FOGCore->getClass('ImageManager')->buildSelectBox($Host->get('imageID')); ?></td></tr>
-						<tr><td><?php print _("Host OS"); ?>:</td><td><?php print $this->FOGCore->getClass('OSManager')->buildSelectBox($Host->get('osID')); ?></td></tr>
 						<tr><td><?php print _("Host Kernel"); ?>:</td><td><input type="text" name="kern" value="<?php print $Host->get('kern'); ?>" /></td></tr>
 						<tr><td><?php print _("Host Kernel Arguments"); ?>:</td><td><input type="text" name="args" value="<?php print $Host->get('args'); ?>" /></td></tr>
 						<tr><td><?php print _("Host Primary Disk"); ?>:</td><td><input type="text" name="dev" value="<?php print $Host->get('dev'); ?>" /></td></tr>
@@ -788,9 +797,12 @@ class HostManagementPage extends FOGPage
 	}
 
 	public function delete()
-	{
+	{	
 		// Find
 		$Host = new Host($this->request['id']);
+		
+		// Title
+		$this->title = sprintf('%s: %s', _('Remove'), $Host->get('name'));
 		
 		// Hook
 		$this->HookManager->processEvent('HOST_ADD', array('Host' => &$Host));
@@ -842,6 +854,123 @@ class HostManagementPage extends FOGPage
 			// Redirect
 			$this->FOGCore->redirect($this->formAction);
 		}
+	}
+	
+	public function import()
+	{
+		// Title
+		$this->title = _('Import Host List');
+		
+		?>
+		<form enctype="multipart/form-data" method="POST" action="<?php print $this->formAction; ?>">
+		<center><table cellpadding=0 cellspacing=0 border=0 width=90%>
+			<tr><td><?php print _("CSV File"); ?>:</font></td><td><input class="smaller" type="file" name="file" value="" /></td></tr>
+			<tr><td colspan=2><font><center><br /><input class="smaller" type="submit" value="<?php print _("Upload CSV"); ?>" /></center></font></td></tr>				
+		</table></center>
+		</form>
+		<p><?php print _('This page allows you to upload a CSV file of hosts into FOG to ease migration.  Right click <a href="./other/hostimport.csv">here</a> and select <strong>Save target as...</strong> or <strong>Save link as...</strong>  to download a template file.  The only fields that are required are hostname and MAC address.  Do <strong>NOT</strong> include a header row, and make sure you resave the file as a CSV file and not XLS!'); ?></p>
+		<?php
+	}
+	
+	public function import_post()
+	{
+		// TODO: Rewrite this... it works for now
+		try
+		{
+			// Error checking
+			if ($_FILES["file"]["error"] > 0)
+			{
+				throw new Exception(sprintf('%s: %s', _('Error'), (is_array($_FILES["file"]["error"]) ? implode(', ', $_FILES["file"]["error"]) : $_FILES["file"]["error"])));
+			}
+			if (!file_exists($_FILES["file"]["tmp_name"]))
+			{
+				throw new Exception('Could not find tmp filename');
+			}
+			
+			$numSuccess = $numFailed = $numAlreadyExist = 0;
+			
+			$handle = fopen($_FILES["file"]["tmp_name"], "r");
+			while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) 
+			{
+				// Ignore header data if left in CSV
+				if (preg_match('#ie#', $data[0]))
+				{
+					continue;
+				}
+				
+				$totalRows++;
+				if ( count( $data ) < 6 && count( $data ) >= 2 )
+				{
+					try
+					{
+						// Error checking
+						if ($this->FOGCore->getClass('HostManager')->doesHostExistWithMac(new MACAddress($data[0])))
+						{
+							throw new Exception('A Host with this MAC Address already exists');
+						}
+					
+						$Host = new Host(array(
+							'name'		=> $data[1],
+							'description'	=> $data[3] . ' ' . _('Uploaded by batch import on'),
+							'ip'		=> $data[2],
+							'imageID'	=> $data[5],
+							'createdTime'	=> time(),
+							'createdBy'	=> $this->FOGUser->get('name'),
+							'mac'		=> $data[0]
+						));
+						
+						if ($Host->save())
+						{
+							$numSuccess++;
+						}
+						else
+						{
+							$numFailed++;
+						}
+							
+					}
+					catch (Exception $e )
+					{
+						$numFailed++;
+						$uploadErrors .= sprintf('%s #%s: %s<br />', _('Row'), $totalRows, $e->getMessage());
+					}					
+				}
+				else
+				{
+					$numFailed++;
+					$uploadErrors .= sprintf('%s #%s: %s<br />', _('Row'), $totalRows, _('Invalid number of cells'));
+				}
+			}
+			fclose($handle);
+		}
+		catch (Exception $e)
+		{
+			$error = $e->getMessage();
+		}
+		
+		// Title
+		$this->title = 'Import Host Results';
+		
+		// Output
+		?>
+		<table cellpadding=0 cellspacing=0 border=0 width=100%>
+			<tr><td width="25%"><?php print _("Total Rows"); ?></font></td><td><?php print $totalRows; ?></td></tr>
+			<tr><td><?php print _("Successful Hosts"); ?></td><td><?php print $numSuccess; ?></td></tr>
+			<tr><td><?php print _("Failed Hosts"); ?></td><td><?php print $numFailed; ?></td></tr>				
+			<tr><td><?php print _("Errors"); ?></td><td><?php print $uploadErrors; ?></td></tr>						
+		</table>
+		<?php
+	}
+	
+	public function export()
+	{
+		// Title
+		$this->title = _('TODO!');
+	}
+	
+	public function export_post()
+	{
+	
 	}
 }
 

@@ -37,8 +37,8 @@ if (!$crit)
 }
 
 // Variables
-$hostMan = $core->getHostManager();
-$taskMan = $core->getTaskManager();
+$hostMan = $FOGCore->getClass('HostManager');
+$taskMan = $FOGCore->getClass('TaskManager');
 $data = array();
 
 // Main

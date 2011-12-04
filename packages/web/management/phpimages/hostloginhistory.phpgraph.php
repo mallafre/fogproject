@@ -4,10 +4,10 @@ session_start();
 require_once( "../../commons/config.php" );
 require_once( "../../commons/functions.include.php" );
 
-$conn = mysql_connect( MYSQL_HOST, MYSQL_USERNAME, MYSQL_PASSWORD);
+$conn = mysql_connect( DATABASE_HOST, DATABASE_USERNAME, DATABASE_PASSWORD);
 if ( $conn )
 {
-	@mysql_select_db( MYSQL_DATABASE );
+	@mysql_select_db( DATABASE_NAME );
 }
 
 require_once( "../lib/UserLoginEntry.class.php" );

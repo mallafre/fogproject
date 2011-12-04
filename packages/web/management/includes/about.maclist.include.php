@@ -47,7 +47,7 @@ if ( $_GET["update"] == "1" )
 				{
 					if ( strlen(trim( $macprefix ) ) == 8 && strlen($maker) > 0 )
 					{
-						if ( $core->addUpdateMACLookupTable( $macprefix, $maker ) )
+						if ( $FOGCore->addUpdateMACLookupTable( $macprefix, $maker ) )
 							$imported++;
 					}
 				}
@@ -69,7 +69,7 @@ if ( $_GET["update"] == "1" )
 }
 else if ( $_GET["clear"] == "1" )
 {
-	$core->clearMACLookupTable();
+	$FOGCore->clearMACLookupTable();
 }
 
 ?>
@@ -81,7 +81,7 @@ else if ( $_GET["clear"] == "1" )
 
 <div>
 	<p>
-	<?php echo(_("Current Records: ").$core->getMACLookupCount()); ?></p>
+	<?php echo(_("Current Records: ").$FOGCore->getMACLookupCount()); ?></p>
 	
 	<p>
 		<input type="button" id="delete" value="<?php echo(_("Delete Current Records")); ?>" onclick="clearMacs();" />  <input style='margin-left: 20px' type="button" id="update" value="<?php echo(_("Update Current Listing")); ?>" onclick="updateMacs();" />

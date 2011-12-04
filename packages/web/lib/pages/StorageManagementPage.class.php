@@ -1,11 +1,11 @@
 <?php
 
 // Blackout - 10:40 AM 1/12/2011
-class TemplateManagementPage extends FOGPage
+class StorageManagementPage extends FOGPage
 {
 	// Base variables
-	var $name = 'Template Management';
-	var $node = 'template';
+	var $name = 'Storage Management';
+	var $node = 'storage';
 	var $id = 'id';
 	
 	// Menu Items
@@ -45,7 +45,7 @@ class TemplateManagementPage extends FOGPage
 	public function index()
 	{
 		// Set title
-		$this->title = _('All Current Users');
+		$this->title = _('All Users');
 		
 		// Find data
 		$Users = $this->FOGCore->getClass('UserManager')->find();
@@ -75,10 +75,13 @@ class TemplateManagementPage extends FOGPage
 	public function search()
 	{
 		// Set title
-		$this->title = _('Search Current Users');
+		$this->title = _('Search');
 		
 		// Set search form
 		$this->searchFormURL = 'ajax/users.search.php';
+		
+		// Hook
+		$this->HookManager->processEvent('STORAGE_SEARCH');
 
 		// Output
 		$this->render();
@@ -86,6 +89,9 @@ class TemplateManagementPage extends FOGPage
 	
 	public function add()
 	{
+		// Set title
+		$this->title = _('New Storage');
+		
 		// Hook
 		$this->HookManager->processEvent('USER_ADD');
 		
@@ -131,7 +137,7 @@ class TemplateManagementPage extends FOGPage
 				'name'		=> $_POST['name'],
 				'type'		=> ($_POST['isGuest'] == 'on' ? '1' : '0'),
 				'password'	=> $_POST['password'],
-				'createdBy'	=> $this->currentUser->get('name')
+				'createdBy'	=> $this->FOGCore->get('name')
 			));
 			
 			// Save
@@ -172,6 +178,11 @@ class TemplateManagementPage extends FOGPage
 	{
 		// Find
 		$User = new User($this->request['id']);
+		
+		// Title - set title for page title in window
+		$this->title = sprintf('%s: %s', _('Edit'), $User->get('name'));
+		// But disable displaying in content
+		$this->titleDisplay = false;
 		
 		// Hook
 		$this->HookManager->processEvent('USER_ADD', array('User' => &$User));
@@ -267,6 +278,9 @@ class TemplateManagementPage extends FOGPage
 		// Find
 		$User = new User($this->request['id']);
 		
+		// Title
+		$this->title = sprintf('%s: %s', _('Remove'), $User->get('name'));
+		
 		// Hook
 		$this->HookManager->processEvent('USER_DELETE', array('User' => &$User));
 		
@@ -323,4 +337,4 @@ class TemplateManagementPage extends FOGPage
 }
 
 // Register page with FOGPageManager
-//$FOGPageManager->add(new UserManagementPage());
+$FOGPageManager->add(new StorageManagementPage());

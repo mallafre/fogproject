@@ -61,15 +61,9 @@ class DatabaseManager
 			switch($this->type)
 			{
 				case 'mysql':
-					// NEW
-					$db = new MySQL($this->host, $this->user, $this->pass, $this->db);
+					$this->db = new MySQL($this->host, $this->user, $this->pass, $this->db);
 					
-					// OLD
-					//$db = new MySqlOLD(); $db->setCredentials( $this->user, $this->pass ); $db->setHost( $this->host ); $db->setSchema( $this->db );
-					
-					$this->db = $db;
-					
-					return $db;	
+					return $this->db;	
 					
 					break;
 				case 'mssql':

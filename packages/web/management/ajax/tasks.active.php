@@ -40,7 +40,7 @@ foreach ($allTasks as $task)
 	$taskData = array();
 	
 	// Determine state
-	$state = ($task->getState() == Task::STATE_QUEUED && $core->getTaskManager()->hasActiveTaskCheckedIn($task->get('id')) ? 'In Line' : $task->getStateText());
+	$state = ($task->getState() == Task::STATE_QUEUED && $FOGCore->getClass('TaskManager')->hasActiveTaskCheckedIn($task->get('id')) ? 'In Line' : $task->getStateText());
 	
 	// Push static variables into local array
 	$Host = $task->getHost();

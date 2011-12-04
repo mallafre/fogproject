@@ -25,7 +25,7 @@ if ( IS_INCLUDED !== true ) die( _("Unable to load system configuration informat
 <h2><?php print _("All Current Users"); ?></h2>
 <?php
 	
-$uMan = $core->getUserManager();
+$uMan = $FOGCore->getClass('UserManager');
 $users = $uMan->getAllUsers();
 
 if ( count( $users ) > 0 )

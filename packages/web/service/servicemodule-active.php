@@ -120,7 +120,7 @@ $glEn = $FOGCore->getSetting( $strGlobalSettingName );
 if ( $glEn == "1" )
 {
 	// OK, we are enabled globally, now make sure the host isn't disabled
-	$hostMan = $core->getHostManager();
+	$hostMan = $FOGCore->getClass('HostManager');
 	$arhost = null;
 	try
 	{

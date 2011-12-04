@@ -46,7 +46,7 @@ if ($_FILES["file"] != null  )
 					try
 					{
 						// Error checking
-						if ($core->getHostManager()->doesHostExistWithMac(new MACAddress($data[0])))
+						if ($FOGCore->getClass('HostManager')->doesHostExistWithMac(new MACAddress($data[0])))
 						{
 							throw new Exception('A Host with this MAC Address already exists');
 						}

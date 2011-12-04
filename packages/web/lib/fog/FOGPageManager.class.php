@@ -9,7 +9,10 @@ class FOGPageManager
 	
 	private $FOGCore;
 	
-	private $debug = false;
+	private $debug = true;
+	private $info = false;
+	
+	private $pageTitle;
 	
 	public function __construct()
 	{
@@ -51,6 +54,7 @@ class FOGPageManager
 			}
 			
 			// INFO
+			//$this->info('Adding FOGPage: %s, Node: %s, Methods: %s', array(get_class($class), $class->node, implode('(), ', (array)get_class_methods($class->node)) . '()'));
 			$this->info('Adding FOGPage: %s, Node: %s', array(get_class($class), $class->node));
 		
 			$this->nodes[$class->node] = $class;
@@ -63,6 +67,21 @@ class FOGPageManager
 		return $this;
 	}
 	
+	public function getFOGPageClass()
+	{
+		return $this->nodes[$GLOBALS[$this->nodeVariable]];
+	}
+	
+	public function getFOGPageTitle()
+	{
+		return $this->getFOGPageClass()->title;
+	}
+	
+	public function isFOGPageTitleDisplayEnabled()
+	{
+		return ($this->getFOGPageClass()->titleDisplay == true && !empty($this->getFOGPageClass()->title));
+	}
+	
 	// Call FOGPage->method based on $node and $sub
 	public function render()
 	{
@@ -71,7 +90,7 @@ class FOGPageManager
 			// Variables
 			$node = $GLOBALS[$this->nodeVariable];
 			$sub = $method = $GLOBALS[$this->subVariable];
-			$class = $this->nodes[$node];
+			$class = $this->getFOGPageClass();
 		
 			// Error checking
 			if (!array_key_exists($node, $this->nodes))
@@ -135,7 +154,7 @@ class FOGPageManager
 	// Info
 	protected function info($txt, $data = array())
 	{
-		if ($this->debug)
+		if ($this->info)
 		{
 			$this->FOGCore->info('%s: %s', array(get_class($this), (count($data) ? vsprintf($txt, $data) : $txt)));
 		}

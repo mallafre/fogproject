@@ -97,6 +97,7 @@ var Loader;
 		{
 			// Variables
 			var $this = $(this);
+			var SubmitButton = $('#' + $this.attr('id') + '-submit');
 		
 			// Bind search input
 			// keyup - perform search
@@ -110,21 +111,21 @@ var Loader;
 				}, Options.SearchDelay);
 			// focus
 			}).focus(function() {
-				var $this = $(this);
+				var $this = $(this).removeClass('placeholder');
 				if ($this.val() == 'Search')
 				{
-					$this.css({ 'text-align': 'left' }).val('');
+					$this.val('');
 				}
 				else
 				{
-					$this.select();
+					//$this.select();
 				}
 			// blur - if the search textbox is empty, reset everything!
 			}).blur(function() {
 				var $this = $(this);
 				if ($this.val() == '')
 				{
-					$this.css({ 'text-align': 'center' }).val('Search');
+					$this.addClass('placeholder').val('Search');
 					if (this.SearchAJAX) this.SearchAJAX.abort();
 					if (this.SearchTimer) clearTimeout(this.SearchTimer);
 					Loader.fogStatusUpdate();
@@ -149,7 +150,7 @@ var Loader;
 				// Length check
 				if (Query.length < Options.SearchMinLength)
 				{
-					Loader.fogStatusUpdate(_L['SEARCH_LENGTH_MIN'].replace(/%1/, Options.SearchMinLength), { 'Class': 'error' });
+					//Loader.fogStatusUpdate(_L['SEARCH_LENGTH_MIN'].replace(/%1/, Options.SearchMinLength), { 'Class': 'error' });
 					return;
 				}
 				
@@ -169,10 +170,18 @@ var Loader;
 						$('.ping').fogPingAbort();
 						
 						// Update Status
-						Loader.fogStatusUpdate(_L['PERFORMING_SEARCH'], { 'Class': 'loading' });
+						//Loader.fogStatusUpdate(_L['PERFORMING_SEARCH'], { 'Class': 'loading' });
+						//Loader.fogStatusUpdate(_L['PERFORMING_SEARCH']);
+						Loader.fogStatusUpdate();
+						
+						// Submit button spinner
+						SubmitButton.addClass('searching');
 					},
 					'success':	function(response)
 					{
+						// Submit button spinner
+						SubmitButton.removeClass('searching');
+						
 						// Deselect search box
 						//$this.blur();
 						
@@ -453,7 +462,7 @@ var Loader;
 		// Display messages if any were found
 		if (Messages.length > 0)
 		{
-			Loader.fogStatusUpdate(Messages.join('</p><p>'));
+			Loader.fogStatusUpdate(Messages.join('</p><p>')).hide().fadeIn();
 		}
 		
 		return this;
@@ -512,6 +521,8 @@ var Loader;
 				Loader.fadeOut('fast');
 			}, Options.AutoHide);
 		}
+		
+		return this;
 	}
 	
 	$.fn.fogVariable = function(opts)

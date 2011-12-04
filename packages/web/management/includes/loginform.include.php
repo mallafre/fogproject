@@ -42,13 +42,13 @@ function getLanguages()
 	<!-- Header -->
 	<div id="header" class="login">
 		<div id="logo">
-			<h1><a href="#"><img src="images/fog.png" /><sup><?php echo FOG_VERSION ?></sup></a></h1>
+			<h1><a href="<?php print $_SERVER['PHP_SELF']; ?>"><img src="images/fog-logo.png" title="Home" /><sup><?php echo FOG_VERSION; ?></sup></a></h1>
 			<h2>Open Source Computer Cloning Solution</h2>
 		</div>
 	</div>
 	<!-- Content -->
 	<div id="content" class="dashboard">
-		<h1><?php print _("FOG Management Login"); ?></h1>
+		<h1><?php print _('Management Login'); ?></h1>
 		<div id="content-inner">
 			<form method="post" action="?node=login" id="login-form">
 				<?php

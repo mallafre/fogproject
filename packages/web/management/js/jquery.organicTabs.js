@@ -81,21 +81,24 @@
 				return false;
 			});
 			
+			// Find start slide from anchor if it exists
+			var startSlide = (base.anchor ? base.$nav.find('a[href$="#' + base.anchor + '"]').parent().index() : 0);
+			
 			// Content: Hide all tabs expect for the first tab
-			base.$content.children().addClass('organic-tabs-hidden').eq(0).removeClass('organic-tabs-hidden');
+			base.$content.children().hide().removeClass('organic-tabs-hidden').eq(startSlide).show();
 			
 			// Nav: Make first tab the default selected
-			base.$nav.find('li > a[href*="#"]').removeClass('organic-tabs-current').eq(0).addClass('organic-tabs-current');
+			base.$nav.find('li > a[href*="#"]').removeClass('organic-tabs-current').eq(startSlide).addClass('organic-tabs-current');
 			
 			// Content: On load -> Check anchor -> Click anchor link to change tab to content
 			if (base.anchor)
 			{
 				// TODO: Fix - make seemless on load instead of animate
 				//base.$nav.find('.organic-tabs-current').removeClass('organic-tabs-current').end().find('a[href="#' + base.anchor + '"]').addClass('organic-tabs-current');
-				//base.$content.find('#' + base.anchor).removeClass('organic-tabs-hidden').siblings().addClass('#organic-tabs-hidden');
+				//base.$content.find('#' + base.anchor).show().siblings().hide();
 				
-				$('a[href$="#' + base.anchor + '"]').click();
-			}		
+				//$('a[href$="#' + base.anchor + '"]').click();
+			}
 		};
 		
 		// Function: Returns current active tab

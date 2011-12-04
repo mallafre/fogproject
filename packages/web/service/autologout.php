@@ -30,8 +30,8 @@ $arMacs 	= HostManager::parseMacList($mac);
 if ( $arMacs == null || count( $arMacs ) == 0 )
 	die( "#!im" );
 
-$hostMan = $core->getHostManager();
-$serviceManager = $core->getClientServiceManager();
+$hostMan = $FOGCore->getClass('HostManager');
+$serviceManager = $FOGCore->getClass('ClientServiceManager');
 
 // first get the global settings
 $tme = $FOGCore->getSetting( "FOG_SERVICE_AUTOLOGOFF_MIN" );

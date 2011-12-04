@@ -21,7 +21,7 @@
 
 if ( IS_INCLUDED !== true ) die( "Unable to load system configuration information." );
 
-$hostMan = $core->getHostManager();
+$hostMan = $FOGCore->getClass('HostManager');
 
 ?>
 <h2><?php print _("Host Listing Export")." <a href=\"export.php?type=csv\" target=\"_blank\"><img class=\"noBorder\" src=\"images/csv.png\" /></a>"; ?></h2>

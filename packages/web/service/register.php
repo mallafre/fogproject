@@ -62,7 +62,7 @@ $arMacs 	= HostManager::parseMacList($mac);
 if ( $arMacs == null || count( $arMacs ) == 0 )
 	die( "#!im" );
 
-$hostMan = $core->getHostManager();
+$hostMan = $FOGCore->getClass('HostManager');
 
 if ( count( $arMacs ) > 1 )
 {

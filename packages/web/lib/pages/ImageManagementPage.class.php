@@ -45,7 +45,7 @@ class ImageManagementPage extends FOGPage
 	public function index()
 	{
 		// Set title
-		$this->title = _('All Current Images');
+		$this->title = _('All Images');
 		
 		// Find data
 		$Images = $this->FOGCore->getClass('ImageManager')->find();
@@ -75,10 +75,13 @@ class ImageManagementPage extends FOGPage
 	public function search()
 	{
 		// Set title
-		$this->title = _('Search Current Images');
+		$this->title = _('Search');
 		
 		// Set search form
 		$this->searchFormURL = 'ajax/image.search.php';
+		
+		// Hook
+		$this->HookManager->processEvent('IMAGE_SEARCH');
 
 		// Output
 		$this->render();
@@ -86,6 +89,9 @@ class ImageManagementPage extends FOGPage
 	
 	public function add()
 	{
+		// Set title
+		$this->title = _('New Image');
+		
 		// Hook
 		$this->HookManager->processEvent('IMAGE_ADD');
 		
@@ -185,6 +191,11 @@ class ImageManagementPage extends FOGPage
 	{
 		// Find
 		$Image = new Image($this->request['id']);
+		
+		// Title - set title for page title in window
+		$this->title = sprintf('%s: %s', _('Edit'), $Image->get('name'));
+		// But disable displaying in content
+		$this->titleDisplay = false;
 		
 		// Hook
 		$this->HookManager->processEvent('IMAGE_ADD', array('Image' => &$Image));
@@ -286,6 +297,9 @@ class ImageManagementPage extends FOGPage
 	{
 		// Find
 		$Image = new Image($this->request['id']);
+		
+		// Title
+		$this->title = sprintf('%s: %s', _('Remove'), $Image->get('name'));
 		
 		// Hook
 		$this->HookManager->processEvent('IMAGE_DELETE', array('Image' => &$Image));

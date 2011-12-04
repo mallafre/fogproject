@@ -64,8 +64,8 @@ if ($currentUser != null && $currentUser->isLoggedIn())
 					array('width' => 55, 'class' => 'c')
 				);
 				
-				$hostMan = $core->getHostManager();
-				$taskMan = $core->getTaskManager();
+				$hostMan = $FOGCore->getClass('HostManager');
+				$taskMan = $FOGCore->getClass('TaskManager');
 				
 				$data = array();
 				$hosts = $hostMan->getAllHosts();

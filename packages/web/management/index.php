@@ -144,7 +144,7 @@ $HookManager->processEvent('CSS');
 	<!-- Header -->
 	<div id="header">
 		<div id="logo">
-			<h1><a href="#"><img src="images/fog.png" alt="FOG" /><sup><?php echo FOG_VERSION; ?></sup></a></h1>
+			<h1><a href="<?php print $_SERVER['PHP_SELF']; ?>"><img src="images/fog-logo.png" title="Home" /><sup><?php echo FOG_VERSION; ?></sup></a></h1>
 			<h2>Open Source Computer Cloning Solution</h2>
 		</div>
 		<div id="menu">

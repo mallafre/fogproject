@@ -42,8 +42,8 @@ $arMacs 	= HostManager::parseMacList($mac);
 if ( $arMacs == null || count( $arMacs ) == 0 )
 	die( "#!im" );
 
-$hostMan = $core->getHostManager();
-$serviceMan = $core->getClientServiceManager();
+$hostMan = $FOGCore->getClass('HostManager');
+$serviceMan = $FOGCore->getClass('ClientServiceManager');
 
 try
 {

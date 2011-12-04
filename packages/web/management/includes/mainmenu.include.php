@@ -21,7 +21,7 @@ if ($currentUser != null && $currentUser->isLoggedIn())
 	);
 	
 	// Plugin system enabled?
-	if ($GLOBALS['FOGCore']->getSetting( "FOG_PLUGINSYS_ENABLED"))
+	if ($GLOBALS['FOGCore']->getSetting('FOG_PLUGINSYS_ENABLED'))
 	{
 		$mainMenuItems['Plugin Management'] = 'plugin';
 	}
@@ -30,7 +30,7 @@ if ($currentUser != null && $currentUser->isLoggedIn())
 	$mainMenuItems['Logout'] = 'logout';
 	
 	// Hook
-	$HookManager->processEvent('MainMenuData', array('data' => &$mainMenuItems));
+	$HookManager->processEvent('MAIN_MENU_DATA', array('data' => &$mainMenuItems));
 	
 	// Build the menu
 	print "<ul>\n";

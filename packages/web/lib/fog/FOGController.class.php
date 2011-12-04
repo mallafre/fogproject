@@ -28,7 +28,8 @@ abstract class FOGController
 	public $autoSave = false;
 	
 	// DEBUG mode - print all Errors & SQL queries
-	protected $debug = true;	
+	protected $debug = true;
+	protected $info = false;
 	
 	// FOG Database Class
 	protected $db;
@@ -397,15 +398,15 @@ abstract class FOGController
 	{
 		if ($this->debug)
 		{
-			$GLOBALS['FOGCore']->error('%s: %s', array(get_class($this), (count($data) ? vsprintf($txt, $data) : $txt)));
+			$this->FOGCore->error('%s: %s', array(get_class($this), (count($data) ? vsprintf($txt, $data) : $txt)));
 		}
 	}
 	// Info
 	protected function info($txt, $data = array())
 	{
-		if ($this->debug)
+		if ($this->info)
 		{
-			$GLOBALS['FOGCore']->info('%s: %s', array(get_class($this), (count($data) ? vsprintf($txt, $data) : $txt)));
+			$this->FOGCore->info('%s: %s', array(get_class($this), (count($data) ? vsprintf($txt, $data) : $txt)));
 		}
 	}
 	

@@ -25,7 +25,8 @@ abstract class FOGPage
 	);
 	
 	// Page title
-	public $title = '';
+	public $titleDisplay = true;
+	public $title;
 	
 	// Render engine
 	public $headerData = array();
@@ -56,7 +57,7 @@ abstract class FOGPage
 		$this->db = $GLOBALS['db'];
 		$this->FOGCore = $GLOBALS['FOGCore'];
 		$this->HookManager = $GLOBALS['HookManager'];
-		$this->currentUser = $GLOBALS['currentUser'];
+		$this->FOGUser = $GLOBALS['currentUser'];
 		
 		// Set name if passed
 		if ($name)
@@ -134,11 +135,11 @@ abstract class FOGPage
 				// HTML output
 				if ($this->searchFormURL)
 				{
-					$result = sprintf('<h2>%s</h2>%s<input id="%s-search" type="text" value="%s" class="search-input" />',
-						_('Search'),
+					$result = sprintf('%s<div id="search-wrapper"><input id="%s-search" class="search-input placeholder" type="text" value="" placeholder="%s" autocomplete="off" /> <input id="%s-search-submit" class="search-submit" type="button" value="" /></div>',
 						"\n\t\t\t",
 						(substr($this->node, -1) == 's' ? substr($this->node, 0, -1) : $this->node),	// TODO: Store this in class as variable
-						_('Search')
+						sprintf('%s %s', ucwords((substr($this->node, -1) == 's' ? substr($this->node, 0, -1) : $this->node)), _('Search')),
+						(substr($this->node, -1) == 's' ? substr($this->node, 0, -1) : $this->node)	// TODO: Store this in class as variable
 					);
 				}
 			

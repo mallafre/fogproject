@@ -72,7 +72,7 @@ if ($currentUser != null && $currentUser->isLoggedIn())
 				<label for="grp"><?php print _('Add to group'); ?></label>
 				<select name="grp" id="grp"><option value="">- <?php print _('Select a group'); ?> -</option>
 				<?php
-				$groupMan = $core->getGroupManager();
+				$groupMan = $FOGCore->getClass('GroupManager');
 				$arGroups = $groupMan->getAllGroups();
 				for ($i = 0; $i < count($arGroups); $i++)
 				{
