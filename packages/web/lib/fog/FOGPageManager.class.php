@@ -88,14 +88,14 @@ class FOGPageManager
 		try
 		{
 			// Variables
-			$node = $GLOBALS[$this->nodeVariable];
+			$node = ($GLOBALS[$this->nodeVariable] ? $GLOBALS[$this->nodeVariable] : 'home');
 			$sub = $method = $GLOBALS[$this->subVariable];
 			$class = $this->getFOGPageClass();
 		
 			// Error checking
 			if (!array_key_exists($node, $this->nodes))
 			{
-				throw new Exception('No FOGPage Class found for this node');
+				throw new Exception(sprintf('No FOGPage Class found for this node. You should try the old "includes" style management code <a href="%s">found here</a>', preg_replace("#index\.php#", 'indexold.php', $_SERVER['PHP_SELF']) . "?$_SERVER[QUERY_STRING]"));
 			}
 			
 			// Figure out which method to call - default to index() if method is not found

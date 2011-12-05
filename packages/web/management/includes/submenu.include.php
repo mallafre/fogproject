@@ -33,7 +33,7 @@ if ($currentUser != null && $currentUser->isLoggedIn())
 		if ($groupid)
 		{
 			// Group Management: Edit
-			if (preg_match('#pagetest#', $_SERVER['PHP_SELF']))
+			if (!preg_match('#indexold#', $_SERVER['PHP_SELF']))
 			{
 				$FOGSubMenu->addItems('group', array(	_('General')		=> "$_SERVER[PHP_SELF]?node=$node&sub=edit&groupid=$groupid#group-general",
 									_('Basic Tasks')	=> "$_SERVER[PHP_SELF]?node=$node&sub=edit&groupid=$groupid#group-tasks",
@@ -74,9 +74,9 @@ if ($currentUser != null && $currentUser->isLoggedIn())
 	// Host Management
 	if ($node == "host")
 	{
-		if (preg_match('#pagetest#', $_SERVER['PHP_SELF']))
+		if (!preg_match('#indexold#', $_SERVER['PHP_SELF']))
 		{
-			$FOGSubMenu->addItems('host', array(	_('New Search')		=> 'newsearch',
+			$FOGSubMenu->addItems('host', array(	_('New Search')		=> 'search',
 								_('List All Hosts')	=> 'list',
 								_('Add New Host')	=> 'add',
 								_('Export Hosts')	=> 'export',
@@ -85,7 +85,7 @@ if ($currentUser != null && $currentUser->isLoggedIn())
 		}
 		else
 		{
-			$FOGSubMenu->addItems('host', array(	_('New Search')		=> 'newsearch',
+			$FOGSubMenu->addItems('host', array(	_('New Search')		=> 'search',
 								_('List All Hosts')	=> 'list',
 								_('Add New Host')	=> 'add',
 								_('Export Hosts')	=> 'export',
@@ -99,7 +99,7 @@ if ($currentUser != null && $currentUser->isLoggedIn())
 			$hostname = ($Host->isValid() ? $Host->get('name') : '-');
 		
 			// Host Management: Edit
-			if (preg_match('#pagetest#', $_SERVER['PHP_SELF']))
+			if (!preg_match('#indexold#', $_SERVER['PHP_SELF']))
 			{
 				// NEW menu items - tab based, single page
 				$FOGSubMenu->addItems('host', array(	_('General')		=> "$_SERVER[PHP_SELF]?node=$node&sub=edit&id=$id#host-general",
@@ -158,7 +158,7 @@ if ($currentUser != null && $currentUser->isLoggedIn())
 		if ($imageid)
 		{
 			// Image Management: Edit
-			if (preg_match('#pagetest#', $_SERVER['PHP_SELF']))
+			if (!preg_match('#indexold#', $_SERVER['PHP_SELF']))
 			{
 				$FOGSubMenu->addItems('images', array(	_('General')		=> "$_SERVER[PHP_SELF]?node=$node&sub=list&imageid=$imageid",
 									_('Delete')		=> "$_SERVER[PHP_SELF]?node=$node&sub=delete&imageid=$imageid",
@@ -278,7 +278,7 @@ if ($currentUser != null && $currentUser->isLoggedIn())
 	// Storage Management
 	if ($node == "storage")
 	{
-		if (preg_match('#pagetest#', $_SERVER['PHP_SELF']))
+		if (!preg_match('#indexold#', $_SERVER['PHP_SELF']))
 		{
 			$FOGSubMenu->addItems('storage', array(	_('All Storage Nodes')		=> "$_SERVER[PHP_SELF]?node=$node&sub=edit&id=$id#storage-nodes",
 								_('Add Storage Nodes')		=> "$_SERVER[PHP_SELF]?node=$node&sub=edit&id=$id#storage-add-node",

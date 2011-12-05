@@ -39,7 +39,7 @@ $(function()
 		},
 		'error':	function()
 		{
-			ResultContainers.find('span').removeClass('icon-loading-grey').addClass('icon-kill').attr('title', 'Failed to connect!');
+			ResultContainers.find('span').removeClass().addClass('icon icon-kill').attr('title', 'Failed to connect!');
 		}
 	});
 	

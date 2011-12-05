@@ -171,40 +171,11 @@ $(function()
 		}
 	});
 	
-	// DEV - Blackout - 2:36 PM 29/11/2011
-	if (window.location.href.match(/pagetest/))
-	{
-		/*
-		var used = new Array();
-		$('#sidebar > ul:eq(1) > li > a[href*="&sub="]').each(function()
-		{
-			var $this = $(this);
-			var sub = $this.attr('href').match(/&sub=(.*)/)[1].split('&')[0];
-			
-			if (!used[sub])
-			{
-				used[sub] = sub;
-				
-				var content = $('#' + sub);
-				
-				if (content.is('*'))
-				{
-					debug('sub: ' + sub + ' CONTENT FOUND!');
-				}
-				else
-				{
-					debug('sub: ' + sub + ' FAIL!');
-				}
-			}
-		});
-		*/
-		
-		// Tabs
-		// Blackout - 9:14 AM 30/11/2011
-		$('.organic-tabs').organicTabs({
-			'targetID'	: '#tab-container'
-		});
-	}	
+	// Tabs
+	// Blackout - 9:14 AM 30/11/2011
+	$('.organic-tabs').organicTabs({
+		'targetID'	: '#tab-container'
+	});
 });
 
 function debug(txt)

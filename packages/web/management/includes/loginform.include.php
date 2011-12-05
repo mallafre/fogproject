@@ -42,7 +42,7 @@ function getLanguages()
 	<!-- Header -->
 	<div id="header" class="login">
 		<div id="logo">
-			<h1><a href="<?php print $_SERVER['PHP_SELF']; ?>"><img src="images/fog-logo.png" title="Home" /><sup><?php echo FOG_VERSION; ?></sup></a></h1>
+			<h1><img src="images/fog-logo.png" /><sup><?php echo FOG_VERSION; ?></sup></h1>
 			<h2>Open Source Computer Cloning Solution</h2>
 		</div>
 	</div>
@@ -71,8 +71,8 @@ function getLanguages()
 			</form>
 				
 			<div id="login-form-info">
-				<div><?php print _("Estimated FOG sites"); ?>: <b><span class="icon icon-loading-grey"></span></b></div>
-				<div><?php print _("Latest Version"); ?>: <b><span class="icon icon-loading-grey"></span></b></div>	
+				<p><?php print _("Estimated FOG sites"); ?>: <b><span class="icon icon-loading"></span></b></p>
+				<p><?php print _("Latest Version"); ?>: <b><span class="icon icon-loading"></span></b></p>	
 			</div>
 		</div>
 	</div>
