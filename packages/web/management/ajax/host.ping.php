@@ -23,61 +23,46 @@
 require_once((defined('BASEPATH') ? BASEPATH . '/commons/config.php' : '../../commons/config.php'));
 require_once(BASEPATH . '/commons/init.php');
 
-// Allow AJAX check
-if (!$_SESSION['AllowAJAXTasks'])
+try
 {
-	die('FOG Session Invalid');
-}
-
-// Blackout - just incase the JS element cannot be found
-if ($_REQUEST['ping'] == 'undefined')
-{
-	die('Undefined host to ping');
-}
-
-if (!isset($_SESSION['FOGPingActive']))
-{
-	// FOG Session Invalid
-	die('99');
-}
-else if (!$_SESSION['FOGPingActive'])
-{
-	// Ping disabled via FOG Configuration
-	die('97');
-}
-
-if (isset($_GET["ping"]))
-{
-	try
+	// Error checking
+	if (!$_SESSION['AllowAJAXTasks'])
 	{
-		$ip = gethostbyname($_GET["ping"]);
-		
-		if ($ip != $_GET["ping"])
-		{
-			$ping = new Ping($ip);
-			if ($ping->execute())
-			{
-				// Ping Success!
-				echo "1";
-			}
-			else
-			{
-				// Ping failed
-				echo "0";
-			}
-		}
-		else
-		{
-			echo "Unable to resolve hostname: $ip";
-		}
+		throw new Exception(_('FOG session invalid'));
 	}
-	catch (Exception $e)
+	if (empty($_REQUEST['ping']) || $_REQUEST['ping'] == 'undefined')
 	{
-		echo $e->getMessage();
+		throw new Exception(_('Undefined host to ping'));
 	}
+	if (!HostManager::isHostnameSafe($_GET['ping']))
+	{
+		throw new Exception(_('Invalid hostname'));
+	}
+	
+	// Resolve hostname
+	$ip = gethostbyname($_GET['ping']);
+	
+	// Did the hostname resolve correctly?
+	if ($ip == $_GET['ping'])
+	{
+		throw new Exception(_('Unable to resolve hostname'));
+	}
+	
+	// Ping IP Address
+	$result = $FOGCore->getClass('Ping', $ip)->execute();
+	
+	// Show error message if not successful
+	if ($result !== true)
+	{
+		// Error from Ping class
+		throw new Exception($result);
+	}
+	
+	// Success
+	print '1';
 }
-else
+catch (Exception $e)
 {
-	// No host passed to ping
-	echo "98";
+	// Failure
+	print $e->getMessage();
 }

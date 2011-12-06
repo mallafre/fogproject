@@ -30,50 +30,28 @@
 class Ping
 {
 	private $host;
+	private $port = '445';	// Microsoft netbios port
 	private $timeout;
 	private $internalSleep;
 
-	public function __construct( $host, $timeout=2, $sleep=false, $type='udp' )
+	public function __construct( $host, $timeout=2, $sleep=false, $type='udp', $port='7' )
 	{
 		$this->host = $host;
 		$this->timeout = $timeout;
 		$this->internalSleep = $sleep;
 		$this->type = ($type != 'icmp' ? 'udp' : 'icmp');
+		$this->port = $port;
 	}
 	
 	public function execute()
 	{
 		if ( $this->timeout > 0 && $this->host != null )
 		{
-			if ($this->internalSleep) usleep($this->internalSleep);
+			//if ($this->internalSleep) usleep($this->internalSleep);
 			
-			return ($this->type == 'icmp' ? $this->icmpPing() : $this->udpPing());
+			//return ($this->type == 'icmp' ? $this->icmpPing() : $this->udpPing());
+			return $this->fsockopenPing();
 		}
-		return false;
-	}
-	
-	function icmpPing() {
-		/* ICMP ping packet with a pre-calculated checksum */
-		$package = "\x08\x00\x7d\x4b\x00\x00\x00\x00PingHost";
-		$socket  = socket_create(AF_INET, SOCK_RAW, 1);
-		socket_set_option($socket, SOL_SOCKET, SO_RCVTIMEO, array('sec' => $this->timeout, 'usec' => 0));
-		socket_connect($socket, $this->host, null);
-		
-		print $socket;
-
-		$ts = microtime(true);
-		socket_send($socket, $package, strLen($package), 0);
-		if (socket_read($socket, 255))
-		{
-			$result = microtime(true) - $ts;
-		}
-		else
-		{
-			$result = false;
-		}
-		socket_close($socket);
-
-		return $result;
 	}
 	
 	// Blackout - 9:08 AM 4/10/2011
@@ -81,7 +59,7 @@ class Ping
 	{
 		try
 		{
-			$h = fsockopen('udp://'.$this->host, 7, $errNo, $errStr, $this->timeout);
+			$h = fsockopen('udp://'.$this->host, $this->port, $errNo, $errStr, $this->timeout);
 
 			if (!$h)
 			{
@@ -101,13 +79,45 @@ class Ping
 			$blReturn = ( (microtime(true) - $start) <= $this->timeout );
 			fclose($h);
 			
-			return $blReturn;
+			if (!$blReturn)
+			{
+				throw new Exception('Ping timeout');
+			}
+			
+			return true;
 		}
 		catch (Exception $e)
 		{
-			print $e->getMessage();
+			return $e->getMessage();
 		}
-			
-		return false;
+	}
+	
+	// Blackout - 7:41 AM 6/12/2011
+	function commandLinePing()
+	{
+		exec(sprintf('ping -c1 -w1 %s', $this->host), $output, $return);
+		
+		return ($return === 0 ? true : $return);
+	}
+	
+	// Blackout - 7:41 AM 6/12/2011
+	function fsockopenPing()
+	{
+		$socket = @fsockopen($this->host, $this->port, $errorCode, $errorMessage, $this->timeout);
+		if ($socket)
+		{
+			fclose($socket);
+		}
+		
+		//
+		// Blackout - 7:41 AM 6/12/2011
+		// 110 = ETIMEDOUT = Connection timed out
+		// 111 = ECONNREFUSED = Connection refused
+		// 112 = EHOSTDOWN = Host is down
+		//
+		// All error codes for all O/S's are located here: http://www.ioplex.com/~miallen/errcmp.html - also in 'man connect'
+		//
+		
+		return ($errorCode === 0 || !in_array($errorCode, array(110, 111, 112)) ? true : $errorMessage);
 	}
 }

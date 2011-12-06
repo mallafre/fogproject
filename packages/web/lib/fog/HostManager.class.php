@@ -50,6 +50,13 @@ class HostManager extends FOGManagerController
 				GROUP BY 	
 					hostID DESC';
 
+	// Custom functions
+	public function isHostnameSafe($name)
+	{
+		return (strlen($name) > 0 && strlen($name) <= 15 && preg_replace('#[0-9a-zA-Z_\-]#', '', $name) == '');
+	}
+
+
 	// LEGACY
 	const SORT_HOST_ASC = 1;
 	const SORT_HOST_DESC = 2;
