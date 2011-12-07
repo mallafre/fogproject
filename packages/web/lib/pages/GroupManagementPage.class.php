@@ -55,12 +55,6 @@ class GroupManagementPage extends FOGPage
 		
 		// Find data
 		$Groups = $this->FOGCore->getClass('GroupManager')->find();
-	
-		// Error checking
-		if (!count($Groups))
-		{
-			throw new Exception('No groups found');
-		}
 		
 		// Row data
 		foreach ($Groups AS $Group)
@@ -172,6 +166,9 @@ class GroupManagementPage extends FOGPage
 			// Hook
 			$this->HookManager->processEvent('GROUP_ADD_FAIL', array('Group' => &$Group));
 			
+			// Log History event
+			$this->FOGCore->logHistory(sprintf('%s add failed: Name: %s, Error: %s', _('Group'), $_POST['name'], $e->getMessage()));
+			
 			// Set session message
 			$this->FOGCore->setMessage($e->getMessage());
 			
@@ -242,21 +239,10 @@ class GroupManagementPage extends FOGPage
 					}
 
 
-					$members = getImageMembersByGroupID( $GLOBALS['conn'], $Group->get('id') );
-					if ( $members != null )
+					//$members = getImageMembersByGroupID( $GLOBALS['conn'], $Group->get('id') );
+					foreach ($Group->get('hosts') AS $Host)
 					{
-						for( $i = 0; $i < count( $members ); $i++ )
-						{
-							if ( $members[$i] != null )
-							{
-								$bgcolor = "alt1";
-								if ( $i % 2 == 0 ) $bgcolor = "alt2";
-								
-								?>
-								<tr class="$bgcolor"><td>&nbsp;" . $members[$i]->getHostName() . "</td><td>&nbsp;" . $members[$i]->getIPaddress() . "</td><td>&nbsp;" . $members[$i]->get('mac') . "</td><td><a href="?node=$node&sub=$sub&groupid=" . $groupid . "&tab=$tab&delhostid=" . $members[$i]->getID() . ""><img src="images/deleteSmall.png" class="link" /></a></td></tr>
-								<?php
-							}
-						}
+						printf('<tr class="%s"><td>%s</td><td>%s</td><td>%s</td><td><a href="%s"><img src="images/deleteSmall.png" class="link" /></a></td></tr>', (++$i % 2 ? 'alt': ''), $Host->get('name'), $Host->get('ip'), $Host->get('mac'), "?node=" . $this->node . "&sub=" . $this->sub . "&groupid=" . $this->request['id'] . "&id=" . $Host->get('id'));
 					}
 					?>
 					</table></center>
@@ -477,10 +463,13 @@ class GroupManagementPage extends FOGPage
 			$this->HookManager->processEvent('GROUP_EDIT_FAIL', array('Group' => &$Group));
 			
 			// Log History event
-			$this->FOGCore->logHistory(sprintf('Group update failed: Name: %s, Error: %s', $_POST['name'], $e->getMessage()));
+			$this->FOGCore->logHistory(sprintf('%s update failed: Name: %s, Error: %s', _('Group'), $_POST['name'], $e->getMessage()));
 		
 			// Set session message
 			$this->FOGCore->setMessage($e->getMessage());
+			
+			// Redirect
+			$this->FOGCore->redirect(sprintf('?node=%s&sub=edit&%s=%s#%s', $this->request['node'], $this->id, $Group->get('id'), $this->request['tab']));
 		}
 	}
 

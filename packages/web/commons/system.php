@@ -24,6 +24,14 @@ if (defined('MYSQL_HOST') && !defined('DATABASE_HOST'))
 	define('DATABASE_PASSWORD', MYSQL_PASSWORD);
 	define('DATABASE_NAME', MYSQL_DATABASE);
 }
+if (defined('DB_HOST') && !defined('DATABASE_HOST'))
+{
+	define('DATABASE_TYPE', (define('DB_TYPE') ? DB_TYPE : 'mysql'));
+	define('DATABASE_HOST', DB_HOST);
+	define('DATABASE_USERNAME', DB_USERNAME);
+	define('DATABASE_PASSWORD', DB_PASSWORD);
+	define('DATABASE_NAME', DB_DATABASE);
+}
 
 function DetermineBasePath()
 {

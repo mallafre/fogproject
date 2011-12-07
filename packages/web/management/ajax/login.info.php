@@ -11,7 +11,7 @@ $fetchDataInfo = array(	'sites' 	=> 'http://www.fogproject.org/globalusers/',
 
 foreach ($fetchDataInfo AS $key => $url)
 {
-	if ($fetchedData = Fetch($url))
+	if ($fetchedData = $FOGCore->fetchURL($url))
 	{
 		$data[$key] = $fetchedData;
 	}

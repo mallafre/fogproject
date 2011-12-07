@@ -100,7 +100,9 @@ class MySQL
 			// printf
 			if (!is_array($data))
 			{
-				throw new Exception('printf data passed, but not an array!');
+				//throw new Exception('printf data passed, but not an array!');
+				
+				$data = array($data);
 			}
 			if (count($data))
 			{

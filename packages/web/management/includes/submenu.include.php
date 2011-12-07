@@ -280,10 +280,10 @@ if ($currentUser != null && $currentUser->isLoggedIn())
 	{
 		if (!preg_match('#indexold#', $_SERVER['PHP_SELF']))
 		{
-			$FOGSubMenu->addItems('storage', array(	_('All Storage Nodes')		=> "$_SERVER[PHP_SELF]?node=$node&sub=edit&id=$id#storage-nodes",
-								_('Add Storage Nodes')		=> "$_SERVER[PHP_SELF]?node=$node&sub=edit&id=$id#storage-add-node",
-								_('All Storage Groups')		=> "$_SERVER[PHP_SELF]?node=$node&sub=edit&id=$id#storage-groups",
-								_('Add Storage Group')		=> "$_SERVER[PHP_SELF]?node=$node&sub=edit&id=$id#storage-add-group",
+			$FOGSubMenu->addItems('storage', array(	_('All Storage Nodes')		=> "$_SERVER[PHP_SELF]?node=$node",
+								_('Add Storage Nodes')		=> "$_SERVER[PHP_SELF]?node=$node&sub=add-storage-node",
+								_('All Storage Groups')		=> "$_SERVER[PHP_SELF]?node=$node&sub=all-storage-groups",
+								_('Add Storage Group')		=> "$_SERVER[PHP_SELF]?node=$node&sub=add-storage-group",
 						));
 		}
 		else

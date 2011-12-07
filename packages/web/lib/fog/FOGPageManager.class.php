@@ -88,8 +88,8 @@ class FOGPageManager
 		try
 		{
 			// Variables
-			$node = ($GLOBALS[$this->nodeVariable] ? $GLOBALS[$this->nodeVariable] : 'home');
-			$sub = $method = $GLOBALS[$this->subVariable];
+			$node = ($GLOBALS[$this->nodeVariable] ? preg_replace('#[^\w]#', '_', urldecode($GLOBALS[$this->nodeVariable])) : 'home');
+			$sub = $method = preg_replace('#[^\w]#', '_', urldecode($GLOBALS[$this->subVariable]));
 			$class = $this->getFOGPageClass();
 		
 			// Error checking
@@ -115,10 +115,16 @@ class FOGPageManager
 				$method = 'search';
 			}
 			
-			// POST - Change method to 'method_post', if the method exists
+			// POST - Append '_post' to method name if request method is POST and the method exists
 			if ($_SERVER['REQUEST_METHOD'] == 'POST' && method_exists($class, $method . '_post'))
 			{
 				$method = $method . '_post';
+			}
+			
+			// AJAX - Append '_ajax' to method name if request is ajax and the method exists
+			if ($this->FOGCore->isAJAXRequest() && method_exists($class, $method . '_ajax'))
+			{
+				$method = $method . '_ajax';
 			}
 			
 			// Arguments

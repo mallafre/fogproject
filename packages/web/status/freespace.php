@@ -23,7 +23,7 @@ if ($_REQUEST['id'])
 			$URL = "http://" . $Node['ngmHostname'] . SPACE_DEFAULT_WEBROOT . "status/freespace.php";
 			//print $URL;
 			
-			if ($Response = Fetch($URL))
+			if ($Response = $FOGCore->fetchURL($URL))
 			{
 				// Backwards compatibility for old versions of FOG
 				if (preg_match('#(.*)@(.*)#', $Response, $match))

@@ -49,12 +49,6 @@ class UserManagementPage extends FOGPage
 		
 		// Find data
 		$Users = $this->FOGCore->getClass('UserManager')->find();
-	
-		// Error checking
-		if (!count($Users))
-		{
-			throw new Exception('No users found');
-		}
 		
 		// Row data
 		foreach ($Users AS $User)
@@ -166,6 +160,9 @@ class UserManagementPage extends FOGPage
 			// Hook
 			$this->HookManager->processEvent('USER_ADD_FAIL', array('User' => &$User));
 			
+			// Log History event
+			$this->FOGCore->logHistory(sprintf('%s add failed: Name: %s, Error: %s', _('User'), $_POST['name'], $e->getMessage()));
+			
 			// Set session message
 			$this->FOGCore->setMessage($e->getMessage());
 			
@@ -265,6 +262,9 @@ class UserManagementPage extends FOGPage
 			// Hook
 			$this->HookManager->processEvent('USER_UPDATE_FAIL', array('User' => &$User));
 			
+			// Log History event
+			$this->FOGCore->logHistory(sprintf('%s update failed: Name: %s, Error: %s', _('User'), $_POST['name'], $e->getMessage()));
+			
 			// Set session message
 			$this->FOGCore->setMessage($e->getMessage());
 			
@@ -326,6 +326,9 @@ class UserManagementPage extends FOGPage
 		{
 			// Hook
 			$this->HookManager->processEvent('USER_DELETE_FAIL', array('User' => &$User));
+			
+			// Log History event
+			$this->FOGCore->logHistory(sprintf('%s %s: ID: %s, Name: %s', _('User'), _('deleted'), $User->get('id'), $User->get('name')));
 			
 			// Set session message
 			$this->FOGCore->setMessage($e->getMessage());

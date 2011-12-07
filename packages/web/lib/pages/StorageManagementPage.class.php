@@ -45,28 +45,22 @@ class StorageManagementPage extends FOGPage
 	public function index()
 	{
 		// Set title
-		$this->title = _('All Users');
+		$this->title = _('All Storage Nodes');
 		
 		// Find data
-		$Users = $this->FOGCore->getClass('UserManager')->find();
-	
-		// Error checking
-		if (!count($Users))
-		{
-			throw new Exception('No users found');
-		}
+		$StorageNodes = $this->FOGCore->getClass('StorageNodeManager')->find();
 		
 		// Row data
-		foreach ($Users AS $User)
+		foreach ($StorageNodes AS $StorageNode)
 		{
 			$this->data[] = array(
-				'id'	=> $User->get('id'),
-				'name'	=> $User->get('name')
+				'id'	=> $StorageNode->get('id'),
+				'name'	=> $StorageNode->get('name')
 			);
 		}
 		
 		// Hook
-		$this->HookManager->processEvent('USER_DATA', array('headerData' => &$this->headerData, 'data' => &$this->data, 'templates' => &$this->templates, 'attributes' => &$this->attributes));
+		$this->HookManager->processEvent('STORAGE_NODE_DATA', array('headerData' => &$this->headerData, 'data' => &$this->data, 'templates' => &$this->templates, 'attributes' => &$this->attributes));
 		
 		// Output
 		$this->render();
@@ -74,30 +68,20 @@ class StorageManagementPage extends FOGPage
 	
 	public function search()
 	{
-		// Set title
-		$this->title = _('Search');
-		
-		// Set search form
-		$this->searchFormURL = 'ajax/users.search.php';
-		
-		// Hook
-		$this->HookManager->processEvent('STORAGE_SEARCH');
-
-		// Output
-		$this->render();
+		$this->index();
 	}
 	
-	public function add()
+	public function add_storage_node()
 	{
 		// Set title
-		$this->title = _('New Storage');
+		$this->title = _('New Storage Nodes');
 		
 		// Hook
-		$this->HookManager->processEvent('USER_ADD');
+		$this->HookManager->processEvent('STORAGE_NODE_ADD');
 		
 		// TODO: Put table rows into variables -> Add hooking
 		?>
-		<h2><?php print _("Add new user account"); ?></h2>
+		<h2><?php print _("Add new Storage Node"); ?></h2>
 		<form method="POST" action="<?php print $this->formAction; ?>">
 			<input type="hidden" name="add" value="1" />
 			<table cellpadding="0" cellspacing="0" border="0" width="100%">
@@ -165,6 +149,9 @@ class StorageManagementPage extends FOGPage
 		{
 			// Hook
 			$this->HookManager->processEvent('USER_ADD_FAIL', array('User' => &$User));
+			
+			// Log History event
+			$this->FOGCore->logHistory(sprintf('%s add failed: Name: %s, Error: %s', _('Storage'), $_POST['name'], $e->getMessage()));
 			
 			// Set session message
 			$this->FOGCore->setMessage($e->getMessage());
@@ -265,6 +252,9 @@ class StorageManagementPage extends FOGPage
 			// Hook
 			$this->HookManager->processEvent('USER_UPDATE_FAIL', array('User' => &$User));
 			
+			// Log History event
+			$this->FOGCore->logHistory(sprintf('%s update failed: Name: %s, Error: %s', _('User'), $_POST['name'], $e->getMessage()));
+			
 			// Set session message
 			$this->FOGCore->setMessage($e->getMessage());
 			
@@ -326,6 +316,9 @@ class StorageManagementPage extends FOGPage
 		{
 			// Hook
 			$this->HookManager->processEvent('USER_DELETE_FAIL', array('User' => &$User));
+			
+			// Log History event
+			$this->FOGCore->logHistory(sprintf('%s %s: ID: %s, Name: %s', _('User'), _('deleted'), $User->get('id'), $User->get('name')));
 			
 			// Set session message
 			$this->FOGCore->setMessage($e->getMessage());

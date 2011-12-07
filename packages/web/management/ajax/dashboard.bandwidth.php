@@ -23,7 +23,7 @@ while ($Node = mysql_fetch_array($StorageNodes))
 	$URL = "http://" . $Node['ngmHostname'] . $GLOBALS['FOGCore']->getSetting("FOG_NFS_BANDWIDTHPATH") . '?dev=' . $Node['ngmInterface'];
 	
 	// Fetch bandwidth stats from remote server
-	if ($FetchedData = Fetch($URL))
+	if ($FetchedData = $FOGCore->fetchURL($URL))
 	{
 		// Legacy client
 		if (preg_match('/(.*)##(.*)/U', $FetchedData, $match))

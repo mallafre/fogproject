@@ -49,12 +49,6 @@ class ImageManagementPage extends FOGPage
 		
 		// Find data
 		$Images = $this->FOGCore->getClass('ImageManager')->find();
-	
-		// Error checking
-		if (!count($Images))
-		{
-			throw new Exception('No users found');
-		}
 		
 		// Row data
 		foreach ($Images AS $Image)
@@ -179,6 +173,9 @@ class ImageManagementPage extends FOGPage
 			// Hook
 			$this->HookManager->processEvent('IMAGE_ADD_FAIL', array('Image' => &$Image));
 			
+			// Log History event
+			$this->FOGCore->logHistory(sprintf('%s add failed: Name: %s, Error: %s', _('Image'), $_POST['name'], $e->getMessage()));
+			
 			// Set session message
 			$this->FOGCore->setMessage($e->getMessage());
 			
@@ -285,10 +282,13 @@ class ImageManagementPage extends FOGPage
 			// Hook
 			$this->HookManager->processEvent('IMAGE_UPDATE_FAIL', array('Image' => &$Image));
 			
+			// Log History event
+			$this->FOGCore->logHistory(sprintf('%s update failed: Name: %s, Error: %s', _('Image'), $_POST['name'], $e->getMessage()));
+			
 			// Set session message
 			$this->FOGCore->setMessage($e->getMessage());
 			
-			// Redirect to new entry
+			// Redirect
 			$this->FOGCore->redirect($this->formAction);
 		}
 	}
@@ -346,6 +346,9 @@ class ImageManagementPage extends FOGPage
 		{
 			// Hook
 			$this->HookManager->processEvent('IMAGE_DELETE_FAIL', array('Image' => &$Image));
+			
+			// Log History event
+			$this->FOGCore->logHistory(sprintf('%s %s: ID: %s, Name: %s', _('Image'), _('deleted'), $Image->get('id'), $Image->get('name')));
 			
 			// Set session message
 			$this->FOGCore->setMessage($e->getMessage());

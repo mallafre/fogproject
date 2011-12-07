@@ -108,8 +108,14 @@ class Group extends FOGController
 		$this->db->query("SELECT * FROM groups INNER JOIN groupMembers ON ( groups.groupID = groupMembers.gmGroupID ) WHERE groupID='%s' ORDER BY groupName", array($this->get('id')));
 		while ($host = $this->db->fetch()->get())
 		{
-			$this->add('hosts', new Host($host['gmHostID']));
+			//$this->add('hosts', new Host($host['gmHostID']));
+			//$this->data['hosts'][] = new Host($host['gmHostID']);
+			$this->data['hosts'][] = new Host($host);
+			
+			//$data[] = $host['gmHostID'];
 		}
+		
+		print_r($this->data['hosts']);exit;
 		
 		return $this;
 	}

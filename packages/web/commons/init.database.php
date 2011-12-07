@@ -21,7 +21,8 @@ $db = $DatabaseManager->connect();
 $conn = $db->getLink();
 if ($FOGCore)
 {
-	$FOGCore->db = $conn;
+	$FOGCore->conn = $conn;
+	$FOGCore->db = $db;
 }
 if ($conn)
 {
@@ -38,4 +39,15 @@ if ($conn)
 else
 {
 	die(_('Unable to connect to Database'));
+}
+
+// FOG Locales
+if (!isset($_SESSION['locale']))
+{
+	// Get locale from DB
+	$_SESSION['locale'] = $FOGCore->getSetting('FOG_DEFAULT_LOCALE');
+	
+	// Set locale
+	putenv('LC_ALL=' . $_SESSION['locale']);
+	setlocale(LC_ALL, $_SESSION['locale']);
 }

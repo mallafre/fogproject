@@ -11,7 +11,6 @@ if ($currentUser != null && $currentUser->isLoggedIn())
 		// Hook
 		$HookManager->processEvent('TasksScheduledRemove', array('id' => &$_GET['rmid']));
 		
-		$FOGCore = new FOGCore($conn);
 		if ($FOGCore->stopScheduledTask(new ScheduledTask(null, null, null, null, $_GET['rmid'])))
 		{
 			// Hook

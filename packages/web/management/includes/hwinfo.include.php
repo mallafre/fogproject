@@ -15,7 +15,7 @@ if ( $currentUser != null && $currentUser->isLoggedIn() )
 			if ($id != null && $StorageNode = mysql_fetch_array(mysql_query("SELECT ngmHostname FROM nfsGroupMembers WHERE ngmID = '$id'", $conn)))
 			{
 				echo ( "<center><table cellpadding=0 cellspacing=0 border=0 width=90%>" );
-				if ($ret = Fetch('http://' . $StorageNode['ngmHostname'] . '/fog/status/hw.php'))
+				if ($ret = $FOGCore->fetchURL('http://' . $StorageNode['ngmHostname'] . '/fog/status/hw.php'))
 				{
 					$arRet = explode( "\n", $ret );
 					$section = 0; //general

@@ -37,14 +37,16 @@ class FOGCore
 
 	public $db;
 	
-	function __construct( $conn )
+	function __construct()
 	{
-		$this->db = $conn;
+		$this->conn = $GLOBALS['conn'];
+		$this->db = $GLOBALS['db'];
+		$this->FOGCore = $GLOBALS['FOGCore'];
 	}
 	
 	private function cleanOldUnrunScheduledTasks()
 	{
-		if ( $this->db != null )
+		if ( $this->conn != null )
 		{
 			$sql = "UPDATE 
 					scheduledTasks 
@@ -55,13 +57,13 @@ class FOGCore
 					stDateTime < (UNIX_TIMESTAMP() - " . Timer::TASK_SINGLE_FLEXTIME . ") and 
 					stActive = '1'";
 			
-			mysql_query( $sql, $this->db ) or die( mysql_error($this->db) );
+			mysql_query( $sql, $this->conn ) or die( mysql_error($this->conn) );
 		}
 	}
 	
 	function stopScheduledTask( $task )
 	{
-		if ( $task != null && $this->db != null )
+		if ( $task != null && $this->conn != null )
 		{
 			if ( is_numeric( $task->getID() ) )
 			{
@@ -72,7 +74,7 @@ class FOGCore
 					WHERE 
 						stID = '" . $task->getID() . "'";
 			
-				if ( mysql_query( $sql, $this->db ) )
+				if ( mysql_query( $sql, $this->conn ) )
 					return true;
 			}
 		}
@@ -82,7 +84,7 @@ class FOGCore
 	function getScheduledTasksByStorageGroupID( $groupid, $blIgnoreNonImageReady=false )
 	{
 		$arTasks = array();
-		if ( $this->db != null && ((is_numeric( $groupid ) && $groupid >= 0) || $groupid = "%" ))
+		if ( $this->conn != null && ((is_numeric( $groupid ) && $groupid >= 0) || $groupid = "%" ))
 		{
 			$this->cleanOldUnrunScheduledTasks();
 			
@@ -94,7 +96,7 @@ class FOGCore
 					stActive = '1'";
 				
 
-			$res = mysql_query( $sql, $this->db ) or die( mysql_error($this->db) );
+			$res = mysql_query( $sql, $this->conn ) or die( mysql_error($this->conn) );
 			//echo mysql_num_rows( $res ) ;
 			while( $ar = mysql_fetch_array( $res ) )
 			{
@@ -238,37 +240,15 @@ class FOGCore
 	}
 	
 	// Moved from functions - Blackout - 11:36 AM 26/09/2011
-	function getSetting( $key )
+	function getSetting($key)
 	{
-		$conn = $GLOBALS['conn'];
-		if ( $conn != null )
-		{
-			$key = mysql_real_escape_string( $key );
-			$sql = "SELECT settingValue FROM globalSettings WHERE settingKey = '$key'";
-			$res = mysql_query( $sql, $conn ) or criticalError( mysql_error(), _("FOG :: Database error!") );
-			while( $ar = mysql_fetch_array( $res ) )
-			{
-				return trim($ar["settingValue"]);
-			}
-		}
-		return "";
+		return $this->db->query("SELECT settingValue FROM globalSettings WHERE settingKey = '%s' LIMIT 1", array($key))->fetch()->get('settingValue');
 	}
 
 	// Moved from functions - Blackout - 11:36 AM 26/09/2011
-	function setSetting( $key, $value )
+	function setSetting($key, $value)
 	{
-		$conn = $GLOBALS['conn'];
-		if ( $conn != null )
-		{
-			$key = mysql_real_escape_string( $key );
-			$value = mysql_real_escape_string( $value );
-			$sql = "UPDATE globalSettings SET settingValue =  '$value' WHERE settingKey = '$key' limit 1";
-			if ( mysql_query( $sql, $conn ) )
-				return true;
-			else 
-				return false;
-		}
-		return false;
+		return $this->db->query("UPDATE globalSettings SET settingValue = '%s' WHERE settingKey = '%s'", array($value, $key))->queryResult();
 	}
 	
 	function getClass($class)
@@ -299,7 +279,8 @@ class FOGCore
 	
 	function error($txt, $data = array())
 	{
-		if (!$this->isAJAXRequest())
+		//if (!$this->isAJAXRequest() && !preg_match('#/service/#', $_SERVER['PHP_SELF']))
+		if (!FOGCore::isAJAXRequest() && !preg_match('#/service/#', $_SERVER['PHP_SELF']))
 		{
 			printf('<div class="debug-error">FOG ERROR: %s</div>%s', (count($data) ? vsprintf($txt, $data) : $txt), "\n");
 		}
@@ -307,7 +288,7 @@ class FOGCore
 	
 	function info($txt, $data = array())
 	{
-		if (!$this->isAJAXRequest() && !preg_match('#/service/#', $_SERVER['PHP_SELF']))
+		if (!FOGCore::isAJAXRequest() && !preg_match('#/service/#', $_SERVER['PHP_SELF']))
 		{
 			printf('<div class="debug-info">FOG INFO: %s</div>%s', (count($data) ? vsprintf($txt, $data) : $txt), "\n");
 		}
@@ -318,7 +299,7 @@ class FOGCore
 	// Blackout - 6:43 AM 4/12/2011
 	function getMACManufacturer( $macprefix )
 	{
-		if ( $this->db && strlen( $macprefix ) == 8 )
+		if ( $this->conn && strlen( $macprefix ) == 8 )
 		{
 			$sql = "SELECT
 					ouiMan
@@ -339,7 +320,7 @@ class FOGCore
 	
 	function addUpdateMACLookupTable( $macprefix, $strMan )
 	{
-		if ( $this->db && strlen( $macprefix ) == 8 && $strMan != null && strlen( $strMan ) > 0 )
+		if ( $this->conn && strlen( $macprefix ) == 8 && $strMan != null && strlen( $strMan ) > 0 )
 		{
 			if ( $this->doesMACLookCodeExist( $macprefix ) )
 			{
@@ -369,7 +350,7 @@ class FOGCore
 	
 	private function doesMACLookCodeExist( $macprefix )
 	{
-		if ( $this->db != null  )
+		if ( $this->conn != null  )
 		{
 			if ( strlen( $macprefix ) == 8 )
 			{
@@ -398,7 +379,7 @@ class FOGCore
 	
 	function clearMACLookupTable()
 	{
-		if ( $this->db != null )
+		if ( $this->conn != null )
 		{
 			$sql = "DELETE 
 				FROM 
@@ -413,7 +394,7 @@ class FOGCore
 	
 	function getMACLookupCount()
 	{
-		if ( $this->db != null )
+		if ( $this->conn != null )
 		{
 			$sql = "SELECT 
 					COUNT(*) AS cnt
@@ -429,4 +410,53 @@ class FOGCore
 		}
 		return -1;
 	}
+	
+	// Blackout - 10:26 AM 25/05/2011
+	// Used from one of my classes - hacked to make it work
+	// TODO: Make a FOG Utilities Class - include this
+	function fetchURL($URL)
+	{
+		if ($this->db && $GLOBALS['FOGCore']->getSetting('FOG_PROXY_IP'))
+		{
+			$Proxy = $GLOBALS['FOGCore']->getSetting('FOG_PROXY_IP') . ':' . $GLOBALS['FOGCore']->getSetting('FOG_PROXY_PORT');
+		}
+		
+		$userAgent = 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.9.6.12) Gecko/20110319 Firefox/4.0.1 ( .NET CLR 3.5.30729; .NET4.0E)';
+		$timeout = 10;
+		$maxRedirects = 20;
+		
+		$contextOptions = array(
+					'ssl'	=> array(
+							'allow_self_signed' => true
+							),
+					'http'	=> array(
+							'method' 	=> 'GET',
+							'user_agent' 	=> $userAgent,
+							'timeout' 	=> $timeout,
+							'max_redirects'	=> $maxRedirects,
+							'header' 	=> array(
+										'Accept-language: en',
+										'Pragma: no-cache'
+									)
+							)
+					);
+
+		// Proxy
+		if ($Proxy)
+		{
+			$contextOptions['http']['proxy'] = 'tcp://' . $Proxy;
+			$contextOptions['http']['request_fulluri'] = true;
+		}
+
+		// Get data
+		if ($response = trim(@file_get_contents($URL, false, stream_context_create($contextOptions))))
+		{
+			return $response;
+		}
+		else
+		{
+			return false;
+		}
+	}
+
 }

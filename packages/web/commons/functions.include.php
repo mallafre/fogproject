@@ -1244,15 +1244,47 @@ function getGroupNameByID( $conn, $id )
 
 function getImageMemberFromHostID( $conn, $hostid )
 {
-	$Host = new Host($hostid);
-	
-	$Task = new Task(array(
-		'hostID'	=> $hostid,
-		'NFSGroupID'	=> $Host->getImage()->getStorageGroup()->get('id'),
-		'NFSMemberID'	=> $Host->getImage()->getStorageGroup()->getRandomStorageNode()->get('id')
-	));
-	
-	return $Task;
+	try
+	{
+		$Host = new Host($hostid);
+		
+		$Image = $Host->getImage();
+		if (!$Image->get('id'))
+		{
+			throw new Exception('No Image defined for this host');
+		}
+		
+		$StorageGroup = $Image->getStorageGroup();
+		if (!$StorageGroup->get('id'))
+		{
+			throw new Exception('No StorageGroup defined for this host');
+		}
+		
+		
+		$Task = new Task(array(
+			'hostID'	=> $hostid,
+			'NFSGroupID'	=> $Host->getImage()->getStorageGroup()->get('id'),
+			'NFSMemberID'	=> $Host->getImage()->getStorageGroup()->getRandomStorageNode()->get('id')
+		));
+		
+		
+		/*
+		// Fails badly when no image or storage node exists
+		$Host = new Host($hostid);
+		$Task = new Task(array(
+			'hostID'	=> $hostid,
+			'NFSGroupID'	=> $Host->getImage()->getStorageGroup()->get('id'),
+			'NFSMemberID'	=> $Host->getImage()->getStorageGroup()->getRandomStorageNode()->get('id')
+		));
+		*/
+		
+		return $Task;
+	}
+	catch (Exception $e)
+	{
+		FOGCore::error(sprintf('%s(): Error: %s', __FUNCTION__, $e->getMessage()));
+		exit;
+	}
 	
 	/*
 				$sql = "SELECT 
@@ -3142,52 +3174,3 @@ function SystemUptime()
 	return array('uptime' => $uptime, 'load' => $load);
 }
 
-// Blackout - 10:26 AM 25/05/2011
-// Used from one of my classes - hacked to make it work
-// TODO: Make a FOG Utilities Class - include this
-function Fetch($URL)
-{
-	global $conn;
-	
-	if ($GLOBALS['FOGCore']->getSetting( 'FOG_PROXY_IP'))
-	{
-		$Proxy = $GLOBALS['FOGCore']->getSetting( 'FOG_PROXY_IP') . ':' . $GLOBALS['FOGCore']->getSetting( 'FOG_PROXY_PORT');
-	}
-	
-	$UserAgent = 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.9.6.12) Gecko/20110319 Firefox/4.0.1 ( .NET CLR 3.5.30729; .NET4.0E)';
-	$Timeout = 10;
-	$MaxRedirects = 20;
-	
-	$ContextOptions = array(
-				'ssl'	=> array(
-						'allow_self_signed' => true
-						),
-				'http'	=> array(
-						'method' 	=> 'GET',
-						'user_agent' 	=> $UserAgent,
-						'timeout' 	=> $Timeout,
-						'max_redirects'	=> $MaxRedirects,
-						'header' 	=> array(
-									'Accept-language: en',
-									'Pragma: no-cache'
-								)
-						)
-				);
-
-	// Proxy
-	if ($Proxy)
-	{
-		$ContextOptions['http']['proxy'] = 'tcp://' . $Proxy;
-		$ContextOptions['http']['request_fulluri'] = true;
-	}
-
-	// Get data
-	if ($Response = trim(@file_get_contents($URL, false, stream_context_create($ContextOptions))))
-	{
-		return $Response;
-	}
-	else
-	{
-		return false;
-	}
-}

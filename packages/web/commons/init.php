@@ -60,20 +60,18 @@ if (!function_exists('__autoload'))
 require_once(BASEPATH . '/commons/functions.include.php');
 
 // Core
-$FOGCore = new FOGCore($conn);
+$FOGCore = new FOGCore();
 
 // Hook Manager - Init & Load Hooks
 $HookManager = new HookManager();
 $HookManager->load();
 
 // Locale
-if (!isset($_SESSION['locale']))
+if ($_SESSION['locale'])
 {
-	$_SESSION['locale'] = $FOGCore->getSetting('FOG_DEFAULT_LOCALE');
+	putenv('LC_ALL='.$_SESSION['locale']);
+	setlocale(LC_ALL, $_SESSION['locale']);
 }
-
-putenv('LC_ALL='.$_SESSION['locale']);
-setlocale(LC_ALL, $_SESSION['locale']);
 
 // Languages
 bindtextdomain('messages', 'languages');
