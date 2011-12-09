@@ -110,24 +110,24 @@ class HostManagementPage extends FOGPage
 		<form method="POST" action="<?php print $this->formAction; ?>">
 			<input type="hidden" name="add" value="1" />
 			<table cellpadding="0" cellspacing="0" border="0" width="100%">
-				<tr><td width="35%"><?php print _("Host Name"); ?>:*</td><td><input type="text" name="host" value="<?php print $_POST['host']; ?>" maxlength="15" class="hostname-input" /></td></tr>
-				<tr><td><?php print _("Host IP"); ?>:</td><td><input type="text" name="ip" value="<?php print $_POST['ip']; ?>" /></td></tr>
-				<tr><td><?php print _("Primary MAC"); ?>:*</td><td><input type="text" id="mac" name="mac" value="<?php print $_POST['mac']; ?>" /> &nbsp; <span id="priMaker"></span> </td></tr>
-				<tr><td><?php print _("Host Description"); ?>:</td><td><textarea name="description" rows="5" cols="40"><?php print $_POST['description']; ?></textarea></td></tr>
-				<tr><td><?php print _("Host Image"); ?>:</td><td><?php print $this->FOGCore->getClass('ImageManager')->buildSelectBox($_POST['image']);  ?></td></tr>
-				<tr><td><?php print _("Host Kernel"); ?>:</td><td><input type="text" name="kern" value="<?php print $_POST['kern']; ?>" /></td></tr>		
-				<tr><td><?php print _("Host Kernel Arguments"); ?>:</td><td><input type="text" name="args" value="<?php print $_POST['args']; ?>" /></td></tr>	
-				<tr><td><?php print _("Host Primary Disk"); ?>:</td><td><input type="text" name="dev" value="<?php print $_POST['dev']; ?>" /></td></tr>		
+				<tr><td width="35%"><?php print _("Host Name"); ?></td><td><input type="text" name="host" value="<?php print $_POST['host']; ?>" maxlength="15" class="hostname-input" /> *</td></tr>
+				<tr><td><?php print _("Host IP"); ?></td><td><input type="text" name="ip" value="<?php print $_POST['ip']; ?>" /></td></tr>
+				<tr><td><?php print _("Primary MAC"); ?></td><td><input type="text" id="mac" name="mac" value="<?php print $_POST['mac']; ?>" /> * &nbsp; <span id="priMaker"></span> </td></tr>
+				<tr><td><?php print _("Host Description"); ?></td><td><textarea name="description" rows="5" cols="40"><?php print $_POST['description']; ?></textarea></td></tr>
+				<tr><td><?php print _("Host Image"); ?></td><td><?php print $this->FOGCore->getClass('ImageManager')->buildSelectBox($_POST['image']);  ?></td></tr>
+				<tr><td><?php print _("Host Kernel"); ?></td><td><input type="text" name="kern" value="<?php print $_POST['kern']; ?>" /></td></tr>		
+				<tr><td><?php print _("Host Kernel Arguments"); ?></td><td><input type="text" name="args" value="<?php print $_POST['args']; ?>" /></td></tr>	
+				<tr><td><?php print _("Host Primary Disk"); ?></td><td><input type="text" name="dev" value="<?php print $_POST['dev']; ?>" /></td></tr>		
 			</table>
 
 			<br />
 			<h2><?php print _("Active Directory"); ?></h2>		
 			<table cellpadding="0" cellspacing="0" border="0" width="100%">
-				<tr><td width="35%"><?php print _("Join Domain after image task"); ?>:</td><td><input id="adEnabled" type="checkbox" name="domain" value="on"<?php print ($_POST['domain'] == 'on' ? ' selected="selected"' : ''); ?> /></td></tr>
-				<tr><td><?php print _("Domain name"); ?>:</td><td><input id="adDomain" type="text" name="domainname" value="<?php print $_POST['domainname']; ?>" /></td></tr>				
-				<tr><td><?php print _("Organizational Unit"); ?>:</td><td><input id="adOU" type="text" name="ou" value="<?php print $_POST['ou']; ?>" /> <?php print _("(Blank for default)"); ?></td></tr>				
-				<tr><td><?php print _("Domain Username"); ?>:</td><td><input id="adUsername" type="text" name="domainuser" value="<?php print $_POST['domainuser']; ?>" /></td></tr>						
-				<tr><td><?php print _("Domain Password"); ?>:</td><td><input id="adPassword" type="text" name="domainpassword" value="<?php print $_POST['domainpassword']; ?>" /> <?php print _("(Must be encrypted)"); ?></td></tr>											
+				<tr><td width="35%"><?php print _("Join Domain after image task"); ?></td><td><input id="adEnabled" type="checkbox" name="domain" value="on"<?php print ($_POST['domain'] == 'on' ? ' selected="selected"' : ''); ?> /></td></tr>
+				<tr><td><?php print _("Domain name"); ?></td><td><input id="adDomain" type="text" name="domainname" value="<?php print $_POST['domainname']; ?>" /></td></tr>				
+				<tr><td><?php print _("Organizational Unit"); ?></td><td><input id="adOU" type="text" name="ou" value="<?php print $_POST['ou']; ?>" /> <?php print _("(Blank for default)"); ?></td></tr>				
+				<tr><td><?php print _("Domain Username"); ?></td><td><input id="adUsername" type="text" name="domainuser" value="<?php print $_POST['domainuser']; ?>" /></td></tr>						
+				<tr><td><?php print _("Domain Password"); ?></td><td><input id="adPassword" type="text" name="domainpassword" value="<?php print $_POST['domainpassword']; ?>" /> <?php print _("(Must be encrypted)"); ?></td></tr>											
 				<tr><td>&nbsp;</td><td><input type="submit" value="<?php print _("Add"); ?>" /></td></tr>
 			</table>
 		</form>
@@ -233,14 +233,14 @@ class HostManagementPage extends FOGPage
 						<input type="hidden" name="id" value="<?php print $this->request['id']; ?>" />
 						<h2><?php print _("Edit host definition"); ?></h2>
 						<table cellpadding="0" cellspacing="0" border="0" width="100%">
-							<tr><td width="35%"><?php print _("Host Name"); ?>:*</td><td><input type="text" name="host" value="<?php print $Host->get('name'); ?>" maxlength="15" class="hostname-input" /></td></tr>
-							<tr><td><?php print _("Host IP"); ?>:</td><td><input type="text" name="ip" value="<?php print $Host->get('ip'); ?>" /></td></tr>
-							<tr><td><?php print _("Primary MAC"); ?>:*</td><td><input type="text" id="mac" name="mac" value="<?php print $Host->get('mac'); ?>" /> &nbsp; <span id="priMaker"></span> </td></tr>
-							<tr><td><?php print _("Host Description"); ?>:</td><td><textarea name="description" rows="5" cols="40"><?php print $Host->get('description'); ?></textarea></td></tr>
-							<tr><td><?php print _("Host Image"); ?>:</td><td><?php print $this->FOGCore->getClass('ImageManager')->buildSelectBox($Host->get('imageID')); ?></td></tr>
-							<tr><td><?php print _("Host Kernel"); ?>:</td><td><input type="text" name="kern" value="<?php print $Host->get('kern'); ?>" /></td></tr>
-							<tr><td><?php print _("Host Kernel Arguments"); ?>:</td><td><input type="text" name="args" value="<?php print $Host->get('args'); ?>" /></td></tr>
-							<tr><td><?php print _("Host Primary Disk"); ?>:</td><td><input type="text" name="dev" value="<?php print $Host->get('dev'); ?>" /></td></tr>
+							<tr><td width="35%"><?php print _("Host Name"); ?></td><td><input type="text" name="host" value="<?php print $Host->get('name'); ?>" maxlength="15" class="hostname-input" /> *</td></tr>
+							<tr><td><?php print _("Host IP"); ?></td><td><input type="text" name="ip" value="<?php print $Host->get('ip'); ?>" /></td></tr>
+							<tr><td><?php print _("Primary MAC"); ?></td><td><input type="text" id="mac" name="mac" value="<?php print $Host->get('mac'); ?>" /> * &nbsp; <span id="priMaker"></span> </td></tr>
+							<tr><td><?php print _("Host Description"); ?></td><td><textarea name="description" rows="5" cols="40"><?php print $Host->get('description'); ?></textarea></td></tr>
+							<tr><td><?php print _("Host Image"); ?></td><td><?php print $this->FOGCore->getClass('ImageManager')->buildSelectBox($Host->get('imageID')); ?></td></tr>
+							<tr><td><?php print _("Host Kernel"); ?></td><td><input type="text" name="kern" value="<?php print $Host->get('kern'); ?>" /></td></tr>
+							<tr><td><?php print _("Host Kernel Arguments"); ?></td><td><input type="text" name="args" value="<?php print $Host->get('args'); ?>" /></td></tr>
+							<tr><td><?php print _("Host Primary Disk"); ?></td><td><input type="text" name="dev" value="<?php print $Host->get('dev'); ?>" /></td></tr>
 							<tr><td>&nbsp;</td><td><input type="submit" value="<?php print _("Update"); ?>" /></td></tr>
 						</table>
 					</form>
@@ -272,11 +272,11 @@ class HostManagementPage extends FOGPage
 						<input type="hidden" name="id" value="<?php print $this->request['id']; ?>" />
 						<h2><?php print _("Active Directory"); ?></h2>
 						<table cellpadding=0 cellspacing=0 border=0 width="100%">
-							<tr><td><?php print _("Join Domain after image task"); ?>:</td><td><input id='adEnabled' type="checkbox" name="domain"<?php print ($Host->get('useAD') == '1' ? ' checked="checked"' : ''); ?> /></td></tr>
-							<tr><td><?php print _("Domain name"); ?>:</td><td><input id="adDomain" class="smaller" type="text" name="domainname" value="<?php print $Host->get('ADDomain'); ?>" /></td></tr>
-							<tr><td><?php print _("Organizational Unit"); ?>:<br> <span class="lightColor"><?php print _("(Blank for default)"); ?></span></td><td><input size="50" id="adOU" class="smaller" type="text" name="ou" value="<?php print $Host->get('ADOU'); ?>" /></td></tr>
-							<tr><td><?php print _("Domain Username"); ?>:</td><td><input id="adUsername" class="smaller" type="text" name="domainuser" value="<?php print $Host->get('ADUser'); ?>" /></td></tr>
-							<tr><td><?php print _("Domain Password"); ?>:</td><td><input id="adPassword" class="smaller" type="text" name="domainpassword" value="<?php print $Host->get('ADPass'); ?>" /> <span class="lightColor"><?php print _("(Must be encrypted)"); ?></span></td></tr>
+							<tr><td><?php print _("Join Domain after image task"); ?></td><td><input id='adEnabled' type="checkbox" name="domain"<?php print ($Host->get('useAD') == '1' ? ' checked="checked"' : ''); ?> /></td></tr>
+							<tr><td><?php print _("Domain name"); ?></td><td><input id="adDomain" class="smaller" type="text" name="domainname" value="<?php print $Host->get('ADDomain'); ?>" /></td></tr>
+							<tr><td><?php print _("Organizational Unit"); ?><br> <span class="lightColor"><?php print _("(Blank for default)"); ?></span></td><td><input size="50" id="adOU" class="smaller" type="text" name="ou" value="<?php print $Host->get('ADOU'); ?>" /></td></tr>
+							<tr><td><?php print _("Domain Username"); ?></td><td><input id="adUsername" class="smaller" type="text" name="domainuser" value="<?php print $Host->get('ADUser'); ?>" /></td></tr>
+							<tr><td><?php print _("Domain Password"); ?></td><td><input id="adPassword" class="smaller" type="text" name="domainpassword" value="<?php print $Host->get('ADPass'); ?>" /> <span class="lightColor"><?php print _("(Must be encrypted)"); ?></span></td></tr>
 							<tr><td colspan=2><center><br /><input type="hidden" name="updatead" value="1" /><input type="submit" value="<?php print _("Update"); ?>" /></td></tr>
 						</table>
 					</form>
@@ -287,7 +287,7 @@ class HostManagementPage extends FOGPage
 					<form method="POST" action="<?php print $this->formAction; ?>&tab=host-printers">
 						<input type="hidden" name="id" value="<?php print $this->request['id']; ?>" />
 						<h2><?php print _("Host Printer Configuration"); ?></h2>
-						<p><?php print _("Select Management Level for this Host"); ?>:</p>
+						<p><?php print _("Select Management Level for this Host"); ?></p>
 						<p class="l">
 						
 						<input type="radio" name="level" value="0"<?php print ($Host->get('printerLevel') === '0' || $Host->get('printerLevel') === '' ? ' checked="checked"' : ''); ?> /><?php print _("No Printer Management"); ?><br/>
@@ -1166,7 +1166,7 @@ class HostManagementPage extends FOGPage
 		?>
 		<form enctype="multipart/form-data" method="POST" action="<?php print $this->formAction; ?>">
 		<table cellpadding=0 cellspacing=0 border=0 width=90%>
-			<tr><td><?php print _("CSV File"); ?>:</font></td><td><input class="smaller" type="file" name="file" value="" /></td></tr>
+			<tr><td><?php print _("CSV File"); ?></font></td><td><input class="smaller" type="file" name="file" value="" /></td></tr>
 			<tr><td colspan=2><font><center><br /><input class="smaller" type="submit" value="<?php print _("Upload CSV"); ?>" /></center></font></td></tr>				
 		</table>
 		</form>
@@ -1277,4 +1277,4 @@ class HostManagementPage extends FOGPage
 }
 
 // Register page with FOGPageManager
-$FOGPageManager->add(new HostManagementPage());
+$FOGPageManager->register(new HostManagementPage());

@@ -107,7 +107,7 @@ else
 	echo ( "<form enctype=\"multipart/form-data\" method=\"POST\" action=\"?node=$_GET[node]&sub=$_GET[sub]\">" );
 	echo ( "<center><table cellpadding=0 cellspacing=0 border=0 width=90%>" );
 		echo ( "<tr><td>"._("CSV File").":</font></td><td><input class=\"smaller\" type=\"file\" name=\"file\" value=\"\" /></td></tr>" );
-		echo ( "<tr><td colspan=2><font><center><br /><input class=\"smaller\" type=\"submit\" value=\""._("Upload CSV")."\" /></center></font></td></tr>" );				
+		echo ( "<tr><td colspan=2><font><center><input class=\"smaller\" type=\"submit\" value=\""._("Upload CSV")."\" /></center></font></td></tr>" );				
 	echo ( "</table></center>" );
 	echo ( "</form>" );
 	echo ( "<p class=\"titleBottom\">" );

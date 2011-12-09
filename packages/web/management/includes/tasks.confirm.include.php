@@ -62,7 +62,7 @@ if ( $currentUser != null && $currentUser->isLoggedIn() )
 					echo ( "</div>" );
 					echo ( "<table width=\"100%\" cellspacing=\"0\" cellpadding=0 border=0>" );
 					echo ( "<tr><td><font>" . $imageMembers->getHostName() . "</font></td><td><font>" . $imageMembers->get('mac') . "</font></td><td><font>" . $imageMembers->getIPAddress() . "</font></td><td><font>" . $imageMembers->getImage() . "</font></td></tr>" );
-					echo ( "<tr><td colspan=10><center><br /><br /><input class=\"smaller\" type=\"submit\" value=\""._("Upload Image")."\"  /></center></td></tr>" );
+					echo ( "<tr><td colspan=10><center><br /><input class=\"smaller\" type=\"submit\" value=\""._("Upload Image")."\"  /></center></td></tr>" );
 					echo ( "</table>" );
 				echo ( "</form>" );
 			}
@@ -119,7 +119,7 @@ if ( $currentUser != null && $currentUser->isLoggedIn() )
 					{
 						echo ( "<tr><td><font class=\"smaller\">" . $imageMembers[$i]->getHostName() . "</font></td><td><font class=\"smaller\">" . $imageMembers[$i]->getMACColon() . "</font></td><td><font class=\"smaller\">" . $imageMembers[$i]->getIPAddress() . "</font></td><td><font class=\"smaller\">" . $imageMembers[$i]->getImage() . "</font></td></tr>" );
 					}
-					echo ( "<tr><td colspan=10><center><br /><br /><input class=\"smaller\" type=\"submit\" value=\""._("Image All Computers")."\" /></center></td></tr>" );
+					echo ( "<tr><td colspan=10><center><br /><input class=\"smaller\" type=\"submit\" value=\""._("Image All Computers")."\" /></center></td></tr>" );
 					echo ( "</table>" );
 				echo ( "</form>" );
 
@@ -173,7 +173,7 @@ if ( $currentUser != null && $currentUser->isLoggedIn() )
 						{
 							echo ( "<tr><td><font class=\"smaller\">" . $imageMembers[$i]->getHostName() . "</font></td><td><font class=\"smaller\">" . $imageMembers[$i]->get('mac') . "</font></td><td><font class=\"smaller\">" . $imageMembers[$i]->getIPAddress() . "</font></td><td><font class=\"smaller\">" . $imageMembers[$i]->getImage() . "</font></td></tr>" );
 						}
-						echo ( "<tr><td colspan=10><font class=\"smaller\"><center><br /><br /><input class=\"smaller\" type=\"submit\" value=\""._("Image All Computers using multicast")."\"  /></center></font></td></tr>" );
+						echo ( "<tr><td colspan=10><font class=\"smaller\"><center><br /><input class=\"smaller\" type=\"submit\" value=\""._("Image All Computers using multicast")."\"  /></center></font></td></tr>" );
 						echo ( "</table>" );
 					echo ( "</form>" );
 				}
@@ -224,7 +224,7 @@ if ( $currentUser != null && $currentUser->isLoggedIn() )
 				{
 					echo ( "<tr><td>&nbsp;" . $imageMembers[$i]->getHostName() . "</td><td><font class=\"smaller\">" . $imageMembers[$i]->get('mac') . "</font></td><td><font class=\"smaller\">" . $imageMembers[$i]->getIPAddress() . "</font></td><td><font class=\"smaller\">" . $imageMembers[$i]->getImage() . "</font></td></tr>" );
 				}
-				echo ( "<tr><td colspan=10><center><br /><br /><input class=\"smaller\" type=\"submit\" value=\"Wake up computers\"  /></center></td></tr>" );
+				echo ( "<tr><td colspan=10><center><br /><input class=\"smaller\" type=\"submit\" value=\"Wake up computers\"  /></center></td></tr>" );
 				echo ( "</table>" );
 			echo ( "</form>" );
 		}
@@ -268,7 +268,7 @@ if ( $currentUser != null && $currentUser->isLoggedIn() )
 				{
 					echo ( "<tr><td>&nbsp;" . $imageMembers[$i]->getHostName() . "</td><td><font class=\"smaller\">" . $imageMembers[$i]->get('mac') . "</font></td><td><font class=\"smaller\">" . $imageMembers[$i]->getIPAddress() . "</font></td><td><font class=\"smaller\">" . $imageMembers[$i]->getImage() . "</font></td></tr>" );
 				}
-				echo ( "<tr><td colspan=10><center><br /><br /><input class=\"smaller\" type=\"submit\" value=\""._("Wipe computer(s)")."\"  /></center></td></tr>" );
+				echo ( "<tr><td colspan=10><center><br /><input class=\"smaller\" type=\"submit\" value=\""._("Wipe computer(s)")."\"  /></center></td></tr>" );
 				echo ( "</table>" );
 			echo ( "</form>" );
 		}
@@ -314,7 +314,7 @@ if ( $currentUser != null && $currentUser->isLoggedIn() )
 					echo ( "<tr><td>&nbsp;" . $imageMembers[$i]->getHostName() . "</td><td><font class=\"smaller\">" . $imageMembers[$i]->get('mac') . "</font></td><td><font class=\"smaller\">" . $imageMembers[$i]->getIPAddress() . "</font></td><td><font class=\"smaller\">" . $imageMembers[$i]->getImage() . "</font></td></tr>" );
 				}
 				
-				echo ( "<tr><td colspan=10><center><br /><br /><input class=\"smaller\" type=\"submit\" value=\"Scan Host\"  /></center></td></tr>" );
+				echo ( "<tr><td colspan=10><center><br /><input class=\"smaller\" type=\"submit\" value=\"Scan Host\"  /></center></td></tr>" );
 				echo ( "</table>" );
 			echo ( "</form>" );
 		}
@@ -346,7 +346,7 @@ if ( $currentUser != null && $currentUser->isLoggedIn() )
 				{
 					echo ( "<tr><td>&nbsp;" . $imageMembers[$i]->getHostName() . "</td><td><font class=\"smaller\">" . $imageMembers[$i]->get('mac') . "</font></td><td><font class=\"smaller\">" . $imageMembers[$i]->getIPAddress() . "</font></td><td><font class=\"smaller\">" . $imageMembers[$i]->getImage() . "</font></td></tr>" );
 				}
-				echo ( "<tr><td colspan=10><center><br /><br /><input class=\"smaller\" type=\"submit\" value=\""._("Debug computer(s)")."\"  /></center></td></tr>" );
+				echo ( "<tr><td colspan=10><center><br /><input class=\"smaller\" type=\"submit\" value=\""._("Debug computer(s)")."\"  /></center></td></tr>" );
 				echo ( "</table>" );
 			echo ( "</form>" );
 		}
@@ -377,7 +377,7 @@ if ( $currentUser != null && $currentUser->isLoggedIn() )
 				{
 					echo ( "<tr><td>&nbsp;" . $imageMembers[$i]->getHostName() . "</td><td><font class=\"smaller\">" . $imageMembers[$i]->get('mac') . "</font></td><td><font class=\"smaller\">" . $imageMembers[$i]->getIPAddress() . "</font></td><td><font class=\"smaller\">" . $imageMembers[$i]->getImage() . "</font></td></tr>" );
 				}
-				echo ( "<tr><td colspan=10><center><br /><br /><input class=\"smaller\" type=\"submit\" value=\""._("Run memtest86+")."\"  /></center></td></tr>" );
+				echo ( "<tr><td colspan=10><center><br /><input class=\"smaller\" type=\"submit\" value=\""._("Run memtest86+")."\"  /></center></td></tr>" );
 				echo ( "</table>" );
 			echo ( "</form>" );
 		}
@@ -413,7 +413,7 @@ if ( $currentUser != null && $currentUser->isLoggedIn() )
 				{
 					echo ( "<tr><td>&nbsp;" . $imageMembers[$i]->getHostName() . "</td><td><font class=\"smaller\">" . $imageMembers[$i]->get('mac') . "</font></td><td><font class=\"smaller\">" . $imageMembers[$i]->getIPAddress() . "</font></td><td><font class=\"smaller\">" . $imageMembers[$i]->getImage() . "</font></td></tr>" );
 				}
-				echo ( "<tr><td colspan=10><center><br /><br /><input class=\"smaller\" type=\"submit\" value=\""._("Run testdisk")."\"  /></center></td></tr>" );
+				echo ( "<tr><td colspan=10><center><br /><input class=\"smaller\" type=\"submit\" value=\""._("Run testdisk")."\"  /></center></td></tr>" );
 				echo ( "</table>" );
 			echo ( "</form>" );
 		}
@@ -449,7 +449,7 @@ if ( $currentUser != null && $currentUser->isLoggedIn() )
 				{
 					echo ( "<tr><td>&nbsp;" . $imageMembers[$i]->getHostName() . "</td><td><font class=\"smaller\">" . $imageMembers[$i]->get('mac') . "</font></td><td><font class=\"smaller\">" . $imageMembers[$i]->getIPAddress() . "</font></td><td><font class=\"smaller\">" . $imageMembers[$i]->getImage() . "</font></td></tr>" );
 				}
-				echo ( "<tr><td colspan=10><center><br /><br /><input class=\"smaller\" type=\"submit\" value=\""._("Run File Recovery")."\" /></center></td></tr>" );
+				echo ( "<tr><td colspan=10><center><br /><input class=\"smaller\" type=\"submit\" value=\""._("Run File Recovery")."\" /></center></td></tr>" );
 				echo ( "</table>" );
 			echo ( "</form>" );
 		}
@@ -486,7 +486,7 @@ if ( $currentUser != null && $currentUser->isLoggedIn() )
 				{
 					echo ( "<tr><td>&nbsp;" . $imageMembers[$i]->getHostName() . "</td><td><font class=\"smaller\">" . $imageMembers[$i]->get('mac') . "</font></td><td><font class=\"smaller\">" . $imageMembers[$i]->getIPAddress() . "</font></td><td><font class=\"smaller\">" . $imageMembers[$i]->getImage() . "</font></td></tr>" );
 				}
-				echo ( "<tr><td colspan=10><center><br /><br /><input class=\"smaller\" type=\"submit\" value=\""._("Reset Password")."\" /></center></td></tr>" );
+				echo ( "<tr><td colspan=10><center><br /><input class=\"smaller\" type=\"submit\" value=\""._("Reset Password")."\" /></center></td></tr>" );
 				echo ( "</table>" );
 			echo ( "</form>" );
 		}		
@@ -530,7 +530,7 @@ if ( $currentUser != null && $currentUser->isLoggedIn() )
 				{
 					echo ( "<tr><td>&nbsp;" . $imageMembers[$i]->getHostName() . "</td><td><font class=\"smaller\">" . $imageMembers[$i]->get('mac') . "</font></td><td><font class=\"smaller\">" . $imageMembers[$i]->getIPAddress() . "</font></td><td><font class=\"smaller\">" . $imageMembers[$i]->getImage() . "</font></td></tr>" );
 				}
-				echo ( "<tr><td colspan=10><center><br /><br /><input class=\"smaller\" type=\"submit\" value=\""._("Run Surface Test")."\"  /></center></td></tr>" );
+				echo ( "<tr><td colspan=10><center><br /><input class=\"smaller\" type=\"submit\" value=\""._("Run Surface Test")."\"  /></center></td></tr>" );
 				echo ( "</table>" );
 			echo ( "</form>" );
 		}
@@ -573,7 +573,7 @@ if ( $currentUser != null && $currentUser->isLoggedIn() )
 				{
 					echo ( "<tr><td>&nbsp;" . $imageMembers[$i]->getHostName() . "</td><td><font class=\"smaller\">" . $imageMembers[$i]->get('mac') . "</font></td><td><font class=\"smaller\">" . $imageMembers[$i]->getIPAddress() . "</font></td><td><font class=\"smaller\">" . $imageMembers[$i]->getImage() . "</font></td></tr>" );
 				}
-				echo ( "<tr><td colspan=10><center><br /><br /><input class=\"smaller\" type=\"submit\" value=\""._("Deploy Snapins")."\"  /></center></td></tr>" );
+				echo ( "<tr><td colspan=10><center><br /><input class=\"smaller\" type=\"submit\" value=\""._("Deploy Snapins")."\"  /></center></td></tr>" );
 				echo ( "</table>" );
 			echo ( "</form>" );
 		}
@@ -620,7 +620,7 @@ if ( $currentUser != null && $currentUser->isLoggedIn() )
 					{
 						echo ( "<tr><td><font class=\"smaller\">" . $imageMembers[$i]->getHostName() . "</font></td><td><font class=\"smaller\">" . $imageMembers[$i]->get('mac') . "</font></td><td><font class=\"smaller\">" . $imageMembers[$i]->getIPAddress() . "</font></td><td><font class=\"smaller\">" . $imageMembers[$i]->getImage() . "</font></td></tr>" );
 					}
-					echo ( "<tr><td colspan=10><center><br /><br /><input class=\"smaller\" type=\"submit\" value=\""._("Image All Computers")."\"  /></center></td></tr>" );
+					echo ( "<tr><td colspan=10><center><br /><input class=\"smaller\" type=\"submit\" value=\""._("Image All Computers")."\"  /></center></td></tr>" );
 					echo ( "</table>" );
 				echo ( "</form>" );
 
@@ -671,7 +671,7 @@ if ( $currentUser != null && $currentUser->isLoggedIn() )
 				{
 					echo ( "<tr><td><font class=\"smaller\">" . $imageMembers[$i]->getHostName() . "</font></td><td><font class=\"smaller\">" . $imageMembers[$i]->get('mac') . "</font></td><td><font class=\"smaller\">" . $imageMembers[$i]->getIPAddress() . "</font></td><td><font class=\"smaller\">" . $imageMembers[$i]->getImage() . "</font></td></tr>" );
 				}
-				echo ( "<tr><td colspan=10><center><br /><br /><input class=\"smaller\" type=\"submit\" value=\""._("Deploy Snapin")."\" /></center></td></tr>" );
+				echo ( "<tr><td colspan=10><center><br /><input class=\"smaller\" type=\"submit\" value=\""._("Deploy Snapin")."\" /></center></td></tr>" );
 				echo ( "</table>" );
 				echo ( "</form>" );
 
@@ -719,7 +719,7 @@ if ( $currentUser != null && $currentUser->isLoggedIn() )
 				{
 					echo ( "<tr><td>&nbsp;" . $imageMembers[$i]->getHostName() . "</td><td><font class=\"smaller\">" . $imageMembers[$i]->get('mac') . "</font></td><td><font class=\"smaller\">" . $imageMembers[$i]->getIPAddress() . "</font></td><td><font class=\"smaller\">" . $imageMembers[$i]->getImage() . "</font></td></tr>" );
 				}
-				echo ( "<tr><td colspan=10><center><br /><br /><input class=\"smaller\" type=\"submit\" value=\""._("Run Inventory")."\"  /></center></td></tr>" );
+				echo ( "<tr><td colspan=10><center><br /><input class=\"smaller\" type=\"submit\" value=\""._("Run Inventory")."\"  /></center></td></tr>" );
 				echo ( "</table>" );
 			echo ( "</form>" );
 		}

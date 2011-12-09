@@ -443,7 +443,7 @@ if ($currentUser != null && $currentUser->isLoggedIn())
 				echo ( "<tr><td>"._("Host Kernel").":</td><td><input class=\"smaller\" type=\"text\" name=\"kern\" value=\"" . $Host->get('kernel') . "\" /></td></tr>" );
 				echo ( "<tr><td>"._("Host Kernel Arguments").":</td><td><input class=\"smaller\" type=\"text\" name=\"args\" value=\"\" /></td></tr>" );
 				echo ( "<tr><td>"._("Host Primary Disk").":</td><td><input class=\"smaller\" type=\"text\" name=\"dev\" value=\"" . $Host->get('kernelDevice') . "\" /></td></tr>" );		
-				echo ( "<tr><td colspan=2><font class=\"smaller\"><center><br /><input type=\"hidden\" name=\"updategen\" value=\"1\" /><input class=\"smaller\" type=\"submit\" value=\""._("Update")."\" /></center></font></td></tr>" );
+				echo ( "<tr><td colspan=2><font class=\"smaller\"><center><input type=\"hidden\" name=\"updategen\" value=\"1\" /><input class=\"smaller\" type=\"submit\" value=\""._("Update")."\" /></center></font></td></tr>" );
 			echo ( "</table>" );
 			echo ( "</form>" );
 		}
@@ -463,7 +463,7 @@ if ($currentUser != null && $currentUser->isLoggedIn())
 				echo ( "<tr><td>"._("Organizational Unit").":<br> <span class=\"lightColor\">"._("(Blank for default)")."</span></td><td><input size=\"50\" id=\"adOU\" class=\"smaller\" type=\"text\" name=\"ou\" value=\"" . $Host->get('ADOU') . "\" /></td></tr>" );
 				echo ( "<tr><td>"._("Domain Username").":</td><td><input id=\"adUsername\" class=\"smaller\" type=\"text\" name=\"domainuser\" value=\"" . $Host->get('ADUser') . "\" /></td></tr>" );
 				echo ( "<tr><td>"._("Domain Password").":</td><td><input id=\"adPassword\" class=\"smaller\" type=\"text\" name=\"domainpassword\" value=\"" . $Host->get('ADPass') . "\" /> <span class=\"lightColor\">"._("(Must be encrypted)")."</span></td></tr>" );
-				echo ( "<tr><td colspan=2><center><br /><input type=\"hidden\" name=\"updatead\" value=\"1\" /><input type=\"submit\" value=\""._("Update")."\" /></center></td></tr>" );
+				echo ( "<tr><td colspan=2><center><input type=\"hidden\" name=\"updatead\" value=\"1\" /><input type=\"submit\" value=\""._("Update")."\" /></center></td></tr>" );
 			echo ( "</table>" );
 
 			echo ( "</form>" );
@@ -562,7 +562,7 @@ if ($currentUser != null && $currentUser->isLoggedIn())
 					echo ( "<tr><td width=\"270\">&nbsp;"._("Printer Manager Enabled?")."</td><td>&nbsp;<input type=\"checkbox\" name=\"printermanager\" $printermanagerchecked /></td><td><span class=\"icon icon-help hand\" title=\"" . _("This setting will enable or disable the printer manager service module on this specific host.  If the module is globally disabled, this setting is ignored. ") . "\"></span></td></tr>" );														
 					echo ( "<tr><td width=\"270\">&nbsp;"._("Task Reboot Enabled?")."</td><td>&nbsp;<input type=\"checkbox\" name=\"taskreboot\" $taskrebootchecked /></td><td><span class=\"icon icon-help hand\" title=\"" . _("This setting will enable or disable the task reboot service module on this specific host.  If the module is globally disabled, this setting is ignored. ") . "\"></span></td></tr>" );														
 					echo ( "<tr><td width=\"270\">&nbsp;"._("User Tracker Enabled?")."</td><td>&nbsp;<input type=\"checkbox\" name=\"usertracker\" $usertrackerchecked /></td><td><span class=\"icon icon-help hand\" title=\"" . _("This setting will enable or disable the user tracker service module on this specific host.  If the module is globally disabled, this setting is ignored. ") . "\"></span></td></tr>" );														
-					echo ( "<tr><td colspan='3'><center><br /><input type=\"submit\" value=\""._("Update")."\" /></center></td></tr>" );
+					echo ( "<tr><td colspan='3'><center><input type=\"submit\" value=\""._("Update")."\" /></center></td></tr>" );
 				echo ( "</table></center>" );
 			echo ( "<p class=\"titleBottomLeft\">"._("Host Screen Resolution")."</p>" );
 				echo ( "<center><table cellpadding=0 cellspacing=0 border=0 width=\"100%\">" );
@@ -587,7 +587,7 @@ if ($currentUser != null && $currentUser->isLoggedIn())
 					echo ( "<tr><td width=\"270\">&nbsp;"._("Screen Width (in pixels)")."</td><td>&nbsp;<input type=\"text\" name=\"x\" value=\"$x\"/></td><td><span class=\"icon icon-help hand\" title=\"" . _("This setting defines the screen horizontal resolution to be used with this host.  Leaving this field blank will force this host to use the global default setting") . "\"></span></td></tr>" );
 					echo ( "<tr><td width=\"270\">&nbsp;"._("Screen Height (in pixels)")."</td><td>&nbsp;<input type=\"text\" name=\"y\" value=\"$y\"/></td><td><span class=\"icon icon-help hand\" title=\"" . _("This setting defines the screen vertial resolution to be used with this host.  Leaving this field blank will force this host to use the global default setting") . "\"></span></td></tr>" );
 					echo ( "<tr><td width=\"270\">&nbsp;"._("Screen Refresh Rate")."</td><td>&nbsp;<input type=\"text\" name=\"r\" value=\"$r\" /></td><td><span class=\"icon icon-help hand\" title=\"" . _("This setting defines the screen refresh rate to be used with this host.  Leaving this field blank will force this host to use the global default setting") . "\"></span></td></tr>" );
-					echo ( "<tr><td colspan='3'><center><br /><input type=\"submit\" value=\""._("Update")."\" /></center></td></tr>" );
+					echo ( "<tr><td colspan='3'><center><input type=\"submit\" value=\""._("Update")."\" /></center></td></tr>" );
 				echo ( "</table></center>" );
 			echo ( "<p class=\"titleBottomLeft\">"._("Auto Log Out Settings")."</p>" );
 				echo ( "<center><table cellpadding=0 cellspacing=0 border=0 width=\"100%\">" );
@@ -606,7 +606,7 @@ if ($currentUser != null && $currentUser->isLoggedIn())
 					}
 
 					echo ( "<tr><td width=\"270\">&nbsp;"._("Auto Log Out Time (in minutes)")."</td><td>&nbsp;<input type=\"text\" name=\"tme\" value=\"$tme\"/></td><td><span class=\"icon icon-help hand\" title=\"" . _("This setting defines the time to auto log out this host.") . "\"></span></td></tr>" );
-					echo ( "<tr><td colspan='3'><center><br /><input type=\"submit\" value=\""._("Update")."\" /></center></td></tr>" );
+					echo ( "<tr><td colspan='3'><center><input type=\"submit\" value=\""._("Update")."\" /></center></td></tr>" );
 				echo ( "</table></center>" );
 			echo ( "</form>" );
 		}

@@ -36,7 +36,7 @@ if ( $_GET["rmsgid"] != null && is_numeric( $_GET["rmsgid"] ) )
 			echo ( "<center><table cellpadding=0 cellspacing=0 border=0 width=90%>" );
 				echo ( "<tr><td>"._("Storage Group Name").":</td><td>" . $ar["ngName"] . "</td></tr>" );
 				echo ( "<tr><td>"._("Storage Group Description").":</td><td>" . $ar["ngDesc"] . "</font></td></tr>" );
-				echo ( "<tr><td colspan=2><center><br /><form method=\"POST\" action=\"?node=" . $_GET["node"] . "&sub=" . $_GET["sub"] . "&rmsgid=" . $_GET["rmsgid"] . "&confirm=1\"><input class=\"smaller\" type=\"submit\" value=\""._("Delete Storage Definition")."\" /></form></center></td></tr>" );				
+				echo ( "<tr><td colspan=2><center><form method=\"POST\" action=\"?node=" . $_GET["node"] . "&sub=" . $_GET["sub"] . "&rmsgid=" . $_GET["rmsgid"] . "&confirm=1\"><input class=\"smaller\" type=\"submit\" value=\""._("Delete Storage Definition")."\" /></form></center></td></tr>" );				
 			echo ( "</table></center>" );		
 		}
 	}
@@ -96,7 +96,7 @@ else
 			echo ( "<table cellpadding=0 cellspacing=0 border=0 width=90%>" );
 				echo ( "<tr><td>"._("Storage Group Name").":</td><td><input class=\"smaller\" type=\"text\" name=\"name\" value=\"" . $ar["ngName"] . "\" /></td></tr>" );
 				echo ( "<tr><td>"._("Storage Group Description").":</td><td><textarea class=\"smaller\" name=\"description\" rows=\"5\" cols=\"65\">" . $ar["ngDesc"] . "</textarea></td></tr>" );
-				echo ( "<tr><td colspan=2><font><center><br /><input type=\"hidden\" name=\"update\" value=\"1\" /><input type=\"hidden\" name=\"storagegroupid\" value=\"" . $_GET["storagegroupid"] . "\" /><input class=\"smaller\" type=\"submit\" value=\""._("Update")."\" /></center></font></td></tr>" );				
+				echo ( "<tr><td colspan=2><font><center><input type=\"hidden\" name=\"update\" value=\"1\" /><input type=\"hidden\" name=\"storagegroupid\" value=\"" . $_GET["storagegroupid"] . "\" /><input class=\"smaller\" type=\"submit\" value=\""._("Update")."\" /></center></font></td></tr>" );				
 			echo ( "</table>" );
 			echo ( "</form>" );
 		}

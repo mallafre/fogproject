@@ -9,7 +9,8 @@ abstract class FOGPage
 	// Node Variable
 	public $node = '';
 	
-	// ID Variable
+	// ID Variable - name of ID variable used in Page
+	// LEGACY: This is for LEGACY support - all of these will be 'id' eventually
 	public $id = '';
 	
 	// Menu Items
@@ -24,6 +25,7 @@ abstract class FOGPage
 		
 	);
 	
+	// Variables
 	// Page title
 	public $titleDisplay = true;
 	public $title;
@@ -37,42 +39,45 @@ abstract class FOGPage
 	private $wrapper = 'td';
 	private $result;
 	
-	// Post
-	protected $post = false;
-	protected $request;
+	// Method & Form
+	protected $post = false;	// becomes true if POST request
+	protected $ajax = false;	// becomes true if AJAX request
+	protected $request = array();
 	protected $formAction;
-	protected $sub;
-	protected $tab;
 	
 	// FOG Class Variables
 	protected $db;
-	protected $FOG;
+	protected $FOGCore;
 	protected $HookManager;
-	protected $currentUser;
+	protected $FOGUser;
 	
 	// __construct
 	public function __construct($name = '')
 	{
-		// Setup classes
+		// Setup Classes
 		$this->db = $GLOBALS['db'];
 		$this->FOGCore = $GLOBALS['FOGCore'];
 		$this->HookManager = $GLOBALS['HookManager'];
 		$this->FOGUser = $GLOBALS['currentUser'];
 		
-		// Set name if passed
-		if ($name)
+		// Set name
+		if (!empty($name))
 		{
 			$this->name = $name;
 		}
 		
-		// True if $this->id is set in $GLOBALS context
+		// Make these key's accessible in $this->request
 		foreach (array('node', 'sub', 'tab', 'confirm') AS $x)
 		{
 			$this->request[$x] = (isset($_REQUEST[$x]) && !empty($_REQUEST[$x]) ? $_REQUEST[$x] : false);
 		}
 		$this->request['id'] = $this->request[$this->id] = (isset($_REQUEST[$this->id]) && !empty($_REQUEST[$this->id]) ? $_REQUEST[$this->id] : false);
 		
-		$this->post = ($_SERVER['REQUEST_METHOD'] == 'POST' ? true : false);
+		// Methods
+		$this->post = $this->FOGCore->isPOSTRequest();
+		$this->ajax = $this->FOGCore->isAJAXRequest();
+		
+		// Default form target
 		$this->formAction = sprintf('%s?node=%s&sub=%s%s', $_SERVER['PHP_SELF'], $this->request['node'], $this->request['sub'], ($this->request['id'] ? sprintf('&%s=%s', $this->id, $this->request['id']) : ''));
 		
 		// DEBUG
@@ -135,8 +140,9 @@ abstract class FOGPage
 				// HTML output
 				if ($this->searchFormURL)
 				{
-					$result = sprintf('%s<div id="search-wrapper"><input id="%s-search" class="search-input placeholder" type="text" value="" placeholder="%s" autocomplete="off" /> <input id="%s-search-submit" class="search-submit" type="button" value="" /></div>',
+					$result = sprintf('%s<form method="GET" action="%s" id="search-wrapper"><input id="%s-search" class="search-input placeholder" type="text" value="" placeholder="%s" autocomplete="off" /> <input id="%s-search-submit" class="search-submit" type="button" value="" /></form>',
 						"\n\t\t\t",
+						$this->searchFormURL,
 						(substr($this->node, -1) == 's' ? substr($this->node, 0, -1) : $this->node),	// TODO: Store this in class as variable
 						sprintf('%s %s', ucwords((substr($this->node, -1) == 's' ? substr($this->node, 0, -1) : $this->node)), _('Search')),
 						(substr($this->node, -1) == 's' ? substr($this->node, 0, -1) : $this->node)	// TODO: Store this in class as variable

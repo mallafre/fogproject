@@ -37,7 +37,7 @@ class FOGCore
 
 	public $db;
 	
-	function __construct()
+	public function __construct()
 	{
 		$this->conn = $GLOBALS['conn'];
 		$this->db = $GLOBALS['db'];
@@ -180,7 +180,7 @@ class FOGCore
 		return $arTasks;
 	}
 	
-	function redirect($url = '')
+	public function redirect($url = '')
 	{
 		if ($url == '')
 		{
@@ -198,14 +198,14 @@ class FOGCore
 		exit;
 	}
 	
-	function setMessage($txt, $data = array())
+	public function setMessage($txt, $data = array())
 	{
 		$_SESSION['FOG_MESSAGES'] = (!is_array($txt) ? array(vsprintf($txt, $data)) : $txt);
 		
 		return $this;
 	}
 	
-	function getMessages()
+	public function getMessages()
 	{
 		print "<!-- FOG Variables -->\n";
 		
@@ -217,7 +217,7 @@ class FOGCore
 		unset($_SESSION['FOG_MESSAGES']);
 	}
 	
-	function logHistory($string)
+	public function logHistory($string)
 	{
 		global $conn, $currentUser;
 		$uname = "";
@@ -239,19 +239,17 @@ class FOGCore
 		return $Manager->search($keyword);
 	}
 	
-	// Moved from functions - Blackout - 11:36 AM 26/09/2011
-	function getSetting($key)
+	public function getSetting($key)
 	{
 		return $this->db->query("SELECT settingValue FROM globalSettings WHERE settingKey = '%s' LIMIT 1", array($key))->fetch()->get('settingValue');
 	}
-
-	// Moved from functions - Blackout - 11:36 AM 26/09/2011
-	function setSetting($key, $value)
+	
+	public function setSetting($key, $value)
 	{
 		return $this->db->query("UPDATE globalSettings SET settingValue = '%s' WHERE settingKey = '%s'", array($value, $key))->queryResult();
 	}
 	
-	function getClass($class)
+	public function getClass($class)
 	{
 		$args = func_get_args();
 		array_pop($args);
@@ -272,12 +270,17 @@ class FOGCore
 		}
 	}
 	
-	function isAJAXRequest()
+	public function isAJAXRequest()
 	{
 		return (strtolower(@$_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest' ? true : false);
 	}
 	
-	function error($txt, $data = array())
+	public function isPOSTRequest()
+	{
+		return (strtolower(@$_SERVER['REQUEST_METHOD']) == 'post' ? true : false);
+	}
+	
+	public function error($txt, $data = array())
 	{
 		//if (!$this->isAJAXRequest() && !preg_match('#/service/#', $_SERVER['PHP_SELF']))
 		if (!FOGCore::isAJAXRequest() && !preg_match('#/service/#', $_SERVER['PHP_SELF']))
@@ -286,7 +289,7 @@ class FOGCore
 		}
 	}
 	
-	function info($txt, $data = array())
+	public function info($txt, $data = array())
 	{
 		if (!FOGCore::isAJAXRequest() && !preg_match('#/service/#', $_SERVER['PHP_SELF']))
 		{
@@ -414,7 +417,7 @@ class FOGCore
 	// Blackout - 10:26 AM 25/05/2011
 	// Used from one of my classes - hacked to make it work
 	// TODO: Make a FOG Utilities Class - include this
-	function fetchURL($URL)
+	public function fetchURL($URL)
 	{
 		if ($this->db && $GLOBALS['FOGCore']->getSetting('FOG_PROXY_IP'))
 		{

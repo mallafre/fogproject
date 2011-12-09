@@ -68,7 +68,7 @@ if ( $_GET["id"] != null && is_numeric( $_GET["id"] ) )
 			echo ( "<tr><td>"._("Printer Port").":</td><td><input type=\"text\" name=\"port\" value=\"$port\" /></td></tr>" );
 			echo ( "<tr><td>"._("Print INF File").":</td><td><input type=\"text\" name=\"inf\" value=\"$inf\" /></td></tr>" );	
 			echo ( "<tr><td>"._("Print IP (optional)").":</td><td><input type=\"text\" name=\"ip\" value=\"$ip\" /></td></tr>" );	
-			echo ( "<tr><td colspan=2><center><br /><input type=\"hidden\" name=\"update\" value=\"1\" /><input type=\"submit\" value=\""._("Update Printer")."\" /></center></td></tr>" );
+			echo ( "<tr><td colspan=2><center><input type=\"hidden\" name=\"update\" value=\"1\" /><input type=\"submit\" value=\""._("Update Printer")."\" /></center></td></tr>" );
 		echo ( "</table></center>" );
 		echo ( "</form>" );
 	}

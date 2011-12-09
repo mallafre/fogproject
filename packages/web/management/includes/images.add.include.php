@@ -81,6 +81,6 @@ if ($_POST['add'])
 	<tr><td><?php print _("Operating System"); ?>:</td><td><?php print $FOGCore->getClass('OSManager')->buildSelectBox($_POST['os']); ?></td></tr>
 	<tr><td><?php print _("Image Path"); ?>:</td><td>/images/<input type="text" name="file" id="iFile" value="<?php print $_POST['file']; ?>" /></td></tr>
 	<tr><td><?php print _("Image Type"); ?>:</td><td><?php print $FOGCore->getClass('ImageTypeManager')->buildSelectBox($_POST['imagetype']); ?> <span class="icon icon-help" title="TODO!"></span></td></tr>				
-	<tr><td colspan=2><center><br /><input type="submit" value="<?php print _("Add"); ?>" /></center></td></tr>				
+	<tr><td colspan=2><center><input type="submit" value="<?php print _("Add"); ?>" /></center></td></tr>				
 </table>
 </form>

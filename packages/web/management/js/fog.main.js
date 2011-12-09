@@ -50,25 +50,11 @@ $(function()
 	$('#logo > h1 > a > img').tipsy({'gravity': 's'});
 	HookTooltips();
 
-	// Host Search
-	$('#host-search').fogAjaxSearch({
-		'URL':		'ajax/host.search.php',
-		'Template':	function(data, i)
-		{
-			return '<tr id="host-' + data['id'] + '"><td><input type="checkbox" name="HID' + data['id'] + '" checked="checked" /></td><td><span class="icon ping"></span></td><td><a href="?node=host&sub=edit&id=' + data['id'] + '" title="Edit">' + data['hostname'] + '</a></td><td>' + data['mac'] + '</td><td>' + (data['ip'] ? data['ip'] : '&nbsp;') + '</td><td class="c"><a href="?node=host&sub=edit&id=' + data['id'] + '"><span class="icon icon-edit" title="Edit: ' + data['hostname'] + '"></span></a></td></tr>';
-		}
-	});
-	
-	// Group Search
-	$('#group-search').fogAjaxSearch({
-		'URL':		'ajax/group.search.php',
-		'Template':	function(data, i)
-		{
-			return '<tr><td><a href="?node=group&sub=edit&groupid=' + data['id'] + '" title="Edit">' + data['name'] + '</a></td><td>' + data['description'] + '</td><td class="c">' + data['count'] + '</td><td class="c"><a href="?node=group&sub=edit&groupid=' + data['id'] + '"><span class="icon icon-edit" title="Edit: ' + data['name'] + '"></span></a></td></tr>';
-		}
-	});
+	// Search boxes
+	$('.search-input').fogAjaxSearch();
 	
 	// Task Search
+	/*
 	$('#task-search').fogAjaxSearch({
 		'URL':		'ajax/tasks.search.php',
 		'Template':	function(data, i)
@@ -100,6 +86,7 @@ $(function()
 			}
 		}
 	});
+	*/
 	
 	// LEGACY - Task Confirm Date/time picker
 	$('#singlescheddatetime').dynDateTime({
@@ -118,33 +105,6 @@ $(function()
 	$('#snapin-upload').click(function() {
 		$('#uploader').html('<input type="file" name="snap" />').find('input').click();
 	});
-
-	// Image Search
-	$('#image-search').fogAjaxSearch({
-		'URL':		'ajax/image.search.php',
-		'Template':	function(data, i)
-		{
-			return '<tr><td><a href="?node=images&sub=edit&imageid=' + data['id'] + '" title="Edit">' + data['name'] + '</a></td><td>' + data['description'].substr(0, 35) + '</td><td class="c">' + data['storagegroup'] + '</td><td class="c"><a href="?node=images&sub=edit&imageid=' + data['id'] + '"><span class="icon icon-edit" title="Edit: ' + data['name'] + '"></span></a></td></tr>';
-		}
-	});
-	
-	// Snapin Search
-	$('#snapin-search').fogAjaxSearch({
-		'URL':		'ajax/snapin.search.php',
-		'Template':	function(data, i)
-		{
-			return '<tr><td><a href="?node=snap&sub=edit&snapinid=' + data['id'] + '" title="Edit">' + data['name'] + '</a></td><td>' + data['description'].substr(0, 45) + '</td><td class="c"><a href="?node=snap&sub=edit&snapinid=' + data['id'] + '"><span class="icon icon-edit" title="Edit: ' + data['name'] + '"></span></a></td></tr>';
-		}
-	});
-	
-	// Printer Search
-	$('#printer-search').fogAjaxSearch({
-		'URL':		'ajax/printer.search.php',
-		'Template':	function(data, i)
-		{
-			return '<tr><td>' + data['model'] + '</td><td>' + data['alias'] + '</td><td>' + data['port'] + '</td><td>' + data['inf'] + '</td><td>' + data['ip'] + '</td><td class="c"><a href="?node=print&sub=edit&id=' + data['id'] + '"><span class="icon icon-edit" title="Edit: ' + data['alias'] + '"></span></a></td></tr>';
-		}
-	});
 	
 	// Host Management - Select all checkbox
 	$('.header input[type="checkbox"][name="no"]').click(function()
@@ -162,20 +122,13 @@ $(function()
 		}
 	});
 	
-	// User Search
-	$('#user-search').fogAjaxSearch({
-		'URL':		'ajax/user.search.php',
-		'Template':	function(data, i)
-		{
-			return '<tr><td><a href="?node=group&sub=edit&groupid=' + data['id'] + '" title="Edit">' + data['name'] + '</a></td><td>' + data['description'] + '</td><td class="c">' + data['count'] + '</td><td class="c"><a href="?node=group&sub=edit&groupid=' + data['id'] + '"><span class="icon icon-edit" title="Edit: ' + data['name'] + '"></span></a></td></tr>';
-		}
-	});
-	
 	// Tabs
 	// Blackout - 9:14 AM 30/11/2011
 	$('.organic-tabs').organicTabs({
 		'targetID'	: '#tab-container'
 	});
+	
+	
 });
 
 function debug(txt)

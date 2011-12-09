@@ -14,33 +14,35 @@ class FOGPageManager
 	
 	private $pageTitle;
 	
+	private $loadedPageClasses = false;
+	
 	public function __construct()
 	{
 		$this->FOGCore = $GLOBALS['FOGCore'];
 	}
 	
-	// Load FOGPage classes
-	public function load()
+	public function getFOGPageClass()
 	{
-		// This variable is required as each class file uses it
-		global $FOGPageManager;
+		return $this->nodes[$GLOBALS[$this->nodeVariable]];
+	}
 	
-		$path = BASEPATH . '/lib/pages';
-		
-		$iterator = new DirectoryIterator($path);
-		foreach ($iterator as $fileInfo)
-		{
-			if ($fileInfo->isFile() && substr($fileInfo->getFilename(), -10) == '.class.php')
-			{
-				require_once($path . '/' . $fileInfo->getFilename());
-			}
-		}
-		
-		return $this;
+	public function getFOGPageName()
+	{
+		return $this->getFOGPageClass()->name;
+	}
+	
+	public function getFOGPageTitle()
+	{
+		return $this->getFOGPageClass()->title;
+	}
+	
+	public function isFOGPageTitleDisplayEnabled()
+	{
+		return ($this->getFOGPageClass()->titleDisplay == true && !empty($this->getFOGPageClass()->title));
 	}
 
-	// Add FOGPage
-	public function add($class)
+	// Register FOGPage
+	public function register($class)
 	{
 		try
 		{
@@ -67,24 +69,14 @@ class FOGPageManager
 		return $this;
 	}
 	
-	public function getFOGPageClass()
-	{
-		return $this->nodes[$GLOBALS[$this->nodeVariable]];
-	}
-	
-	public function getFOGPageTitle()
-	{
-		return $this->getFOGPageClass()->title;
-	}
-	
-	public function isFOGPageTitleDisplayEnabled()
-	{
-		return ($this->getFOGPageClass()->titleDisplay == true && !empty($this->getFOGPageClass()->title));
-	}
-	
 	// Call FOGPage->method based on $node and $sub
 	public function render()
 	{
+		if (!$this->loadedPageClasses)
+		{
+			$this->loadPageClasses();
+		}
+		
 		try
 		{
 			// Variables
@@ -110,13 +102,13 @@ class FOGPageManager
 			}
 			
 			// FOG - Default view override
-			if ($sub != 'list' && $method == 'index' && $this->FOGCore->getSetting('FOG_VIEW_DEFAULT_SCREEN') != 'LIST')
+			if ($sub != 'list' && $method == 'index' && $this->FOGCore->getSetting('FOG_VIEW_DEFAULT_SCREEN') != 'LIST' && method_exists($class, 'search'))
 			{
 				$method = 'search';
 			}
 			
 			// POST - Append '_post' to method name if request method is POST and the method exists
-			if ($_SERVER['REQUEST_METHOD'] == 'POST' && method_exists($class, $method . '_post'))
+			if ($this->FOGCore->isPOSTRequest() && method_exists($class, $method . '_post'))
 			{
 				$method = $method . '_post';
 			}
@@ -146,6 +138,31 @@ class FOGPageManager
 		}
 		
 		return false;
+	}
+	
+	// Load FOGPage classes
+	private function loadPageClasses()
+	{
+		if ($loadedPageClasses)
+		{
+			return $this;
+		}
+	
+		// This variable is required as each class file uses it
+		global $FOGPageManager;
+	
+		$path = BASEPATH . '/lib/pages';
+		
+		$iterator = new DirectoryIterator($path);
+		foreach ($iterator as $fileInfo)
+		{
+			if ($fileInfo->isFile() && substr($fileInfo->getFilename(), -10) == '.class.php')
+			{
+				require_once($path . '/' . $fileInfo->getFilename());
+			}
+		}
+		
+		return $this;
 	}
 	
 	// Error

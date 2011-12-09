@@ -36,7 +36,7 @@ require_once('./includes/processlogin.include.php');
 // Login form + logout
 if ($node == 'logout' || $currentUser == null || !$currentUser->isLoggedIn())
 {
-	if ($node == 'logout')
+	if ($node == 'logout' && ($currentUser instanceof User))
 	{
 		$currentUser->logout();
 		
@@ -46,76 +46,26 @@ if ($node == 'logout' || $currentUser == null || !$currentUser->isLoggedIn())
 	$_SESSION['AllowAJAXTasks'] = false;
 	
 	// Hook
-	$HookManager->processEvent('Logout', array('user' => &$currentUser));
+	$HookManager->processEvent('LOGOUT', array('user' => &$currentUser));
 	
 	require_once('./includes/loginform.include.php');
 }
 
 // Ping Active
-$_SESSION['FOGPingActive'] = ($FOGCore->getSetting('FOG_HOST_LOOKUP') == '1');
+$_SESSION['FOGPingActive'] = ($FOGCore->getSetting('FOG_HOST_LOOKUP') == '1' ? true : false);
 
 // Allow AJAX Tasks
-$_SESSION['AllowAJAXTasks'] = 1;
+$_SESSION['AllowAJAXTasks'] = true;
 
-// Determine content
-// TODO: Move to array, iterate array, etc
-// TODO: Need to make $node match ./includes/$includePage.include.php for all files... i.e. report -> reports, snap -> snapins
-if ($node == 'images')
-	$includePage = 'images';
-else if ($node == 'host')
-	$includePage = 'hosts';
-else if ($node == 'group')
-	$includePage = 'groups';
-else if ($node == 'tasks')
-	$includePage = 'tasks';
-else if ($node == 'users')
-	$includePage = 'users';
-else if ($node == 'about')
-	$includePage = 'about';
-else if ($node == 'help')
-	$includePage = 'help';
-else if ($node == 'snap')
-	$includePage = 'snapins';
-else if ($node == 'report')
-	$includePage = 'reports';
-else if ($node == 'print')
-	$includePage = 'printer';
-else if ($node == 'service')
-	$includePage = 'service';
-else if ($node == 'plugin')
-	$includePage = 'plugin';
-else if ($node == 'storage')
-	$includePage = 'storage';
-else if ($node == 'hwinfo')
-	$includePage = 'hwinfo';
-else
-	$includePage = 'dashboard';
-
-$isHomepage = ($includePage == 'dashboard' ? true : false);
-
-// Determine the current page's title
-$sectionTitles = array(
-		'users'		=> _('User Management'),
-		'host'		=> _('Host Management'),
-		'group'		=> _('Group Management'),
-		'images'	=> _('Image Management'),
-		'storage'	=> _('Storage Management'),
-		'snap'		=> _('Snap-in Management'),
-		'print'		=> _('Printer Management'),
-		'service'	=> _('FOG Configuration'),
-		'tasks'		=> _('Task Management'),
-		'report'	=> _('Reports'),
-		'about'		=> _('Other Information'),
-		'hwinfo'	=> _('Hardware Information'),
-		'logout'	=> _('Logout'),
-		);
-// TODO: Include ID / Name of each item under each section
-$sectionTitle = (isset($sectionTitles[$node]) ? $sectionTitles[$node] : 'Dashboard');
+// Are we on the Homeapge?
+$isHomepage = (!$_REQUEST['node'] || in_array($_REQUEST['node'], array('home', 'dashboard')) ? true : false);
 
 // Render content - must be done before anything is outputted so classes can change HTTP headers
 $FOGPageManager = new FOGPageManager();
 // Load Page Classes -> Render content based on incoming node variables
-$content = $FOGPageManager->load()->render();
+$content = $FOGPageManager->render();
+// Section title
+$sectionTitle = $FOGPageManager->getFOGPageName();
 // Page Title - should be set after page has been rendered
 $pageTitle = $FOGPageManager->getFOGPageTitle();
 
@@ -170,9 +120,6 @@ $HookManager->processEvent('CSS');
 				printf('<h2>%s</h2>', $FOGPageManager->getFOGPageTitle());
 			}
 			print $content;
-
-			//exit;
-			//var_dump($FOGPageManager);exit;
 
 			?>
 		</div>
@@ -277,7 +224,7 @@ else if ($isHomepage)
 }
 
 // Hook
-$HookManager->processEvent('JavaScript');
+$HookManager->processEvent('JAVASCRIPT');
 
 ?>
 

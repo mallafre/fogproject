@@ -48,6 +48,6 @@ if ( $_POST["add"] != null )
 <center><table cellpadding=0 cellspacing=0 border=0 width=90%>
 	<tr><td><?php print _("Storage Group Name"); ?>:</td><td><input class="smaller" type="text" name="name" value="" /></td></tr>
 	<tr><td><?php print _("Storage Group Description"); ?>:</td><td><textarea class="smaller" name="description" rows="5" cols="65"></textarea></td></tr>
-	<tr><td colspan=2><center><br /><input type="hidden" name="add" value="1" /><input class="smaller" type="submit" value="<?php print _("Add"); ?>" /></center></td></tr>				
+	<tr><td colspan=2><center><input type="hidden" name="add" value="1" /><input class="smaller" type="submit" value="<?php print _("Add"); ?>" /></center></td></tr>				
 </table></center>
 </form>

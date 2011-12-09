@@ -78,6 +78,6 @@ if ( $_POST["add"] != null )
 	<tr><td><?php print _("User Password"); ?>:</td><td><input type="password" name="p1" value="" autocomplete="off" /></td></tr>
 	<tr><td><?php print _("User Password (confirm)"); ?>:</td><td><input type="password" name="p2" value="" autocomplete="off" /></td></tr>
 	<tr><td><?php print _("Mobile/Quick Image Access Only?"); ?></td><td><input type="checkbox" name="isGuest" autocomplete="off" /></td></tr>
-	<tr><td colspan=2><center><br /><input type="hidden" name="add" value="1" /><input class="smaller" type="submit" value="<?php print _("Create User"); ?>" /></center></td></tr>				
+	<tr><td colspan=2><center><input type="hidden" name="add" value="1" /><input class="smaller" type="submit" value="<?php print _("Create User"); ?>" /></center></td></tr>				
 </table></center>
 </form>

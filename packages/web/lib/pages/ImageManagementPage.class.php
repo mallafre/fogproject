@@ -30,8 +30,8 @@ class ImageManagementPage extends FOGPage
 		
 		// Row templates
 		$this->templates = array(
-			'<a href="?node=images&sub=edit&imageid=${id}">${name}</a>',
-			'<a href="?node=images&sub=edit&imageid=${id}"><span class="icon icon-edit"></span></a>'
+			sprintf('<a href="?node=%s&sub=edit&%s=${id}">${name}</a>', $this->node, $this->id),
+			sprintf('<a href="?node=%s&sub=edit&%s=${id}"><span class="icon icon-edit"></span></a>', $this->node, $this->id)
 		);
 		
 		// Row attributes
@@ -95,13 +95,13 @@ class ImageManagementPage extends FOGPage
 		<form method="POST" action="<?php print $this->formAction; ?>">
 		<input type="hidden" name="add" value="1" />
 		<table cellpadding="0" cellspacing="0" border="0" width="100%">
-			<tr><td><?php print _("Image Name"); ?>:</td><td><input type="text" name="name" id="iName" onblur="duplicateImageName();" value="<?php print $_POST['name']; ?>" /></td></tr>
-			<tr><td><?php print _("Image Description"); ?>:</td><td><textarea name="description" rows="5" cols="65"><?php print $_POST['description']; ?></textarea></td></tr>
-			<tr><td><?php print _("Storage Group"); ?>:</td><td><?php print $this->FOGCore->getClass('StorageGroupManager')->buildSelectBox($_POST['storagegroup']); ?></td></tr>
-			<tr><td><?php print _("Operating System"); ?>:</td><td><?php print $this->FOGCore->getClass('OSManager')->buildSelectBox($_POST['os']); ?></td></tr>
-			<tr><td><?php print _("Image Path"); ?>:</td><td>/images/<input type="text" name="file" id="iFile" value="<?php print $_POST['file']; ?>" /></td></tr>
-			<tr><td><?php print _("Image Type"); ?>:</td><td><?php print $this->FOGCore->getClass('ImageTypeManager')->buildSelectBox(); ?> <span class="icon icon-help" title="TODO!"></span></td></tr>				
-			<tr><td colspan=2><center><br /><input type="submit" value="<?php print _("Add"); ?>" /></center></td></tr>				
+			<tr><td><?php print _("Image Name"); ?></td><td><input type="text" name="name" id="iName" onblur="duplicateImageName();" value="<?php print $_POST['name']; ?>" /></td></tr>
+			<tr><td><?php print _("Image Description"); ?></td><td><textarea name="description" rows="5" cols="65"><?php print $_POST['description']; ?></textarea></td></tr>
+			<tr><td><?php print _("Storage Group"); ?></td><td><?php print $this->FOGCore->getClass('StorageGroupManager')->buildSelectBox($_POST['storagegroup']); ?></td></tr>
+			<tr><td><?php print _("Operating System"); ?></td><td><?php print $this->FOGCore->getClass('OSManager')->buildSelectBox($_POST['os']); ?></td></tr>
+			<tr><td><?php print _("Image Path"); ?></td><td>/images/ <input type="text" name="file" id="iFile" value="<?php print $_POST['file']; ?>" /></td></tr>
+			<tr><td><?php print _("Image Type"); ?></td><td><?php print $this->FOGCore->getClass('ImageTypeManager')->buildSelectBox(); ?> <span class="icon icon-help" title="TODO!"></span></td></tr>				
+			<tr><td colspan=2><center><input type="submit" value="<?php print _("Add"); ?>" /></center></td></tr>				
 		</table>
 		</form>
 		<?php
@@ -203,13 +203,13 @@ class ImageManagementPage extends FOGPage
 		<form method="POST" action="<?php print $this->formAction; ?>">
 		<input type="hidden" name="add" value="1" />
 		<table cellpadding="0" cellspacing="0" border="0" width="100%">
-			<tr><td><?php print _("Image Name"); ?>:</td><td><input type="text" name="name" id="iName" onblur="duplicateImageName();" value="<?php print $Image->get('name'); ?>" /></td></tr>
-			<tr><td><?php print _("Image Description"); ?>:</td><td><textarea name="description" rows="5" cols="65"><?php print $Image->get('description'); ?></textarea></td></tr>
-			<tr><td><?php print _("Storage Group"); ?>:</td><td><?php print $this->FOGCore->getClass('StorageGroupManager')->buildSelectBox($Image->get('storageGroupID')); ?></td></tr>
-			<tr><td><?php print _("Operating System"); ?>:</td><td><?php print $this->FOGCore->getClass('OSManager')->buildSelectBox($Image->get('osID')); ?></td></tr>
-			<tr><td><?php print _("Image Path"); ?>:</td><td>/images/<input type="text" name="file" id="iFile" value="<?php print $Image->get('path'); ?>" /></td></tr>
-			<tr><td><?php print _("Image Type"); ?>:</td><td><?php print $this->FOGCore->getClass('ImageTypeManager')->buildSelectBox($Image->get('type')); ?></td></tr>				
-			<tr><td colspan=2><center><br /><input type="submit" value="<?php print _("Update"); ?>" /></center></td></tr>				
+			<tr><td><?php print _("Image Name"); ?></td><td><input type="text" name="name" id="iName" onblur="duplicateImageName();" value="<?php print $Image->get('name'); ?>" /></td></tr>
+			<tr><td><?php print _("Image Description"); ?></td><td><textarea name="description" rows="5" cols="65"><?php print $Image->get('description'); ?></textarea></td></tr>
+			<tr><td><?php print _("Storage Group"); ?></td><td><?php print $this->FOGCore->getClass('StorageGroupManager')->buildSelectBox($Image->get('storageGroupID')); ?></td></tr>
+			<tr><td><?php print _("Operating System"); ?></td><td><?php print $this->FOGCore->getClass('OSManager')->buildSelectBox($Image->get('osID')); ?></td></tr>
+			<tr><td><?php print _("Image Path"); ?></td><td>/images/ <input type="text" name="file" id="iFile" value="<?php print $Image->get('path'); ?>" /></td></tr>
+			<tr><td><?php print _("Image Type"); ?></td><td><?php print $this->FOGCore->getClass('ImageTypeManager')->buildSelectBox($Image->get('type')); ?></td></tr>				
+			<tr><td colspan=2><center><input type="submit" value="<?php print _("Update"); ?>" /></center></td></tr>				
 		</table>
 		</form>
 		<?php
@@ -360,4 +360,4 @@ class ImageManagementPage extends FOGPage
 }
 
 // Register page with FOGPageManager
-$FOGPageManager->add(new ImageManagementPage());
+$FOGPageManager->register(new ImageManagementPage());

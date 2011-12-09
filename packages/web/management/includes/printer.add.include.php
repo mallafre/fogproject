@@ -124,7 +124,7 @@ if ( $_POST['printertype'] != "Network" )
         echo ( "<tr><td>"._("Print IP (optional)").":</td><td><input type=\"text\" name=\"ip\" value=\"\" /></td></tr>" );
     }
 }
-echo ( "<tr><td colspan=2><center><br />" );
+echo ( "<tr><td colspan=2><center>" );
 $printertype = $_POST['printertype'];
 echo ( "<input type=\"hidden\" name=\"printertype\" value=\"$printertype\" />" );
 echo ( "<input type=\"hidden\" name=\"add\" value=\"1\" /><input type=\"submit\" value=\""._("Add Printer")."\" /></center></td></tr>" );

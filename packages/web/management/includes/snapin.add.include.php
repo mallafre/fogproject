@@ -104,6 +104,6 @@ if ( $_POST["add"] != null )
 	<tr><td><?php print _("Snapin File"); ?>:</td><td><input class="smaller" type="file" name="snapin" value="" /> <span class="lightColor"> <?php print _("Max Size"); ?>: <?php print ini_get("post_max_size"); ?></span></td></tr>
 	<tr><td><?php print _("Snapin Arguments"); ?>:</td><td><input class="smaller" type="text" name="args" value="" /></td></tr>	
 	<tr><td><?php print _("Reboot after install"); ?>:</td><td><input type="checkbox" name="reboot" /></td></tr>		
-	<tr><td colspan=2><center><br /><input type="hidden" name="add" value="1" /><input class="smaller" type="submit" value="<?php print _("Add"); ?>" /></center></td></tr>				
+	<tr><td colspan=2><center><input type="hidden" name="add" value="1" /><input class="smaller" type="submit" value="<?php print _("Add"); ?>" /></center></td></tr>				
 </table></center>
 </form>

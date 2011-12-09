@@ -5,8 +5,8 @@ class SnapinManagementPage extends FOGPage
 {
 	// Base variables
 	var $name = 'Snapin Management';
-	var $node = 'snap';
-	var $id = 'snapinid';
+	var $node = 'snapin';
+	var $id = 'id';
 	
 	// Menu Items
 	var $menu = array(
@@ -95,13 +95,13 @@ class SnapinManagementPage extends FOGPage
 		?>
 		<form method="POST" action="?node=<?php print $_GET['node']; ?>&sub=<?php print $_GET['sub']; ?>" enctype="multipart/form-data">
 		<center><table cellpadding="0" cellspacing="0" border="0" width="100%">
-			<tr><td><?php print _("Snapin Name"); ?>:</td><td><input type="text" name="name" value="" /></td></tr>
-			<tr><td><?php print _("Snapin Description"); ?>:</td><td><textarea name="description" rows="5" cols="65"></textarea></td></tr>
-			<tr><td><?php print _("Snapin Run With"); ?>:</td><td><input type="text" name="rw" value="" /></td></tr>	
-			<tr><td><?php print _("Snapin Run With Argument"); ?>:</td><td><input type="text" name="rwa" /></td></tr>	
-			<tr><td><?php print _("Snapin File"); ?>:</td><td><input type="file" name="snapin" value="" /> <span class="lightColor"> <?php print _("Max Size"); ?>: <?php print ini_get("post_max_size"); ?></span></td></tr>
-			<tr><td><?php print _("Snapin Arguments"); ?>:</td><td><input type="text" name="args" value="" /></td></tr>	
-			<tr><td><?php print _("Reboot after install"); ?>:</td><td><input type="checkbox" name="reboot" /></td></tr>		
+			<tr><td><?php print _("Snapin Name"); ?></td><td><input type="text" name="name" value="" /></td></tr>
+			<tr><td><?php print _("Snapin Description"); ?></td><td><textarea name="description" rows="5" cols="65"></textarea></td></tr>
+			<tr><td><?php print _("Snapin Run With"); ?></td><td><input type="text" name="rw" value="" /></td></tr>	
+			<tr><td><?php print _("Snapin Run With Argument"); ?></td><td><input type="text" name="rwa" /></td></tr>	
+			<tr><td><?php print _("Snapin File"); ?></td><td><input type="file" name="snapin" value="" /> <span class="lightColor"> <?php print _("Max Size"); ?>: <?php print ini_get("post_max_size"); ?></span></td></tr>
+			<tr><td><?php print _("Snapin Arguments"); ?></td><td><input type="text" name="args" value="" /></td></tr>	
+			<tr><td><?php print _("Reboot after install"); ?></td><td><input type="checkbox" name="reboot" /></td></tr>		
 			<tr><td colspan=2><center><br /><input type="hidden" name="add" value="1" /><input type="submit" value="<?php print _("Add"); ?>" /></center></td></tr>				
 		</table></center>
 		</form>
@@ -530,4 +530,4 @@ class SnapinManagementPage extends FOGPage
 }
 
 // Register page with FOGPageManager
-$FOGPageManager->add(new SnapinManagementPage());
+$FOGPageManager->register(new SnapinManagementPage());

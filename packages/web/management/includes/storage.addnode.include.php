@@ -114,7 +114,7 @@ echo ( "<center>" );
 			echo ( "<tr><td>"._("Is Enabled").":</td><td><input type=\"checkbox\" name=\"isenabled\" checked=\"checked\" /></td></tr>" );					
 			echo ( "<tr><td>"._("Management Username").":</td><td><input class=\"smaller\" type=\"text\" name=\"username\" value=\"" . $ar["ngmUser"] . "\" /></td></tr>" );				
 			echo ( "<tr><td>"._("Management Password").":</td><td><input class=\"smaller\" type=\"text\" name=\"password\" value=\"" . $ar["ngmPass"] . "\" /></td></tr>" );								
-			echo ( "<tr><td colspan=2><font><center><br /><input type=\"hidden\" name=\"add\" value=\"1\" /><input class=\"smaller\" type=\"submit\" value=\""._("Add")."\" /></center></font></td></tr>" );				
+			echo ( "<tr><td colspan=2><font><center><input type=\"hidden\" name=\"add\" value=\"1\" /><input class=\"smaller\" type=\"submit\" value=\""._("Add")."\" /></center></font></td></tr>" );				
 		echo ( "</table>" );
 		echo ( "</form>" );
 	}

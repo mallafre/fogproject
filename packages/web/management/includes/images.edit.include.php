@@ -41,7 +41,7 @@ if ( $_GET["rmimageid"] != null && is_numeric( $_GET["rmimageid"] ) )
 				echo ( "<tr><td>"._("Image Name").":</td><td>" . $ar["imageName"] . "</td></tr>" );
 				echo ( "<tr><td>"._("Image Description").":</td><td>" . $ar["imageDesc"] . "</td></tr>" );
 				echo ( "<tr><td>"._("Image File").":</td><td>" . $storagedir . $ar["imagePath"] . "</td></tr>" );
-				echo ( "<tr><td colspan=2><center><br /><form method=\"POST\" action=\"?node=$_GET[node]&sub=$_GET[sub]&rmimageid=$_GET[rmimageid]&confirm=1\"><input type=\"submit\" value=\""._("Delete only the image definition.")."\" /></form><br /><form method=\"POST\" action=\"?node=$_GET[node]&sub=$_GET[sub]&rmimageid=$_GET[rmimageid]&confirm=1&killfile=1\"><input type=\"submit\" value=\""._("Delete image definition, and image file.")."\" /></form></center></td></tr>" );				
+				echo ( "<tr><td colspan=2><center><form method=\"POST\" action=\"?node=$_GET[node]&sub=$_GET[sub]&rmimageid=$_GET[rmimageid]&confirm=1\"><input type=\"submit\" value=\""._("Delete only the image definition.")."\" /></form><br /><form method=\"POST\" action=\"?node=$_GET[node]&sub=$_GET[sub]&rmimageid=$_GET[rmimageid]&confirm=1&killfile=1\"><input type=\"submit\" value=\""._("Delete image definition, and image file.")."\" /></form></center></td></tr>" );				
 			echo ( "</table></center>" );		
 		}
 	}
@@ -178,7 +178,7 @@ else
 				
 				echo ( "<tr><td>"._("Image File").":</td><td>" . ($masterStorageNode ? $masterStorageNode->get('path') : '') . "<input type=\"text\" name=\"file\" value=\"" . $image->get('path') . "\" /></td></tr>" );
 				echo ( "<tr><td>"._("Image Type").":</td><td>" .  $FOGCore->getClass('ImageTypeManager')->buildSelectBox($image->get('type')) . " <a href=\"javascript:popUpWindow('static/imagetypehelp.html');\"><img class=\"noBorder\" src=\"./images/help.png\" /></a></td></tr>" );
-				echo ( "<tr><td colspan=2><center><br /><input type=\"hidden\" name=\"update\" value=\"1\" /><input type=\"hidden\" name=\"imgid\" value=\"" . $image->get('id') . "\" /><input type=\"submit\" value=\""._("Update")."\" /></center></td></tr>" );				
+				echo ( "<tr><td colspan=2><center><input type=\"hidden\" name=\"update\" value=\"1\" /><input type=\"hidden\" name=\"imgid\" value=\"" . $image->get('id') . "\" /><input type=\"submit\" value=\""._("Update")."\" /></center></td></tr>" );				
 			echo ( "</table>" );
 			echo ( "</form>" );
 		}

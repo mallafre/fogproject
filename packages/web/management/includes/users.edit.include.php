@@ -40,7 +40,7 @@ if ($userid != null && is_numeric($userid))
 			<form method="POST" action="<?php print "?node=$node&sub=$sub&tab=$tab&userid=$userid&confirm=1"; ?>">
 			<center><table cellpadding=0 cellspacing=0 border=0 width=90%>
 				<tr><td><font class="smaller"><?php print _("User Name"); ?>:</font></td><td><font class="smaller"><?php print $user->get('name'); ?></font></td></tr>
-				<tr><td colspan=2><font class="smaller"><center><br /><input class="smaller" type="submit" value="<?php print _("Yes, delete this user"); ?>" /></center></font></td></tr>				
+				<tr><td colspan=2><font class="smaller"><center><input class="smaller" type="submit" value="<?php print _("Yes, delete this user"); ?>" /></center></font></td></tr>				
 			</table></center>
 			</form>
 			<?php
@@ -113,7 +113,7 @@ if ($userid != null && is_numeric($userid))
 				echo ( "<tr><td>".("New Password").":</td><td><input type=\"password\" name=\"p1\" value=\"\" /></td></tr>" );
 				echo ( "<tr><td>"._("New Password (confirm)").":</td><td><input type=\"password\" name=\"p2\" value=\"\" /></td></tr>" );
 				echo ( "<tr><td>"._("Mobile/Quick Image Access Only?")."</td><td><input type=\"checkbox\" name=\"isGuest\" $checked></td></tr>" );
-				echo ( "<tr><td colspan=2><font class=\"smaller\"><center><br /><input type=\"hidden\" name=\"update\" value=\"" . $user->get('id') . "\" /><input class=\"smaller\" type=\"submit\" value=\""._("Update")."\" /></center></font></td></tr>" );				
+				echo ( "<tr><td colspan=2><font class=\"smaller\"><center><input type=\"hidden\" name=\"update\" value=\"" . $user->get('id') . "\" /><input class=\"smaller\" type=\"submit\" value=\""._("Update")."\" /></center></font></td></tr>" );				
 			echo ( "</table>" );
 			echo ( "</form>" );
 		}

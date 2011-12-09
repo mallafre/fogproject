@@ -186,8 +186,14 @@ if ($currentUser != null && $currentUser->isLoggedIn())
 	
 	
 	// Printer Management
-	if ($node == "print")
+	if ($node == "print" || $node == "printer")
 	{
+		$FOGSubMenu->addItems('printer', array(	_('New Search')		=> 'search',
+					_('List All Printers')	=> 'list',
+					_('Add New Printer')	=> 'add',
+			));
+		
+		// LEGACY
 		$FOGSubMenu->addItems('print', array(	_('New Search')		=> 'search',
 							_('List All Printers')	=> 'list',
 							_('Add New Printer')	=> 'add',
@@ -196,9 +202,14 @@ if ($currentUser != null && $currentUser->isLoggedIn())
 		if ($id)
 		{
 			// Printer Management
-			$FOGSubMenu->addItems('print', array(	_('General')		=> "$_SERVER[PHP_SELF]?node=$node&sub=$sub&id=$id",
+			$FOGSubMenu->addItems('printer', array(	_('General')		=> "$_SERVER[PHP_SELF]?node=$node&sub=edit&id=$id",
 								_('Delete')		=> "$_SERVER[PHP_SELF]?node=$node&sub=delete&id=$id",
 						), 'id', 'Printer Menu');
+			
+			// LEGACY
+			$FOGSubMenu->addItems('print', array(	_('General')		=> "$_SERVER[PHP_SELF]?node=$node&sub=$sub&id=$id",
+								_('Delete')		=> "$_SERVER[PHP_SELF]?node=$node&sub=delete&id=$id",
+					), 'id', 'Printer Menu');
 
 			// Printer Note
 			$res = mysql_query( "select * from printers where pID = '$id'", $conn ) or die( mysql_error() );
@@ -254,8 +265,14 @@ if ($currentUser != null && $currentUser->isLoggedIn())
 	}
 	
 	// Snapin Management
-	if ($node == "snap")
+	if ($node == "snap" || $node == "snapin")
 	{
+		$FOGSubMenu->addItems('snapin', array(	_('New Search')		=> 'search',
+							_('List All Snap-ins')	=> 'list',
+							_('New Snapin')		=> 'add',
+					));
+		
+		// LEGACY
 		$FOGSubMenu->addItems('snap', array(	_('New Search')		=> 'search',
 							_('List All Snap-ins')	=> 'list',
 							_('New Snapin')		=> 'add',
@@ -267,9 +284,9 @@ if ($currentUser != null && $currentUser->isLoggedIn())
 			
 			if (!preg_match('#indexold#', $_SERVER['PHP_SELF']))
 			{
-				$FOGSubMenu->addItems('snap', array(	_('General')		=> "$_SERVER[PHP_SELF]?node=$node&sub=edit&snapinid=$snapinid",
-									_('Delete')		=> "$_SERVER[PHP_SELF]?node=$node&sub=delete&snapinid=$snapinid",
-							), 'snapinid', 'Snapin Menu');
+				$FOGSubMenu->addItems('snapin', array(	_('General')		=> "$_SERVER[PHP_SELF]?node=$node&sub=edit&id=$snapinid",
+									_('Delete')		=> "$_SERVER[PHP_SELF]?node=$node&sub=delete&id=$snapinid",
+							), 'id', 'Snapin Menu');
 			}
 			else
 			{

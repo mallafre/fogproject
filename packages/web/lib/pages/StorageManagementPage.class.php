@@ -68,8 +68,8 @@ class StorageManagementPage extends FOGPage
 		
 		// Row templates
 		$this->templates = array(
-			'<a href="?node=storage&sub=edit-storage-node&id=${id}">${name}</a>',
-			'<a href="?node=storage&sub=edit-storage-node&id=${id}"><span class="icon icon-edit"></span></a>'
+			sprintf('<a href="?node=%s&sub=edit&%s=${id}">${name}</a>', $this->node, $this->id),
+			sprintf('<a href="?node=%s&sub=edit&%s=${id}"><span class="icon icon-edit"></span></a>', $this->node, $this->id)
 		);
 		
 		// Row attributes
@@ -585,8 +585,8 @@ class StorageManagementPage extends FOGPage
 		
 		// Row templates
 		$this->templates = array(
-			'<a href="?node=storage&sub=edit-storage-group&id=${id}">${name}</a>',
-			'<a href="?node=storage&sub=edit-storage-group&id=${id}"><span class="icon icon-edit"></span></a>'
+			sprintf('<a href="?node=%s&sub=edit&%s=${id}">${name}</a>', $this->node, $this->id),
+			sprintf('<a href="?node=%s&sub=edit&%s=${id}"><span class="icon icon-edit"></span></a>', $this->node, $this->id)
 		);
 		
 		// Row attributes
@@ -913,4 +913,4 @@ class StorageManagementPage extends FOGPage
 }
 
 // Register page with FOGPageManager
-$FOGPageManager->add(new StorageManagementPage());
+$FOGPageManager->register(new StorageManagementPage());

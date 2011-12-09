@@ -30,8 +30,8 @@ class UserManagementPage extends FOGPage
 		
 		// Row templates
 		$this->templates = array(
-			'<a href="?node=users&sub=edit&id=${id}">${name}</a>',
-			'<a href="?node=users&sub=edit&id=${id}"><span class="icon icon-edit"></span></a>'
+			sprintf('<a href="?node=%s&sub=edit&%s=${id}">${name}</a>', $this->node, $this->id),
+			sprintf('<a href="?node=%s&sub=edit&%s=${id}"><span class="icon icon-edit"></span></a>', $this->node, $this->id)
 		);
 		
 		// Row attributes
@@ -95,9 +95,9 @@ class UserManagementPage extends FOGPage
 		<form method="POST" action="<?php print $this->formAction; ?>">
 			<input type="hidden" name="add" value="1" />
 			<table cellpadding="0" cellspacing="0" border="0" width="100%">
-				<tr><td><?php print _("User Name"); ?>:</td><td><input type="text" name="name" value="" autocomplete="off" /></td></tr>
-				<tr><td><?php print _("User Password"); ?>:</td><td><input type="password" name="password" value="" autocomplete="off" /></td></tr>
-				<tr><td><?php print _("User Password (confirm)"); ?>:</td><td><input type="password" name="password_confirm" value="" autocomplete="off" /></td></tr>
+				<tr><td><?php print _("User Name"); ?></td><td><input type="text" name="name" value="" autocomplete="off" /></td></tr>
+				<tr><td><?php print _("User Password"); ?></td><td><input type="password" name="password" value="" autocomplete="off" /></td></tr>
+				<tr><td><?php print _("User Password (confirm)"); ?></td><td><input type="password" name="password_confirm" value="" autocomplete="off" /></td></tr>
 				<tr><td><?php print _("Mobile/Quick Image Access Only?"); ?></td><td><input type="checkbox" name="isGuest" autocomplete="off" /></td></tr>
 				<tr><td>&nbsp;</td><td><input type="submit" value="<?php print _('Create User'); ?>" /></td></tr>
 			</table>
@@ -176,22 +176,20 @@ class UserManagementPage extends FOGPage
 		// Find
 		$User = new User($this->request['id']);
 		
-		// Title - set title for page title in window
+		// Title
 		$this->title = sprintf('%s: %s', _('Edit'), $User->get('name'));
-		// But disable displaying in content
-		$this->titleDisplay = false;
 		
 		// Hook
-		$this->HookManager->processEvent('USER_ADD', array('User' => &$User));
+		$this->HookManager->processEvent('USER_EDIT', array('User' => &$User));
 		
 		// TODO: Put table rows into variables -> Add hooking
 		?>
 		<form method="POST" action="<?php print $this->formAction; ?>">
 			<input type="hidden" name="update" value="<?php print $User->get('id'); ?>" />
 			<table cellpadding="0" cellspacing="0" border="0" width="100%">
-				<tr><td><?php print _("User Name"); ?>:</td><td><input type="text" name="name" value="<?php print $User->get('name'); ?>" /></td></tr>
-				<tr><td><?php print _("New Password"); ?>:</td><td><input type="password" name="password" value="" /></td></tr>
-				<tr><td><?php print _("New Password (confirm)"); ?>:</td><td><input type="password" name="password_confirm" value="" /></td></tr>
+				<tr><td><?php print _("User Name"); ?></td><td><input type="text" name="name" value="<?php print $User->get('name'); ?>" /></td></tr>
+				<tr><td><?php print _("New Password"); ?></td><td><input type="password" name="password" value="" /></td></tr>
+				<tr><td><?php print _("New Password (confirm)"); ?></td><td><input type="password" name="password_confirm" value="" /></td></tr>
 				<tr><td><?php print _("Mobile/Quick Image Access Only?"); ?></td><td><input type="checkbox" name="isGuest"<?php print ($User->get('type') == User::TYPE_MOBILE ? ' checked="checked"' : ''); ?>></td></tr>
 				<tr><td>&nbsp;</td><td><input type="submit" value="<?php print _('Update'); ?>" /></td></tr>
 			</table>
@@ -340,4 +338,4 @@ class UserManagementPage extends FOGPage
 }
 
 // Register page with FOGPageManager
-$FOGPageManager->add(new UserManagementPage());
+$FOGPageManager->register(new UserManagementPage());

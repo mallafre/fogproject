@@ -36,7 +36,7 @@ if ( $_GET["rmsnid"] != null && is_numeric( $_GET["rmsnid"] ) )
 			echo ( "<center><table cellpadding=0 cellspacing=0 border=0 width=90%>" );
 				echo ( "<tr><td>"._("Storage Node Name").":</td><td>" . $ar["ngmMemberName"] . "</td></tr>" );
 				echo ( "<tr><td>"._("Storage Node Description").":</td><td>" . $ar["ngmMemberDescription"] . "</td></tr>" );
-				echo ( "<tr><td colspan=2><center><br /><form method=\"POST\" action=\"?node=" . $_GET["node"] . "&sub=" . $_GET["sub"] . "&rmsnid=" . $_GET["rmsnid"] . "&confirm=1\"><input type=\"submit\" value=\""._("Delete Storage Node Definition")."\" /></form></center></td></tr>" );				
+				echo ( "<tr><td colspan=2><center><form method=\"POST\" action=\"?node=" . $_GET["node"] . "&sub=" . $_GET["sub"] . "&rmsnid=" . $_GET["rmsnid"] . "&confirm=1\"><input type=\"submit\" value=\""._("Delete Storage Node Definition")."\" /></form></center></td></tr>" );				
 			echo ( "</table></center>" );		
 		}
 	}
@@ -217,7 +217,7 @@ else
 					echo ( "<tr><td>"._("Is Enabled").":</td><td><input type=\"checkbox\" name=\"isenabled\" $echecked /></td></tr>" );					
 					echo ( "<tr><td>"._("Management Username").":</td><td><input type=\"text\" name=\"username\" value=\"" . $ar["ngmUser"] . "\" /></td></tr>" );				
 					echo ( "<tr><td>"._("Management Password").":</td><td><input type=\"text\" name=\"password\" value=\"" . $ar["ngmPass"] . "\" /></td></tr>" );								
-					echo ( "<tr><td colspan=2><font><center><br /><input type=\"hidden\" name=\"update\" value=\"1\" /><input type=\"hidden\" name=\"storagenodeid\" value=\"" . $_GET["storagenodeid"] . "\" /><input type=\"submit\" value=\""._("Update")."\" /></center></font></td></tr>" );				
+					echo ( "<tr><td colspan=2><font><center><input type=\"hidden\" name=\"update\" value=\"1\" /><input type=\"hidden\" name=\"storagenodeid\" value=\"" . $_GET["storagenodeid"] . "\" /><input type=\"submit\" value=\""._("Update")."\" /></center></font></td></tr>" );				
 				echo ( "</table>" );
 				echo ( "</form>" );
 			}

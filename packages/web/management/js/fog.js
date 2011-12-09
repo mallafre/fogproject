@@ -112,20 +112,18 @@ var Loader;
 			// focus
 			}).focus(function() {
 				var $this = $(this).removeClass('placeholder');
-				if ($this.val() == 'Search')
+				
+				if ($this.val() == $this.attr('placeholder'))
 				{
 					$this.val('');
-				}
-				else
-				{
-					//$this.select();
 				}
 			// blur - if the search textbox is empty, reset everything!
 			}).blur(function() {
 				var $this = $(this);
+				
 				if ($this.val() == '')
 				{
-					$this.addClass('placeholder').val('Search');
+					$this.addClass('placeholder').val($this.attr('placeholder'));
 					if (this.SearchAJAX) this.SearchAJAX.abort();
 					if (this.SearchTimer) clearTimeout(this.SearchTimer);
 					Loader.fogStatusUpdate();
@@ -135,7 +133,11 @@ var Loader;
 			}).each(function()
 			{
 				var $this = $(this);
-				if ($this.val() != 'Search') $this.val('')
+				
+				if ($this.val() != $this.attr('placeholder'))
+				{
+					$this.val('')
+				}
 			});
 			
 			function PerformSearch()
@@ -159,9 +161,9 @@ var Loader;
 				
 				// Run AJAX
 				this.SearchAJAX = $.ajax({
-					'type':		'GET',
+					'type':		$('#search-wrapper').attr('method'),
 					'cache':	false,
-					'url':		Options.URL,
+					'url':		$('#search-wrapper').attr('action'),
 					'data':		{ 'crit': Query },
 					'dataType':	'json',
 					'beforeSend':	function()

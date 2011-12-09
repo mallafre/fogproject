@@ -41,7 +41,7 @@ if ( $_GET["rmsnapinid"] != null && is_numeric( $_GET["rmsnapinid"] ) )
 			if ( $ar["sReboot"] == "1" )
 				$checked = "Yes";
 			echo ( "<tr><td>"._("Reboot after install").":</td><td>$checked</td></tr>" );				
-			echo ( "<tr><td colspan=2><center><br /><form method=\"POST\" action=\"?node=$_GET[node]&sub=$_GET[sub]&rmsnapinid=$_GET[rmsnapinid]&confirm=1&killfile=1\"><input class=\"smaller\" type=\"submit\" value=\""._("Delete snapin definition, and snapin file.")."\" /></form></center></td></tr>" );				
+			echo ( "<tr><td colspan=2><center><form method=\"POST\" action=\"?node=$_GET[node]&sub=$_GET[sub]&rmsnapinid=$_GET[rmsnapinid]&confirm=1&killfile=1\"><input class=\"smaller\" type=\"submit\" value=\""._("Delete snapin definition, and snapin file.")."\" /></form></center></td></tr>" );				
 			echo ( "</table></center>" );		
 		}
 	}
@@ -188,7 +188,7 @@ else
 					$checked = "checked=\"checked\"";
 				echo ( "<tr><td>"._("Reboot after install").":</td><td><input type=\"checkbox\" name=\"reboot\" $checked /></td></tr>" );				
 			
-				echo ( "<tr><td colspan=2><font><center><br /><input type=\"hidden\" name=\"update\" value=\"1\" /><input type=\"hidden\" name=\"snapinid\" value=\"" . $ar["sID"] . "\" /><input class=\"smaller\" type=\"submit\" value=\""._("Update")."\" /></center></font></td></tr>" );				
+				echo ( "<tr><td colspan=2><font><center><input type=\"hidden\" name=\"update\" value=\"1\" /><input type=\"hidden\" name=\"snapinid\" value=\"" . $ar["sID"] . "\" /><input class=\"smaller\" type=\"submit\" value=\""._("Update")."\" /></center></font></td></tr>" );				
 			echo ( "</table>" );
 			echo ( "</form>" );
 		}
