@@ -116,7 +116,7 @@ $(function()
 
 	// Snapin uploader for existing snapins
 	$('#snapin-upload').click(function() {
-		$('#uploader').html('<input type="file" name="snap" />');
+		$('#uploader').html('<input type="file" name="snap" />').find('input').click();
 	});
 
 	// Image Search

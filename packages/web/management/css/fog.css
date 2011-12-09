@@ -39,32 +39,35 @@ img.right { float: right; margin-left: 15px; }
 .debug-hook { border: 2px solid magenta; padding: 5px; margin: 2px 0; background: #fff; }
 
 /* Form structure */
-
 form { margin: 0; padding: 0; }
-legend { background: none repeat scroll 0 0 #94C3D3; border-bottom: 1px solid #94C3D3; border-radius: 3px 3px 0 0; color: #FFFFFF; margin-top: -34px; padding: 4px 20px; position: absolute; text-shadow: 1px 1px 0 #6a97a6; } fieldset table tbody td { border-bottom: 0; }
+legend { background: none repeat scroll 0 0 #94C3D3; border-bottom: 1px solid #94C3D3; border-radius: 3px 3px 0 0; color: #FFFFFF; margin-top: -34px; padding: 4px 20px; position: absolute; text-shadow: 1px 1px 0 #6a97a6; }
 fieldset { border: 1px solid #94C3D3; border-radius: 5px; margin-bottom: 40px; padding: 10px; background: #ffffff; /* Old browsers */ background: -moz-linear-gradient(top,  #ffffff 70%, #dedede 97%); /* FF3.6+ */ background: -webkit-gradient(linear, left top, left bottom, color-stop(70%,#ffffff), color-stop(97%,#dedede)); /* Chrome,Safari4+ */ background: -webkit-linear-gradient(top,  #ffffff 70%,#dedede 97%); /* Chrome10+,Safari5.1+ */ background: -o-linear-gradient(top,  #ffffff 70%,#dedede 97%); /* Opera 11.10+ */ background: -ms-linear-gradient(top,  #ffffff 70%,#dedede 97%); /* IE10+ */ background: linear-gradient(top,  #ffffff 70%,#dedede 97%); /* W3C */ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#dedede',GradientType=0 ); /* IE6-9 */ }
 
 /* Form elements */
-input { width: 200px; }
+input { min-width: 200px; }
 input, textarea, select { font-family: "Trebuchet MS", Arial, Helvetica, sans-serif; font-size: 13px; color: #333333; border: 1px solid #94c3d3; border-radius: 3px; background-color: #fff; vertical-align: top; padding: 4px 8px; }
 input:focus, textarea:focus { border-color: #5372af; background-image: url('../images/icon_pencil.png'); background-repeat: no-repeat; background-position: 97% center; }
 input[type="text"]:focus { width: 181px; padding-right: 27px; }
 textarea:focus { background-position: 95% 90%; }
 input:hover, textarea:hover, select:hover { border-color: #5372af; }
-input[type="submit"] { border: 1px solid #eee; border-radius: 5px 5px 5px 5px; box-shadow: 0 0 5px #666; box-shadow: 0 0 5px rgba(102, 102, 102, 0.5); text-shadow: 1px 1px 0 #6a97a6; color: #fff; font-weight: bold; cursor: pointer; font-size: 14px; font-variant: small-caps; letter-spacing: 1px; padding: 4px; width: 220px;  background: #94c3d3; /* Old browsers */ background: -moz-linear-gradient(top,  #94c3d3 0%, #6aa8dd 41%, #94c3d3 100%); /* FF3.6+ */ background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#94c3d3), color-stop(41%,#6aa8dd), color-stop(100%,#94c3d3)); /* Chrome,Safari4+ */ background: -webkit-linear-gradient(top,  #94c3d3 0%,#6aa8dd 41%,#94c3d3 100%); /* Chrome10+,Safari5.1+ */ background: -o-linear-gradient(top,  #94c3d3 0%,#6aa8dd 41%,#94c3d3 100%); /* Opera 11.10+ */ background: -ms-linear-gradient(top,  #94c3d3 0%,#6aa8dd 41%,#94c3d3 100%); /* IE10+ */ background: linear-gradient(top,  #94c3d3 0%,#6aa8dd 41%,#94c3d3 100%); /* W3C */ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#94c3d3', endColorstr='#94c3d3',GradientType=0 ); /* IE6-9 */   }
+input[type="submit"] { border: 1px solid #eee; border-radius: 5px 5px 5px 5px; box-shadow: 0 0 5px #666; box-shadow: 0 0 5px rgba(102, 102, 102, 0.5); text-shadow: 1px 1px 0 #6a97a6; color: #fff; font-weight: bold; cursor: pointer; font-size: 14px; font-variant: small-caps; letter-spacing: 1px; padding: 4px; min-width: 220px;  background: #94c3d3; /* Old browsers */ background: -moz-linear-gradient(top,  #94c3d3 0%, #6aa8dd 41%, #94c3d3 100%); /* FF3.6+ */ background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#94c3d3), color-stop(41%,#6aa8dd), color-stop(100%,#94c3d3)); /* Chrome,Safari4+ */ background: -webkit-linear-gradient(top,  #94c3d3 0%,#6aa8dd 41%,#94c3d3 100%); /* Chrome10+,Safari5.1+ */ background: -o-linear-gradient(top,  #94c3d3 0%,#6aa8dd 41%,#94c3d3 100%); /* Opera 11.10+ */ background: -ms-linear-gradient(top,  #94c3d3 0%,#6aa8dd 41%,#94c3d3 100%); /* IE10+ */ background: linear-gradient(top,  #94c3d3 0%,#6aa8dd 41%,#94c3d3 100%); /* W3C */ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#94c3d3', endColorstr='#94c3d3',GradientType=0 ); /* IE6-9 */   }
 input[type="submit"]:hover { border: 1px solid #fff; text-shadow: 0 0 10px #fff, 1px 1px 0 #6a97a6; box-shadow: 0 0 3px #fff, 0 0 5px #666; }
-input[type="radio"], input[type="checkbox"] { width: 30px; }
+input[type="radio"], input[type="checkbox"] { min-width: 30px; width: 30px; cursor: pointer; border: 0; }
 input.hostname-input { width: 160px; }
 input.hostname-input:focus { width: 141px; }
 .placeholder { font-style: italic; color: #bbb; text-align: center; }
 select > option { border-bottom: 1px dashed #ccc; padding: 2px 5px; }
+label { cursor: pointer; }
 
 /* Form elements - inside of a fieldset */
+fieldset table tbody td { border-bottom: 1px solid #eee; }
+fieldset table tbody tr:last-child td { border-bottom: 0; }
+fieldset table tbody tr:first-child td { border-top: 0; }
+fieldset table tbody td input[type="checkbox"] { margin: 7px; }
 fieldset table tbody td input[type="submit"] { margin: 15px 0 10px 0; }
 fieldset table tbody td select { min-width: 220px; }
 
 /* Menu */
-
 #menu { margin: 0 auto; }
 #menu ul { margin: 0; padding: 15px 0 0 0; list-style: none; line-height: 26px; }
 #menu li { display: inline-block; margin-left: 11px;  }
@@ -72,7 +75,6 @@ fieldset table tbody td select { min-width: 220px; }
 #menu a:hover {  }
 
 /* Structure */
-
 #wrapper { width: 850px; margin: 0 auto; min-height: 100%; }
 #content { float: right; width: 620px; padding-bottom: 21px; background: url(../images/content-bkg.png) no-repeat center top; }
 #content-inner { padding: 0 10px; }
@@ -83,7 +85,6 @@ fieldset table tbody td select { min-width: 220px; }
 
 
 /* Header */
-
 #header { width: 850px; margin: 0 auto 30px auto; padding-top: 30px; border-bottom: 1px solid #efefef; }
 #header.login { }
 
@@ -95,11 +96,9 @@ fieldset table tbody td select { min-width: 220px; }
 #logo a { text-decoration: none; display: block; }
 
 /* Footer */
-
 #footer { height: 21px; padding: 0; margin: -21px 0 0 0; background: #00567a; border-top: 1px solid #003448; color: #fff; position: relative; clear: both; text-align: center; font-size: 11px; line-height: 21px; }
 
 /* Sidebar */
-
 #sidebar { float: left; width: 195px; border-right: 1px solid #efefef; padding-right: 10px; }
 #sidebar ul { margin: 0; padding: 0; list-style: none; margin-bottom: 20px; }
 #sidebar li { font-size: 13px; line-height: 18px; }
@@ -108,7 +107,6 @@ fieldset table tbody td select { min-width: 220px; }
 #sidebar h2 { margin-bottom: 10px; border-bottom: 1px solid #efefef; font-size: 16px; color: #666; }
 
 /* Search */
-
 #search { }
 #search h2 { margin-bottom: 20px; }
 
@@ -177,7 +175,7 @@ pre { white-space: pre-wrap; }
 #search-wrapper { text-align: center; }
 #search-wrapper .search-input { width: 150px; height: 21px; background: #fff; }
 #search-wrapper .search-input:focus { width: 150px; padding-right: 8px; }
-#search-wrapper .search-submit { width: 30px; height: 30px; background-image: url('../images/go.png'); background-repeat: no-repeat; background-position: center center; border-color: #94c3d3 #5372af #5372af #94c3d3; }
+#search-wrapper .search-submit { min-width: 30px; width: 30px; height: 30px; background-image: url('../images/go.png'); background-repeat: no-repeat; background-position: center center; border-color: #94c3d3 #5372af #5372af #94c3d3; }
 #search-wrapper .search-submit.searching { background-image: url('../images/loader.gif'); }
 #search-wrapper .search-submit:active { border-color: #5372af #94c3d3 #94c3d3 #5372af; }
 #search-content { margin-top: 10px; display: none; }

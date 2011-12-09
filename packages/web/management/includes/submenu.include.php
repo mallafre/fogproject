@@ -264,9 +264,19 @@ if ($currentUser != null && $currentUser->isLoggedIn())
 		if ($snapinid)
 		{
 			// Snapin Management: Per Snapin
-			$FOGSubMenu->addItems('snap', array(	_('General')		=> "$_SERVER[PHP_SELF]?node=$node&sub=edit&snapinid=$snapinid&tab=gen",
-								_('Delete')		=> "$_SERVER[PHP_SELF]?node=$node&sub=edit&snapinid=$snapinid&tab=delete",
-						), 'snapinid', 'Snapin Menu');
+			
+			if (!preg_match('#indexold#', $_SERVER['PHP_SELF']))
+			{
+				$FOGSubMenu->addItems('snap', array(	_('General')		=> "$_SERVER[PHP_SELF]?node=$node&sub=edit&snapinid=$snapinid",
+									_('Delete')		=> "$_SERVER[PHP_SELF]?node=$node&sub=delete&snapinid=$snapinid",
+							), 'snapinid', 'Snapin Menu');
+			}
+			else
+			{
+				$FOGSubMenu->addItems('snap', array(	_('General')		=> "$_SERVER[PHP_SELF]?node=$node&sub=edit&snapinid=$snapinid&tab=gen",
+									_('Delete')		=> "$_SERVER[PHP_SELF]?node=$node&sub=edit&snapinid=$snapinid&tab=delete",
+							), 'snapinid', 'Snapin Menu');
+			}
 
 			// Snapin Management: Notes
 			$res = mysql_query( "select * from snapins where sID = '$snapinid'", $conn ) or die( mysql_error() );
@@ -284,7 +294,7 @@ if ($currentUser != null && $currentUser->isLoggedIn())
 		{
 			$FOGSubMenu->addItems('storage', array(	_('All Storage Nodes')		=> "$_SERVER[PHP_SELF]?node=$node",
 								_('Add Storage Nodes')		=> "$_SERVER[PHP_SELF]?node=$node&sub=add-storage-node",
-								_('All Storage Groups')		=> "$_SERVER[PHP_SELF]?node=$node&sub=all-storage-groups",
+								_('All Storage Groups')		=> "$_SERVER[PHP_SELF]?node=$node&sub=storage-groups",
 								_('Add Storage Group')		=> "$_SERVER[PHP_SELF]?node=$node&sub=add-storage-group",
 						));
 		}
