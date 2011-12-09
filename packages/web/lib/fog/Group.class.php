@@ -16,7 +16,7 @@ class Group extends FOGController
 		'building'	=> 'groupBuilding',
 		'kernel'	=> 'groupKernel',
 		'kernelArgs'	=> 'groupKernelArgs',
-		'primaryDisk'	=> 'groupPrimaryDisk'
+		'kernelDevice'	=> 'groupPrimaryDisk'
 	);
 	
 	// Allow setting / getting of these additional fields
@@ -32,29 +32,27 @@ class Group extends FOGController
 	public $lastError;
 	
 	// Overrides
-	public function __construct($data)
-	{
-		// Construct
-		parent::__construct($data);
-	}
-	
 	public function save()
 	{
 		// Save row data
 		parent::save();
 		
-		// Update Hosts in Group
-		// TODO: Enable saving of Host data via Group when Host has been rewritten
-		/*
-		foreach ((array)$this->get('hosts') AS $hostMember)
-		{
-			$hostMember	->set('kernel',		$this->get('kernel'))
-					->set('kernelArgs',	$this->get('kernelArgs'))
-					->set('primaryDisk',	$this->get('primaryDisk'))
-					->save();
-		}
-		*/
+		// Which fields to update in the Host object
+		$updateInHost = array('kernel', 'kernelArgs', 'kernelDevice');
 		
+		// Iterate update array -> Update fields -> Save Host
+		foreach ((array)$this->get('hosts') AS $Host)
+		{
+			foreach ($updateInHost AS $field)
+			{
+				$Host->set($field, $this->get($field));
+			}
+			
+			// Save Host
+			$Host->save();
+		}
+		
+		// Return		
 		return $this;
 	}
 	
@@ -102,21 +100,16 @@ class Group extends FOGController
 		// Reset hosts
 		$this->set('hosts', array());
 		
-		// Query group members
-		//var_dump($this->db);exit;
+		// Find all group members
+		$this->db->query("SELECT hosts.* FROM groups INNER JOIN groupMembers ON ( groups.groupID = groupMembers.gmGroupID ) LEFT JOIN hosts ON (groupMembers.gmHostID = hosts.hostID) WHERE groupID='%s' ORDER BY groupName", array($this->get('id')));
 		
-		$this->db->query("SELECT * FROM groups INNER JOIN groupMembers ON ( groups.groupID = groupMembers.gmGroupID ) WHERE groupID='%s' ORDER BY groupName", array($this->get('id')));
+		// Iterate group member data -> Create new Host object using data
 		while ($host = $this->db->fetch()->get())
 		{
-			//$this->add('hosts', new Host($host['gmHostID']));
-			//$this->data['hosts'][] = new Host($host['gmHostID']);
-			$this->data['hosts'][] = new Host($host);
-			
-			//$data[] = $host['gmHostID'];
+			$this->add('hosts', new Host($host));
 		}
 		
-		print_r($this->data['hosts']);exit;
-		
+		// Return
 		return $this;
 	}
 	

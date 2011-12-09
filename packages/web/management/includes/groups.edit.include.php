@@ -35,7 +35,7 @@ if ( $groupid != null && is_numeric( $groupid ) )
 				->set('description',	$_POST['description'])
 				->set('kernel',		$_POST['kern'])
 				->set('kernelArgs',	$_POST['args'])
-				->set('primaryDisk',	$_POST['dev'])
+				->set('kernelDevice',	$_POST['dev'])
 				->save();
 			
 			// Output result
@@ -396,7 +396,7 @@ if ( $groupid != null && is_numeric( $groupid ) )
 					<tr><td><?php print _("Group Description"); ?>:</td><td><textarea name="description" rows="5" cols="40"><?php print $group->get('description'); ?></textarea></td></tr>
 					<tr><td><?php print _("Group Kernel"); ?>:</td><td><input type="text" name="kern" value="<?php print $group->get('kernel'); ?>" /></td></tr>	
 					<tr><td><?php print _("Group Kernel Arguments"); ?>:</td><td><input type="text" name="args" value="<?php print $group->get('kernelArgs'); ?>" /></td></tr>	
-					<tr><td><?php print _("Group Primary Disk"); ?>:</td><td><input type="text" name="dev" value="<?php print $group->get('primaryDisk'); ?>" /></td></tr>	
+					<tr><td><?php print _("Group Primary Disk"); ?>:</td><td><input type="text" name="dev" value="<?php print $group->get('kernelDevice'); ?>" /></td></tr>	
 					<tr><td>&nbsp;</td><td><input type="submit" value="<?php print _("Update"); ?>" /></td></tr>
 				</table>
 			</form>

@@ -277,7 +277,7 @@ class HostManagementPage extends FOGPage
 							<tr><td><?php print _("Organizational Unit"); ?>:<br> <span class="lightColor"><?php print _("(Blank for default)"); ?></span></td><td><input size="50" id="adOU" class="smaller" type="text" name="ou" value="<?php print $Host->get('ADOU'); ?>" /></td></tr>
 							<tr><td><?php print _("Domain Username"); ?>:</td><td><input id="adUsername" class="smaller" type="text" name="domainuser" value="<?php print $Host->get('ADUser'); ?>" /></td></tr>
 							<tr><td><?php print _("Domain Password"); ?>:</td><td><input id="adPassword" class="smaller" type="text" name="domainpassword" value="<?php print $Host->get('ADPass'); ?>" /> <span class="lightColor"><?php print _("(Must be encrypted)"); ?></span></td></tr>
-							<tr><td colspan=2><center><br /><input type="hidden" name="updatead" value="1" /><input type="submit" value="<?php print _("Update"); ?>" /></center></td></tr>
+							<tr><td colspan=2><center><br /><input type="hidden" name="updatead" value="1" /><input type="submit" value="<?php print _("Update"); ?>" /></td></tr>
 						</table>
 					</form>
 				</div>
@@ -451,74 +451,80 @@ class HostManagementPage extends FOGPage
 						*/
 						
 						?>
+						<fieldset>
+						<legend><?php print _("General"); ?></legend>
+							<table cellpadding=0 cellspacing=0 border=0 width="100%">
+								<tr><td width="270"><?php print _("Hostname Changer Enabled?"); ?></td><td><input type="checkbox" name="hostnamechanger" $hostnamechangerchecked /></td><td><span class="icon icon-help hand" title="<?php print _("This setting will enable or disable the hostname changer module on this specific host.  If the module is globally disabled, this setting is ignored."); ?>"></span></td></tr>						
+								<tr><td width="270"><?php print _("Directory Cleaner Enabled?"); ?></td><td><input type="checkbox" name="dircleanen" $checked /></td><td><span class="icon icon-help hand" title="<?php print _("This setting will enable or disable the directory cleaner service module on this specific host.  If the module is globally disabled, this setting is ignored."); ?>"></span></td></tr>
+								<tr><td width="270"><?php print _("User Cleanup Enabled?"); ?></td><td><input type="checkbox" name="usercleanen" $ucchecked /></td><td><span class="icon icon-help hand" title="<?php print _("This setting will enable or disable the user cleaner service module on this specific host.  If the module is globally disabled, this setting is ignored.  The user clean up service will remove all stale users on the local machine, accept for user accounts that are whitelisted.  This is typically used when dynamic local users is implemented on the workstation."); ?>"></span></td></tr>
+								<tr><td width="270"><?php print _("Display Manager Enabled?"); ?></td><td><input type="checkbox" name="displaymanager" $dmchecked /></td><td><span class="icon icon-help hand" title="<?php print _("This setting will enable or disable the display manager service module on this specific host.  If the module is globally disabled, this setting is ignored. "); ?>"></span></td></tr>
+								<tr><td width="270"><?php print _("Auto Log Out Enabled?"); ?></td><td><input type="checkbox" name="alo" $alochecked /></td><td><span class="icon icon-help hand" title="<?php print _("This setting will enable or disable the auto log out service module on this specific host.  If the module is globally disabled, this setting is ignored. "); ?>"></span></td></tr>
+								<tr><td width="270"><?php print _("Green FOG Enabled?"); ?></td><td><input type="checkbox" name="gf" $gfchecked /></td><td><span class="icon icon-help hand" title="<?php print _("This setting will enable or disable the green fog service module on this specific host.  If the module is globally disabled, this setting is ignored. "); ?>"></span></td></tr>							
+								<tr><td width="270"><?php print _("Snapin Enabled?"); ?></td><td><input type="checkbox" name="snapin" $snapinchecked /></td><td><span class="icon icon-help hand" title="<?php print _("This setting will enable or disable the snapin service module on this specific host.  If the module is globally disabled, this setting is ignored. "); ?>"></span></td></tr>														
+								<tr><td width="270"><?php print _("Client Updater Enabled?"); ?></td><td><input type="checkbox" name="clientupdater" $clientupdaterchecked /></td><td><span class="icon icon-help hand" title="<?php print _("This setting will enable or disable the client updater service module on this specific host.  If the module is globally disabled, this setting is ignored. "); ?>"></span></td></tr>														
+								<tr><td width="270"><?php print _("Host Registration Enabled?"); ?></td><td><input type="checkbox" name="hostregister" $hostregisterchecked /></td><td><span class="icon icon-help hand" title="<?php print _("This setting will enable or disable the host register service module on this specific host.  If the module is globally disabled, this setting is ignored. "); ?>"></span></td></tr>														
+								<tr><td width="270"><?php print _("Printer Manager Enabled?"); ?></td><td><input type="checkbox" name="printermanager" $printermanagerchecked /></td><td><span class="icon icon-help hand" title="<?php print _("This setting will enable or disable the printer manager service module on this specific host.  If the module is globally disabled, this setting is ignored. "); ?>"></span></td></tr>														
+								<tr><td width="270"><?php print _("Task Reboot Enabled?"); ?></td><td><input type="checkbox" name="taskreboot" $taskrebootchecked /></td><td><span class="icon icon-help hand" title="<?php print _("This setting will enable or disable the task reboot service module on this specific host.  If the module is globally disabled, this setting is ignored. "); ?>"></span></td></tr>														
+								<tr><td width="270"><?php print _("User Tracker Enabled?"); ?></td><td><input type="checkbox" name="usertracker" $usertrackerchecked /></td><td><span class="icon icon-help hand" title="<?php print _("This setting will enable or disable the user tracker service module on this specific host.  If the module is globally disabled, this setting is ignored. "); ?>"></span></td></tr>														
+								<tr><td>&nbsp;</td><td><input type="submit" value="<?php print _("Update"); ?>" /></td></tr>
+							</table>
+						</fieldset>
+						<fieldset>
+						<legend><?php print _("Host Screen Resolution"); ?></legend>
+							<table cellpadding=0 cellspacing=0 border=0 width="100%">
+							<?php
+							/*
+							$x = "";
+							$y = "";
+							$r = "";
 
-						<center><table cellpadding=0 cellspacing=0 border=0 width="100%">
-							<tr><td width="270"><?php print _("Hostname Changer Enabled?"); ?></td><td><input type="checkbox" name="hostnamechanger" $hostnamechangerchecked /></td><td><span class="icon icon-help hand" title="<?php print _("This setting will enable or disable the hostname changer module on this specific host.  If the module is globally disabled, this setting is ignored."); ?>"></span></td></tr>						
-							<tr><td width="270"><?php print _("Directory Cleaner Enabled?"); ?></td><td><input type="checkbox" name="dircleanen" $checked /></td><td><span class="icon icon-help hand" title="<?php print _("This setting will enable or disable the directory cleaner service module on this specific host.  If the module is globally disabled, this setting is ignored."); ?>"></span></td></tr>
-							<tr><td width="270"><?php print _("User Cleanup Enabled?"); ?></td><td><input type="checkbox" name="usercleanen" $ucchecked /></td><td><span class="icon icon-help hand" title="<?php print _("This setting will enable or disable the user cleaner service module on this specific host.  If the module is globally disabled, this setting is ignored.  The user clean up service will remove all stale users on the local machine, accept for user accounts that are whitelisted.  This is typically used when dynamic local users is implemented on the workstation."); ?>"></span></td></tr>
-							<tr><td width="270"><?php print _("Display Manager Enabled?"); ?></td><td><input type="checkbox" name="displaymanager" $dmchecked /></td><td><span class="icon icon-help hand" title="<?php print _("This setting will enable or disable the display manager service module on this specific host.  If the module is globally disabled, this setting is ignored. "); ?>"></span></td></tr>
-							<tr><td width="270"><?php print _("Auto Log Out Enabled?"); ?></td><td><input type="checkbox" name="alo" $alochecked /></td><td><span class="icon icon-help hand" title="<?php print _("This setting will enable or disable the auto log out service module on this specific host.  If the module is globally disabled, this setting is ignored. "); ?>"></span></td></tr>
-							<tr><td width="270"><?php print _("Green FOG Enabled?"); ?></td><td><input type="checkbox" name="gf" $gfchecked /></td><td><span class="icon icon-help hand" title="<?php print _("This setting will enable or disable the green fog service module on this specific host.  If the module is globally disabled, this setting is ignored. "); ?>"></span></td></tr>							
-							<tr><td width="270"><?php print _("Snapin Enabled?"); ?></td><td><input type="checkbox" name="snapin" $snapinchecked /></td><td><span class="icon icon-help hand" title="<?php print _("This setting will enable or disable the snapin service module on this specific host.  If the module is globally disabled, this setting is ignored. "); ?>"></span></td></tr>														
-							<tr><td width="270"><?php print _("Client Updater Enabled?"); ?></td><td><input type="checkbox" name="clientupdater" $clientupdaterchecked /></td><td><span class="icon icon-help hand" title="<?php print _("This setting will enable or disable the client updater service module on this specific host.  If the module is globally disabled, this setting is ignored. "); ?>"></span></td></tr>														
-							<tr><td width="270"><?php print _("Host Registration Enabled?"); ?></td><td><input type="checkbox" name="hostregister" $hostregisterchecked /></td><td><span class="icon icon-help hand" title="<?php print _("This setting will enable or disable the host register service module on this specific host.  If the module is globally disabled, this setting is ignored. "); ?>"></span></td></tr>														
-							<tr><td width="270"><?php print _("Printer Manager Enabled?"); ?></td><td><input type="checkbox" name="printermanager" $printermanagerchecked /></td><td><span class="icon icon-help hand" title="<?php print _("This setting will enable or disable the printer manager service module on this specific host.  If the module is globally disabled, this setting is ignored. "); ?>"></span></td></tr>														
-							<tr><td width="270"><?php print _("Task Reboot Enabled?"); ?></td><td><input type="checkbox" name="taskreboot" $taskrebootchecked /></td><td><span class="icon icon-help hand" title="<?php print _("This setting will enable or disable the task reboot service module on this specific host.  If the module is globally disabled, this setting is ignored. "); ?>"></span></td></tr>														
-							<tr><td width="270"><?php print _("User Tracker Enabled?"); ?></td><td><input type="checkbox" name="usertracker" $usertrackerchecked /></td><td><span class="icon icon-help hand" title="<?php print _("This setting will enable or disable the user tracker service module on this specific host.  If the module is globally disabled, this setting is ignored. "); ?>"></span></td></tr>														
-							<tr><td colspan='3'><center><br /><input type="submit" value="<?php print _("Update"); ?>" /></center></td></tr>
-						</table></center>
-						<p class="titleBottomLeft"><?php print _("Host Screen Resolution"); ?></p>
-							<center><table cellpadding=0 cellspacing=0 border=0 width="100%">
-						<?php
-						/*
-								$x = "";
-								$y = "";
-								$r = "";
+							$sql = "SELECT
+									*
+								FROM
+									hostScreenSettings
+								WHERE
+									hssHostID = '$id'";
+							$res = mysql_query( $sql ) or criticalError( mysql_error(), "FOG :: Database error!
+							while( $ar = mysql_fetch_array( $res ) )
+							{
+								$x = $ar["hssWidth"];
+								$y = $ar["hssHeight"];
+								$r = $ar["hssRefresh"];
+							}
+							*/
+							?>
 
-								$sql = "SELECT
-										*
-									FROM
-										hostScreenSettings
-									WHERE
-										hssHostID = '$id'";
-								$res = mysql_query( $sql ) or criticalError( mysql_error(), "FOG :: Database error!
-								while( $ar = mysql_fetch_array( $res ) )
-								{
-									$x = $ar["hssWidth"];
-									$y = $ar["hssHeight"];
-									$r = $ar["hssRefresh"];
-								}
-						*/
-						?>
+							<tr><td width="270"><?php print _("Screen Width (in pixels)"); ?></td><td><input type="text" name="x" value="<?php print $x; ?>"/></td><td><span class="icon icon-help hand" title="<?php print _("This setting defines the screen horizontal resolution to be used with this host.  Leaving this field blank will force this host to use the global default setting"); ?>"></span></td></tr>
+							<tr><td width="270"><?php print _("Screen Height (in pixels)"); ?></td><td><input type="text" name="y" value="<?php print $y; ?>"/></td><td><span class="icon icon-help hand" title="<?php print _("This setting defines the screen vertial resolution to be used with this host.  Leaving this field blank will force this host to use the global default setting"); ?>"></span></td></tr>
+							<tr><td width="270"><?php print _("Screen Refresh Rate"); ?></td><td><input type="text" name="r" value="<?php print $r; ?>" /></td><td><span class="icon icon-help hand" title="<?php print _("This setting defines the screen refresh rate to be used with this host.  Leaving this field blank will force this host to use the global default setting"); ?>"></span></td></tr>
+							<tr><td>&nbsp;</td><td><input type="submit" value="<?php print _("Update"); ?>" /></td></tr>
+						</table>
+						</fieldset>
+						
+						<fieldset>
+						<legend><?php print _("Auto Log Out Settings"); ?></legend>
+							<table cellpadding=0 cellspacing=0 border=0 width="100%">
+							<?php
+							/*
+							$tme = "";
 
-							<tr><td width="270"><?php print _("Screen Width (in pixels)"); ?></td><td><input type="text" name="x" value="$x"/></td><td><span class="icon icon-help hand" title="<?php print _("This setting defines the screen horizontal resolution to be used with this host.  Leaving this field blank will force this host to use the global default setting"); ?>"></span></td></tr>
-							<tr><td width="270"><?php print _("Screen Height (in pixels)"); ?></td><td><input type="text" name="y" value="$y"/></td><td><span class="icon icon-help hand" title="<?php print _("This setting defines the screen vertial resolution to be used with this host.  Leaving this field blank will force this host to use the global default setting"); ?>"></span></td></tr>
-							<tr><td width="270"><?php print _("Screen Refresh Rate"); ?></td><td><input type="text" name="r" value="$r" /></td><td><span class="icon icon-help hand" title="<?php print _("This setting defines the screen refresh rate to be used with this host.  Leaving this field blank will force this host to use the global default setting"); ?>"></span></td></tr>
-							<tr><td colspan='3'><center><br /><input type="submit" value="<?php print _("Update"); ?>" /></center></td></tr>
-						</table></center>
-						<p class="titleBottomLeft"><?php print _("Auto Log Out Settings"); ?></p>
-							<center><table cellpadding=0 cellspacing=0 border=0 width="100%">
-						<?php
-						/*
-								$tme = "";
-
-								$sql = "SELECT
-										*
-									FROM
-										hostAutoLogOut
-									WHERE
-										haloHostID = '$id'";
-								$res = mysql_query( $sql ) or criticalError( mysql_error(), "FOG :: Database error!
-								while( $ar = mysql_fetch_array( $res ) )
-								{
-									$tme = $ar["haloTime"];
-								}
-						*/
-						?>
-
-							<tr><td width="270"><?php print _("Auto Log Out Time (in minutes)"); ?></td><td><input type="text" name="tme" value="$tme"/></td><td><span class="icon icon-help hand" title="<?php print _("This setting defines the time to auto log out this host."); ?>"></span></td></tr>
-							<tr><td colspan='3'><center><br /><input type="submit" value="<?php print _("Update"); ?>" /></center></td></tr>
-						</table></center>
+							$sql = "SELECT
+									*
+								FROM
+									hostAutoLogOut
+								WHERE
+									haloHostID = '$id'";
+							$res = mysql_query( $sql ) or criticalError( mysql_error(), "FOG :: Database error!
+							while( $ar = mysql_fetch_array( $res ) )
+							{
+								$tme = $ar["haloTime"];
+							}
+							*/
+							?>
+							<tr><td width="270"><?php print _("Auto Log Out Time (in minutes)"); ?></td><td><input type="text" name="tme" value="<?php print $tme; ?>"/></td><td><span class="icon icon-help hand" title="<?php print _("This setting defines the time to auto log out this host."); ?>"></span></td></tr>
+							<tr><td>&nbsp;</td><td><input type="submit" value="<?php print _("Update"); ?>" /></td></tr>
+						</table>
+						</fieldset>
 					</form>
 				</div>
 				
@@ -574,7 +580,7 @@ class HostManagementPage extends FOGPage
 								<tr><td>&nbsp;</td><td>&nbsp;<?php print _("Chassis Version"); ?></td><td>&nbsp;<?php print $ar["iCasever"]; ?></td></tr>
 								<tr><td>&nbsp;</td><td>&nbsp;<?php print _("Chassis Serial"); ?></td><td>&nbsp;<?php print $ar["iCaseserial"]; ?></td></tr>
 								<tr><td>&nbsp;</td><td>&nbsp;<?php print _("Chassis Asset"); ?></td><td>&nbsp;<?php print $ar["iCaseasset"]; ?></td></tr>
-								<tr><td>&nbsp;</td><td colspan='2'><center><input type="hidden" name="update" value="1" /><input type="submit" value="<?php print _("Update"); ?>" /></center></td></tr>
+								<tr><td>&nbsp;</td><td colspan='2'><center><input type="hidden" name="update" value="1" /><input type="submit" value="<?php print _("Update"); ?>" /></td></tr>
 								<?php
 							}
 						}
@@ -1159,10 +1165,10 @@ class HostManagementPage extends FOGPage
 		
 		?>
 		<form enctype="multipart/form-data" method="POST" action="<?php print $this->formAction; ?>">
-		<center><table cellpadding=0 cellspacing=0 border=0 width=90%>
+		<table cellpadding=0 cellspacing=0 border=0 width=90%>
 			<tr><td><?php print _("CSV File"); ?>:</font></td><td><input class="smaller" type="file" name="file" value="" /></td></tr>
 			<tr><td colspan=2><font><center><br /><input class="smaller" type="submit" value="<?php print _("Upload CSV"); ?>" /></center></font></td></tr>				
-		</table></center>
+		</table>
 		</form>
 		<p><?php print _('This page allows you to upload a CSV file of hosts into FOG to ease migration.  Right click <a href="./other/hostimport.csv">here</a> and select <strong>Save target as...</strong> or <strong>Save link as...</strong>  to download a template file.  The only fields that are required are hostname and MAC address.  Do <strong>NOT</strong> include a header row, and make sure you resave the file as a CSV file and not XLS!'); ?></p>
 		<?php

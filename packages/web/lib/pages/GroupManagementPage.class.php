@@ -106,8 +106,8 @@ class GroupManagementPage extends FOGPage
 				<tr><td><?php print _("Group Description"); ?>:</td><td><textarea name="description" rows="5" cols="40"><?php print $_POST['description']; ?></textarea></td></tr>
 				<tr><td><?php print _("Group Kernel"); ?>:</td><td><input type="text" name="kern" value="<?php print $_POST['kernel']; ?>" /></td></tr>	
 				<tr><td><?php print _("Group Kernel Arguments"); ?>:</td><td><input type="text" name="args" value="<?php print $_POST['kernelArgs']; ?>" /></td></tr>	
-				<tr><td><?php print _("Group Primary Disk"); ?>:</td><td><input type="text" name="dev" value="<?php print $_POST['primaryDisk']; ?>" /></td></tr>	
-				<tr><td>&nbsp;</td><td><input type="submit" value="<?php print _("Add"); ?>" /></td></tr>
+				<tr><td><?php print _("Group Primary Disk"); ?>:</td><td><input type="text" name="dev" value="<?php print $_POST['kernelDevice']; ?>" /></td></tr>	
+				<tr><td></td><td><input type="submit" value="<?php print _("Add"); ?>" /></td></tr>
 			</table>
 		</form>
 		<?php
@@ -137,7 +137,7 @@ class GroupManagementPage extends FOGPage
 				'description'	=> $_POST['description'],
 				'kernel'	=> $_POST['kern'],
 				'kernelArgs'	=> $_POST['args'],
-				'primaryDisk'	=> $_POST['dev']
+				'kernelDevice'	=> $_POST['dev']
 			));
 			
 			// Save to database
@@ -205,8 +205,8 @@ class GroupManagementPage extends FOGPage
 						<tr><td><?php print _("Group Description"); ?>:</td><td><textarea name="description" rows="5" cols="40"><?php print $Group->get('description'); ?></textarea></td></tr>
 						<tr><td><?php print _("Group Kernel"); ?>:</td><td><input type="text" name="kern" value="<?php print $Group->get('kernel'); ?>" /></td></tr>	
 						<tr><td><?php print _("Group Kernel Arguments"); ?>:</td><td><input type="text" name="args" value="<?php print $Group->get('kernelArgs'); ?>" /></td></tr>	
-						<tr><td><?php print _("Group Primary Disk"); ?>:</td><td><input type="text" name="dev" value="<?php print $Group->get('primaryDisk'); ?>" /></td></tr>	
-						<tr><td>&nbsp;</td><td><input type="submit" value="<?php print _("Update"); ?>" /></td></tr>
+						<tr><td><?php print _("Group Primary Disk"); ?>:</td><td><input type="text" name="dev" value="<?php print $Group->get('kernelDevice'); ?>" /></td></tr>	
+						<tr><td></td><td><input type="submit" value="<?php print _("Update"); ?>" /></td></tr>
 					</table>
 				</div>
 				
@@ -228,7 +228,7 @@ class GroupManagementPage extends FOGPage
 				<!-- Membership -->
 				<div id="group-membership">
 					<h2><?php print _("Modify Membership for ") . $Group->get('name'); ?></h2>
-					<center><table cellpadding=0 cellspacing=0 border=0 width=100%>
+					<table cellpadding=0 cellspacing=0 border=0 width=100%>
 					<?php
 					if ( $_GET["delhostid"] != null && is_numeric( $_GET["delhostid"] ) )
 					{
@@ -245,7 +245,7 @@ class GroupManagementPage extends FOGPage
 						printf('<tr class="%s"><td>%s</td><td>%s</td><td>%s</td><td><a href="%s"><img src="images/deleteSmall.png" class="link" /></a></td></tr>', (++$i % 2 ? 'alt': ''), $Host->get('name'), $Host->get('ip'), $Host->get('mac'), "?node=" . $this->node . "&sub=" . $this->sub . "&groupid=" . $this->request['id'] . "&id=" . $Host->get('id'));
 					}
 					?>
-					</table></center>
+					</table>
 				</div>
 				
 				<!-- Image Association -->
@@ -270,7 +270,9 @@ class GroupManagementPage extends FOGPage
 				<div id="group-os">
 					<h2><?php print _("Operating System Association for") . ': ' . $Group->get('name'); ?></h2>
 					<form method="POST" action="?node=$node&sub=$sub&groupid=$groupid&tab=$tab">
-					echo ( $FOGCore->getClass('OSManager')->buildSelectBox($Host->get('osID'), "grpos") );
+					<?php
+					print $this->FOGCore->getClass('OSManager')->buildSelectBox('', "grpos");
+					?>
 					<p><input type="submit" value="<?php print _("Update Operating System"); ?>" /></p>
 					</form>
 				</div>
@@ -301,59 +303,67 @@ class GroupManagementPage extends FOGPage
 				<div id="group-service">
 					<h2><?php print _("Service Configuration"); ?></h2>
 					<form method="post" action="?node=$node&sub=$sub&groupid=$groupid&tab=$tab&updatemodulestatus=1">
-						<center><table cellpadding=0 cellspacing=0 border=0 width=90%>
-							<tr>
-								<td width="270">&nbsp;<?php print _("Set Hostname Changer status on all hosts to"); ?>:</td>
-								<td>&nbsp;<select name="hostnamechanger" size="1">
-								  <option value="nc" label="Not Configured"><?php print _("Not Configured"); ?></option>
-								  <option value="on" label="Enabled"><?php print _("Enabled"); ?></option>
-								  <option value="" label="Disabled"><?php print _("Disabled"); ?></option>
-								  </select>
-								</td>
-								<td><span class="icon icon-help hand" title="<?php print _("This setting will enable or disable the hostname changer service module on this specific host.  If the module is globally disabled, this setting is ignored."); ?>"></span>
-								</td>
-								</tr>
-							<tr>
-								  <td width="270">&nbsp;<?php print _("Set Directory Cleaner status on all hosts to"); ?>:</td>
-								  <td>&nbsp;<select name="dircleanen" size="1">
-									<option value="nc" label="Not Configured"><?php print _("Not Configured"); ?></option>
-									<option value="on" label="Enabled"><?php print _("Enabled"); ?></option>
-									<option value="" label="Disabled"><?php print _("Disabled"); ?></option>
-								  </select></td>
-								  <td><span class="icon icon-help hand" title="<?php print _("This setting will enable or disable the directory cleaner service module on this specific host.  If the module is globally disabled, this setting is ignored."); ?>"></span></td></tr>
-							<tr>
-								<td width="270">&nbsp;<?php print _("Set User Cleanup status on all hosts to"); ?>:</td>
-								<td>&nbsp;<select name="usercleanen" size="1">
-									<option value="nc" label="Not Configured"><?php print _("Not Configured"); ?></option>
-									<option value="on" label="Enabled"><?php print _("Enabled"); ?></option>
-									<option value="" label="Disabled"><?php print _("Disabled"); ?></option>
-									</select></td>
-								<td><span class="icon icon-help hand" title="<?php print _("This setting will enable or disable the user cleanup service module on this specific host.  If the module is globally disabled, this setting is ignored."); ?>"></span></td></tr>
-					<tr><td width="270">&nbsp;<?php print _("Set Display Manager status on all hosts to"); ?>:</td><td>&nbsp;<select name="displaymanager" size="1"><option value="nc" label="Not Configured"><?php print _("Not Configured"); ?></option><option value="on" label="Enabled"><?php print _("Enabled"); ?></option><option value="" label="Disabled"><?php print _("Disabled"); ?></option></select></td><td><span class="icon icon-help hand" title="<?php print _("This setting will enable or disable the display manager service module on this specific host.  If the module is globally disabled, this setting is ignored."); ?>"></span></td></tr>
-							<tr><td width="270">&nbsp;<?php print _("Set Auto Log Out on all hosts to"); ?>:</td><td>&nbsp;<select name="alo" size="1"><option value="nc" label="Not Configured"><?php print _("Not Configured"); ?></option><option value="on" label="Enabled"><?php print _("Enabled"); ?></option><option value="" label="Disabled"><?php print _("Disabled"); ?></option></select></td><td><span class="icon icon-help hand" title="<?php print _("This setting will enable or disable the auto log out service module on this specific host.  If the module is globally disabled, this setting is ignored."); ?>"></span></td></tr>
-							<tr><td width="270">&nbsp;<?php print _("Set Green FOG on all hosts to"); ?>:</td><td>&nbsp;<select name="gf" size="1"><option value="nc" label="Not Configured"><?php print _("Not Configured"); ?></option><option value="on" label="Enabled"><?php print _("Enabled"); ?></option><option value="" label="Disabled"><?php print _("Disabled"); ?></option></select></td><td><span class="icon icon-help hand" title="<?php print _("This setting will enable or disable the green fog service module on this specific host.  If the module is globally disabled, this setting is ignored."); ?>"></span></td></tr>
-							<tr><td width="270">&nbsp;<?php print _("Set Snapin Client on all hosts to"); ?>:</td><td>&nbsp;<select name="snapin" size="1"><option value="nc" label="Not Configured"><?php print _("Not Configured"); ?></option><option value="on" label="Enabled"><?php print _("Enabled"); ?></option><option value="" label="Disabled"><?php print _("Disabled"); ?></option></select></td><td><span class="icon icon-help hand" title="<?php print _("This setting will enable or disable the snapin service module on this specific host.  If the module is globally disabled, this setting is ignored."); ?>"></span></td></tr>						
-							<tr><td width="270">&nbsp;<?php print _("Set Client Updater on all hosts to"); ?>:</td><td>&nbsp;<select name="clientupdater" size="1"><option value="nc" label="Not Configured"><?php print _("Not Configured"); ?></option><option value="on" label="Enabled"><?php print _("Enabled"); ?></option><option value="" label="Disabled"><?php print _("Disabled"); ?></option></select></td><td><span class="icon icon-help hand" title="<?php print _("This setting will enable or disable the client updater service module on this specific host.  If the module is globally disabled, this setting is ignored."); ?>"></span></td></tr>												
-							<tr><td width="270">&nbsp;<?php print _("Set Host Register on all hosts to"); ?>:</td><td>&nbsp;<select name="hostregister" size="1"><option value="nc" label="Not Configured"><?php print _("Not Configured"); ?></option><option value="on" label="Enabled"><?php print _("Enabled"); ?></option><option value="" label="Disabled"><?php print _("Disabled"); ?></option></select></td><td><span class="icon icon-help hand" title="<?php print _("This setting will enable or disable the client updater service module on this specific host.  If the module is globally disabled, this setting is ignored."); ?>"></span></td></tr>												
-							<tr><td width="270">&nbsp;<?php print _("Set Printer Manager on all hosts to"); ?>:</td><td>&nbsp;<select name="printermanager" size="1"><option value="nc" label="Not Configured"><?php print _("Not Configured"); ?></option><option value="on" label="Enabled"><?php print _("Enabled"); ?></option><option value="" label="Disabled"><?php print _("Disabled"); ?></option></select></td><td><span class="icon icon-help hand" title="<?php print _("This setting will enable or disable the printer manager service module on this specific host.  If the module is globally disabled, this setting is ignored."); ?>"></span></td></tr>												
-							<tr><td width="270">&nbsp;<?php print _("Set Task Reboot on all hosts to"); ?>:</td><td>&nbsp;<select name="taskreboot" size="1"><option value="nc" label="Not Configured"><?php print _("Not Configured"); ?></option><option value="on" label="Enabled"><?php print _("Enabled"); ?></option><option value="" label="Disabled"><?php print _("Disabled"); ?></option></select></td><td><span class="icon icon-help hand" title="<?php print _("This setting will enable or disable the task reboot service module on this specific host.  If the module is globally disabled, this setting is ignored."); ?>"></span></td></tr>												
-							<tr><td width="270">&nbsp;<?php print _("Set User Tracker on all hosts to"); ?>:</td><td>&nbsp;<select name="usertracker" size="1"><option value="nc" label="Not Configured"><?php print _("Not Configured"); ?></option><option value="on" label="Enabled"><?php print _("Enabled"); ?></option><option value="" label="Disabled"><?php print _("Disabled"); ?></option></select></td><td><span class="icon icon-help hand" title="<?php print _("This setting will enable or disable the user tracker service module on this specific host.  If the module is globally disabled, this setting is ignored."); ?>"></span></td></tr>								
-							<tr><td colspan='3'><center><br /><input type="submit" value="<?php print _("Update"); ?>" /></center></td></tr>
-						</table></center>
+						<fieldset>
+							<legend>General</legend>
+							<table cellpadding=0 cellspacing=0 border=0 width=100%>
+								<tr>
+									<td width="270"><?php print _("Set Hostname Changer status on all hosts to"); ?>:</td>
+									<td><select name="hostnamechanger" size="1">
+									  <option value="nc" label="Not Configured"><?php print _("Not Configured"); ?></option>
+									  <option value="on" label="Enabled"><?php print _("Enabled"); ?></option>
+									  <option value="" label="Disabled"><?php print _("Disabled"); ?></option>
+									  </select>
+									</td>
+									<td><span class="icon icon-help hand" title="<?php print _("This setting will enable or disable the hostname changer service module on this specific host.  If the module is globally disabled, this setting is ignored."); ?>"></span>
+									</td>
+									</tr>
+								<tr>
+									  <td width="270"><?php print _("Set Directory Cleaner status on all hosts to"); ?>:</td>
+									  <td><select name="dircleanen" size="1">
+										<option value="nc" label="Not Configured"><?php print _("Not Configured"); ?></option>
+										<option value="on" label="Enabled"><?php print _("Enabled"); ?></option>
+										<option value="" label="Disabled"><?php print _("Disabled"); ?></option>
+									  </select></td>
+									  <td><span class="icon icon-help hand" title="<?php print _("This setting will enable or disable the directory cleaner service module on this specific host.  If the module is globally disabled, this setting is ignored."); ?>"></span></td></tr>
+								<tr>
+									<td width="270"><?php print _("Set User Cleanup status on all hosts to"); ?>:</td>
+									<td><select name="usercleanen" size="1">
+										<option value="nc" label="Not Configured"><?php print _("Not Configured"); ?></option>
+										<option value="on" label="Enabled"><?php print _("Enabled"); ?></option>
+										<option value="" label="Disabled"><?php print _("Disabled"); ?></option>
+										</select></td>
+									<td><span class="icon icon-help hand" title="<?php print _("This setting will enable or disable the user cleanup service module on this specific host.  If the module is globally disabled, this setting is ignored."); ?>"></span></td></tr>
+						<tr><td width="270"><?php print _("Set Display Manager status on all hosts to"); ?>:</td><td><select name="displaymanager" size="1"><option value="nc" label="Not Configured"><?php print _("Not Configured"); ?></option><option value="on" label="Enabled"><?php print _("Enabled"); ?></option><option value="" label="Disabled"><?php print _("Disabled"); ?></option></select></td><td><span class="icon icon-help hand" title="<?php print _("This setting will enable or disable the display manager service module on this specific host.  If the module is globally disabled, this setting is ignored."); ?>"></span></td></tr>
+								<tr><td width="270"><?php print _("Set Auto Log Out on all hosts to"); ?>:</td><td><select name="alo" size="1"><option value="nc" label="Not Configured"><?php print _("Not Configured"); ?></option><option value="on" label="Enabled"><?php print _("Enabled"); ?></option><option value="" label="Disabled"><?php print _("Disabled"); ?></option></select></td><td><span class="icon icon-help hand" title="<?php print _("This setting will enable or disable the auto log out service module on this specific host.  If the module is globally disabled, this setting is ignored."); ?>"></span></td></tr>
+								<tr><td width="270"><?php print _("Set Green FOG on all hosts to"); ?>:</td><td><select name="gf" size="1"><option value="nc" label="Not Configured"><?php print _("Not Configured"); ?></option><option value="on" label="Enabled"><?php print _("Enabled"); ?></option><option value="" label="Disabled"><?php print _("Disabled"); ?></option></select></td><td><span class="icon icon-help hand" title="<?php print _("This setting will enable or disable the green fog service module on this specific host.  If the module is globally disabled, this setting is ignored."); ?>"></span></td></tr>
+								<tr><td width="270"><?php print _("Set Snapin Client on all hosts to"); ?>:</td><td><select name="snapin" size="1"><option value="nc" label="Not Configured"><?php print _("Not Configured"); ?></option><option value="on" label="Enabled"><?php print _("Enabled"); ?></option><option value="" label="Disabled"><?php print _("Disabled"); ?></option></select></td><td><span class="icon icon-help hand" title="<?php print _("This setting will enable or disable the snapin service module on this specific host.  If the module is globally disabled, this setting is ignored."); ?>"></span></td></tr>						
+								<tr><td width="270"><?php print _("Set Client Updater on all hosts to"); ?>:</td><td><select name="clientupdater" size="1"><option value="nc" label="Not Configured"><?php print _("Not Configured"); ?></option><option value="on" label="Enabled"><?php print _("Enabled"); ?></option><option value="" label="Disabled"><?php print _("Disabled"); ?></option></select></td><td><span class="icon icon-help hand" title="<?php print _("This setting will enable or disable the client updater service module on this specific host.  If the module is globally disabled, this setting is ignored."); ?>"></span></td></tr>												
+								<tr><td width="270"><?php print _("Set Host Register on all hosts to"); ?>:</td><td><select name="hostregister" size="1"><option value="nc" label="Not Configured"><?php print _("Not Configured"); ?></option><option value="on" label="Enabled"><?php print _("Enabled"); ?></option><option value="" label="Disabled"><?php print _("Disabled"); ?></option></select></td><td><span class="icon icon-help hand" title="<?php print _("This setting will enable or disable the client updater service module on this specific host.  If the module is globally disabled, this setting is ignored."); ?>"></span></td></tr>												
+								<tr><td width="270"><?php print _("Set Printer Manager on all hosts to"); ?>:</td><td><select name="printermanager" size="1"><option value="nc" label="Not Configured"><?php print _("Not Configured"); ?></option><option value="on" label="Enabled"><?php print _("Enabled"); ?></option><option value="" label="Disabled"><?php print _("Disabled"); ?></option></select></td><td><span class="icon icon-help hand" title="<?php print _("This setting will enable or disable the printer manager service module on this specific host.  If the module is globally disabled, this setting is ignored."); ?>"></span></td></tr>												
+								<tr><td width="270"><?php print _("Set Task Reboot on all hosts to"); ?>:</td><td><select name="taskreboot" size="1"><option value="nc" label="Not Configured"><?php print _("Not Configured"); ?></option><option value="on" label="Enabled"><?php print _("Enabled"); ?></option><option value="" label="Disabled"><?php print _("Disabled"); ?></option></select></td><td><span class="icon icon-help hand" title="<?php print _("This setting will enable or disable the task reboot service module on this specific host.  If the module is globally disabled, this setting is ignored."); ?>"></span></td></tr>												
+								<tr><td width="270"><?php print _("Set User Tracker on all hosts to"); ?>:</td><td><select name="usertracker" size="1"><option value="nc" label="Not Configured"><?php print _("Not Configured"); ?></option><option value="on" label="Enabled"><?php print _("Enabled"); ?></option><option value="" label="Disabled"><?php print _("Disabled"); ?></option></select></td><td><span class="icon icon-help hand" title="<?php print _("This setting will enable or disable the user tracker service module on this specific host.  If the module is globally disabled, this setting is ignored."); ?>"></span></td></tr>								
+								<tr><td>&nbsp;</td><td><input type="submit" value="<?php print _("Update"); ?>" /></td></tr>
+							</table>
+						</fieldset>
+					
 
-						<p class="titleBottomLeft"><?php print _("Group Screen Resolution"); ?></p>
-							<center><table cellpadding=0 cellspacing=0 border=0 width=90%>
-								<tr><td width="270">&nbsp;<?php print _("Screen Width (in pixels)"); ?></td><td>&nbsp;<input type="text" name="x" value="$x"/></td><td><span class="icon icon-help hand" title="<?php print _("This setting defines the screen horizontal resolution to be used with this host.  Leaving this field blank will force this host to use the global default setting"); ?>"></span></td></tr>
-								<tr><td width="270">&nbsp;<?php print _("Screen Height (in pixels)"); ?></td><td>&nbsp;<input type="text" name="y" value="$y"/></td><td><span class="icon icon-help hand" title="<?php print _("This setting defines the screen vertial resolution to be used with this host.  Leaving this field blank will force this host to use the global default setting"); ?>"></span></td></tr>
-								<tr><td width="270">&nbsp;<?php print _("Screen Refresh Rate"); ?></td><td>&nbsp;<input type="text" name="r" value="$r" /></td><td><span class="icon icon-help hand" title="<?php print _("This setting defines the screen refresh rate to be used with this host.  Leaving this field blank will force this host to use the global default setting"); ?>"></span></td></tr>
-								<tr><td colspan='3'><center><br /><input type="submit" value="<?php print _("Update"); ?>" /></center></td></tr>
-							</table></center>
-
-						<p class="titleBottomLeft"><?php print _("Auto Log Out Settings"); ?></p>
-							<center><table cellpadding=0 cellspacing=0 border=0 width=90%>
-								<tr><td width="270">&nbsp;<?php print _("Auto Log Out Time (in minutes)"); ?></td><td>&nbsp;<input type="text" name="tme" value="$tme"/></td><td><span class="icon icon-help hand" title="<?php print _("This setting defines the time to auto log out this host."); ?>"></span></td></tr>
-								<tr><td colspan='3'><center><br /><input type="submit" value="<?php print _("Update"); ?>" /></center></td></tr>
-							</table></center>
+						<fieldset>
+							<legend><?php print _("Group Screen Resolution"); ?></legend>
+							<table cellpadding=0 cellspacing=0 border=0 width=100%>
+								<tr><td width="270"><?php print _("Screen Width (in pixels)"); ?></td><td><input type="text" name="x" value="<?php print $x; ?>"/></td><td><span class="icon icon-help hand" title="<?php print _("This setting defines the screen horizontal resolution to be used with this host.  Leaving this field blank will force this host to use the global default setting"); ?>"></span></td></tr>
+								<tr><td width="270"><?php print _("Screen Height (in pixels)"); ?></td><td><input type="text" name="y" value="<?php print $y; ?>"/></td><td><span class="icon icon-help hand" title="<?php print _("This setting defines the screen vertial resolution to be used with this host.  Leaving this field blank will force this host to use the global default setting"); ?>"></span></td></tr>
+								<tr><td width="270"><?php print _("Screen Refresh Rate"); ?></td><td><input type="text" name="r" value="<?php print $r; ?>" /></td><td><span class="icon icon-help hand" title="<?php print _("This setting defines the screen refresh rate to be used with this host.  Leaving this field blank will force this host to use the global default setting"); ?>"></span></td></tr>
+								<tr><td>&nbsp;</td><td><input type="submit" value="<?php print _("Update"); ?>" /></td></tr>
+							</table>
+						</fieldset>
+						
+						<fieldset>
+							<legend><?php print _("Auto Log Out Settings"); ?></legend>
+							<table cellpadding=0 cellspacing=0 border=0 width=100%>
+								<tr><td width="270"><?php print _("Auto Log Out Time (in minutes)"); ?></td><td><input type="text" name="tme" value="<?php print $tme; ?>"/></td><td><span class="icon icon-help hand" title="<?php print _("This setting defines the time to auto log out this host."); ?>"></span></td></tr>
+								<tr><td>&nbsp;</td><td><input type="submit" value="<?php print _("Update"); ?>" /></td></tr>
+							</table>
+						</fieldset>
 					</form>
 				</div>
 				
@@ -361,13 +371,13 @@ class GroupManagementPage extends FOGPage
 				<div id="group-active-directory">
 					<h2><?php print _("Modify AD information for ") . $Group->get('name'); ?></h2>
 					<form method="POST" action="?node=" . $node . "&sub=" . $sub . "&groupid=" . $groupid . "&tab=$tab">
-					<table cellpadding=0 cellspacing=0 border=0 width=90%>
+					<table cellpadding=0 cellspacing=0 border=0 width=100%>
 						<tr><td><?php print _("Join Domain after image task"); ?>:</td><td><input id='adEnabled' type="checkbox" name="domain" /></td></tr>
 						<tr><td><?php print _("Domain name"); ?>:</td><td><input id="adDomain" type="text" name="domainname" /></td></tr>
 						<tr><td><?php print _("Organizational Unit"); ?>:</td><td><input  id="adOU" type="text" name="ou" /> <span class="lightColor"><?php print _("(Blank for default)"); ?></span></td></tr>
 						<tr><td><?php print _("Domain Username"); ?>:</td><td><input id="adUsername" type="text" name="domainuser" /></td></tr>
 						<tr><td><?php print _("Domain Password"); ?>:</td><td><input id="adPassword" type="text" name="domainpassword" /> <span class="lightColor"><?php print _("(Must be encrypted)"); ?></span></td></tr>
-						<tr><td colspan=2><center><br /><input type="hidden" name="updatead" value="1" /><input type="submit" value="<?php print _("Update"); ?>" /></center></td></tr>
+						<tr><td>&nbsp;</td><td><input type="hidden" name="updatead" value="1" /><input type="submit" value="<?php print _("Update"); ?>" /></td></tr>
 					</table>
 					</form>
 				</div>
@@ -434,7 +444,7 @@ class GroupManagementPage extends FOGPage
 				->set('description',	$_POST['description'])
 				->set('kernel',		$_POST['kern'])
 				->set('kernelArgs',	$_POST['args'])
-				->set('primaryDisk',	$_POST['dev']);
+				->set('kernelDevice',	$_POST['dev']);
 		
 			// Save to database
 			if ($Group->save())

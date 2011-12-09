@@ -141,7 +141,7 @@ abstract class FOGManagerController
 			$listArray[] = sprintf('<option value="%s"%s>[%s] %s</option>', $Object->get('id'), ($matchID == $Object->get('id') ? ' selected="selected"' : ''), $Object->get('id'), $Object->get('name'));
 		}
 		
-		return (isset($listArray) ? sprintf('<select name="%s"><option value="">- %s -</option>%s</select>', $elementName, _('Please select an option'), implode("\n", $listArray)) : false);
+		return (isset($listArray) ? sprintf('<select name="%s" autocomplete="off"><option value="">- %s -</option>%s</select>', $elementName, _('Please select an option'), implode("\n", $listArray)) : false);
 	}
 	
 	// TODO: Read DB fields from child class

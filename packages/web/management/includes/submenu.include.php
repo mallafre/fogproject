@@ -33,6 +33,8 @@ if ($currentUser != null && $currentUser->isLoggedIn())
 		if ($groupid)
 		{
 			// Group Management: Edit
+			$Group = new Group($groupid);
+			
 			if (!preg_match('#indexold#', $_SERVER['PHP_SELF']))
 			{
 				$FOGSubMenu->addItems('group', array(	_('General')		=> "$_SERVER[PHP_SELF]?node=$node&sub=edit&groupid=$groupid#group-general",
@@ -65,8 +67,8 @@ if ($currentUser != null && $currentUser->isLoggedIn())
 			}
 			
 			// Group Management: Notes
-			$FOGSubMenu->addNotes('group', array(	_("Group")		=> getGroupNameByID( $conn, $groupid ),
-								_("Members")		=> count(getImageMembersBygroupid( $conn, $groupid )),
+			$FOGSubMenu->addNotes('group', array(	_('Group')		=> $Group->get('name'),
+								_('Members')		=> count($Group->get('hosts')),
 						), 'groupid');
 		}
 	}
