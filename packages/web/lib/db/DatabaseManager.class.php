@@ -81,7 +81,7 @@ class DatabaseManager
 					}
 					break;								
 				default:
-					throw new Exception('Unknown database type');
+					throw new Exception(sprintf('Unknown database type. Check that DATABASE_TYPE is being set in "%s/commons/config.php"', rtrim($_SERVER['DOCUMENT_ROOT'], '/') . dirname($_SERVER['PHP_SELF'])));
 			}
 		}
 		catch (Exception $e)
