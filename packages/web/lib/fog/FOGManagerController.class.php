@@ -38,6 +38,7 @@ abstract class FOGManagerController
 		
 		// Set required child variable data
 		$this->databaseFields = $this->classVariables['databaseFields'];
+		$this->databaseFieldsFlipped = array_flip($this->databaseFields);
 		$this->databaseTable = $this->classVariables['databaseTable'];
 	}
 	
@@ -94,11 +95,11 @@ abstract class FOGManagerController
 				{
 					if (is_array($value))
 					{
-						$whereArray[] = sprintf("`%s` IN ('%s')", $field, implode("', '", $value));
+						$whereArray[] = sprintf("`%s` IN ('%s')", $this->key($field), implode("', '", $value));
 					}
 					else
 					{
-						$whereArray[] = sprintf("`%s`='%s'", $field, $value);
+						$whereArray[] = sprintf("`%s`='%s'", $this->key($field), $value);
 					}
 				}
 			}
@@ -159,6 +160,25 @@ abstract class FOGManagerController
 		);
 		
 		return ($this->db->fetch()->get('total') ? true : false);
+	}
+	
+	// Key
+	public function key($key)
+	{
+		if (array_key_exists($key, $this->databaseFields))
+		{
+			return $this->databaseFields[$key];
+		}
+		
+		// Cannot be used until all references to acual field names are converted to common names
+		/*
+		if (array_key_exists($key, $this->databaseFieldsFlipped))
+		{
+			return $this->databaseFieldsFlipped[$key];
+		}
+		*/
+		
+		return $key;
 	}
 	
 	// Error
