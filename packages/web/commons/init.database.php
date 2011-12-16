@@ -27,7 +27,7 @@ if ($FOGCore)
 if ($conn)
 {
 	// Database Schema version check
-	if ($DatabaseManager->getVersion() != FOG_SCHEMA)
+	if ($DatabaseManager->getVersion() < FOG_SCHEMA)
 	{
 		if ($_GET['redir'] != '1')
 		{

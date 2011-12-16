@@ -113,7 +113,8 @@ class FOGSubMenu
 			{
 				// HACK: Add div around submenu items for tabs
 				// Blackout - 8:24 AM 30/11/2011
-				$output .= (++$i >= 2 ? '<div class="organic-tabs">' . "\n\t\t" : '');
+				//$output .= (++$i >= 2 ? '<div class="organic-tabs">' . "\n\t\t" : '');
+				$output .= '<div class="organic-tabs">' . "\n\t\t";
 				
 				$output .= "<h2>" . $this->fixTitle($title) . "</h2>\n\t\t<ul>\n";
 				foreach ($data AS $label => $link)
@@ -124,7 +125,8 @@ class FOGSubMenu
 				
 				// HACK: Add div around submenu items for tabs
 				// Blackout - 8:24 AM 30/11/2011
-				$output .= ($i >= 2 ? "\t\t</div>\n" : '');
+				//$output .= ($i >= 2 ? "\t\t</div>\n" : '');
+				$output .= "\t\t</div>\n";
 			}
 		}
 		

@@ -249,19 +249,39 @@ if ($currentUser != null && $currentUser->isLoggedIn())
 	// Service Management
 	if ($node == "service")
 	{
-		$FOGSubMenu->addItems('service', array(	_('Auto Log Out')	=> 'alo',
-							_('Client Updater')	=> 'clientupdater',
-							_('Directory Cleaner')	=> 'dircleaner',
-							_('Display Manager')	=> 'displaymanager',
-							_('Green FOG')		=> 'greenfog',
-							_('Hostname Changer')	=> 'hostnamechanger',
-							_('Host Registration')	=> 'hostregister',
-							_('Printer Manager')	=> 'printermanager',
-							_('Snapin Client')	=> 'snapin',
-							_('Task Reboot')	=> 'taskreboot',
-							_('User Cleanup')	=> 'usercleanup',
-							_('User Tracker')	=> 'usertracker',
-					));
+		if (!preg_match('#indexold#', $_SERVER['PHP_SELF']))
+		{
+			$FOGSubMenu->addItems('service', array(	_('Home')		=> "$_SERVER[PHP_SELF]?node=$node#home",
+								_('Auto Log Out')	=> "$_SERVER[PHP_SELF]?node=$node#auto-logout",
+								_('Client Updater')	=> "$_SERVER[PHP_SELF]?node=$node#client-updater",
+								_('Directory Cleaner')	=> "$_SERVER[PHP_SELF]?node=$node#directory-cleaner",
+								_('Display Manager')	=> "$_SERVER[PHP_SELF]?node=$node#display-manager",
+								_('Green FOG')		=> "$_SERVER[PHP_SELF]?node=$node#green-fog",
+								_('Hostname Changer')	=> "$_SERVER[PHP_SELF]?node=$node#hostname-changer",
+								_('Host Registration')	=> "$_SERVER[PHP_SELF]?node=$node#host-registration",
+								_('Printer Manager')	=> "$_SERVER[PHP_SELF]?node=$node#printer-manager",
+								_('Snapin Client')	=> "$_SERVER[PHP_SELF]?node=$node#snapin-client",
+								_('Task Reboot')	=> "$_SERVER[PHP_SELF]?node=$node#task-reboot",
+								_('User Cleanup')	=> "$_SERVER[PHP_SELF]?node=$node#user-cleanup",
+								_('User Tracker')	=> "$_SERVER[PHP_SELF]?node=$node#user-tracker",
+						));
+		}
+		else
+		{
+			$FOGSubMenu->addItems('service', array(	_('Auto Log Out')	=> 'alo',
+								_('Client Updater')	=> 'clientupdater',
+								_('Directory Cleaner')	=> 'dircleaner',
+								_('Display Manager')	=> 'displaymanager',
+								_('Green FOG')		=> 'greenfog',
+								_('Hostname Changer')	=> 'hostnamechanger',
+								_('Host Registration')	=> 'hostregister',
+								_('Printer Manager')	=> 'printermanager',
+								_('Snapin Client')	=> 'snapin',
+								_('Task Reboot')	=> 'taskreboot',
+								_('User Cleanup')	=> 'usercleanup',
+								_('User Tracker')	=> 'usertracker',
+						));
+		}
 	}
 	
 	// Snapin Management
@@ -354,14 +374,26 @@ if ($currentUser != null && $currentUser->isLoggedIn())
 	// Task Management
 	if ($node == "tasks")
 	{
-		$FOGSubMenu->addItems('tasks', array(	_('New Search')			=> 'search',
-							_('List All Groups')		=> 'listgroups',
-							_('List All Hosts')		=> 'listhosts',
-							_('Active Tasks')		=> 'active',
-							_('Scheduled Tasks')		=> 'sched',
-							_('Active Multicast Tasks')	=> 'activemc',
-							_('Active Snap-ins')		=> 'activesnapins',
-					));
+		if (!preg_match('#indexold#', $_SERVER['PHP_SELF']))
+		{
+			$FOGSubMenu->addItems('tasks', array(	_('New Search')			=> "$_SERVER[PHP_SELF]?node=$node&sub=search",
+								_('Active Tasks')		=> "$_SERVER[PHP_SELF]?node=$node&sub=active",
+								_('Scheduled Tasks')		=> "$_SERVER[PHP_SELF]?node=$node&sub=scheduled",
+								_('Active Multicast Tasks')	=> "$_SERVER[PHP_SELF]?node=$node&sub=active-multicast",
+								_('Active Snap-ins')		=> "$_SERVER[PHP_SELF]?node=$node&sub=active-snapins",
+						));
+		}
+		else
+		{
+			$FOGSubMenu->addItems('tasks', array(	_('New Search')			=> 'search',
+								_('List All Groups')		=> 'listgroups',
+								_('List All Hosts')		=> 'listhosts',
+								_('Active Tasks')		=> 'active',
+								_('Scheduled Tasks')		=> 'sched',
+								_('Active Multicast Tasks')	=> 'activemc',
+								_('Active Snap-ins')		=> 'activesnapins',
+						));
+		}
 	}
 	
 	// User Management
