@@ -308,7 +308,7 @@ abstract class FOGController extends FOGBase
 			// Did we find a row in the database?
 			if (!$queryData = $this->DB->query($query)->fetch()->get())
 			{
-				throw new Exception(($this->DB->debug() ? $this->DB->debug() : 'Row not found'));
+				throw new Exception(($this->DB->error() ? $this->DB->error() : 'Row not found'));
 			}
 			
 			// Loop returned rows -> Set new data

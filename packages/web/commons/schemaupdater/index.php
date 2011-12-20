@@ -60,6 +60,7 @@ $installPath[24] = array( 190, 191, 192, 193, 194 );
 $installPath[25] = array( 195, 196, 197, 198 );
 $installPath[26] = array( 199, 200, 201, 202, 203, 204, 205, 206, 207, 208, 209, 210, 211, 212, 213 );
 $installPath[27] = array( 214, 215, 216 );
+$installPath[28] = array( 217, 218 );
 
 $dbSchema[0] = "CREATE DATABASE " . DATABASE_NAME ;
 
@@ -1059,6 +1060,36 @@ $dbSchema[215] = "INSERT INTO `" . DATABASE_NAME . "`.`imageTypes` (`imageTypeID
 (4, 'Raw Image (Sector By Sector, DD, Slow)');";
 $dbSchema[216] = "UPDATE `" . DATABASE_NAME . "`.`schemaVersion` set vValue = '28'";
 
+// 29 - Blackout - 9:08 PM 20/12/2011
+// Update `images`.`imageOSID`
+$dbSchema[217] = function()
+{
+	// Variables
+	$DB = $GLOBALS['DB'];
+	$FOGCore = $GLOBALS['FOGCore'];
+	
+	// Get all imageID's from Hosts -> Push imageID and osID into an array
+	$DB->query("SELECT DISTINCT hostImage, hostOS FROM `%s`.`hosts` WHERE hostImage > 0", array(DATABASE_NAME));
+	while ($host = $DB->fetch()->get())
+	{
+		$allImageID[$host['hostImage']] = $host['hostOS'];
+	}
+
+	// Iterate imageID's -> Update Image setting new osID -> Save
+	foreach ($allImageID AS $imageID => $osID)
+	{
+		$Image = new Image($imageID);
+		if (!$Image->set('osID', $osID)->save())
+		{
+			$errors[] = sprintf('<div>Failed updating the osID of imageID: imageID: %s, osID: %s</div>', $imageID, $osID);
+		}
+	}
+	
+	// Return true on succes, (string) on error
+	return (count($errors) ? implode('', $errors) : true);
+};
+$dbSchema[218] = "UPDATE `" . DATABASE_NAME . "`.`schemaVersion` set vValue = '29'";
+
 
 
 
@@ -1122,9 +1153,19 @@ $dbSchema[216] = "UPDATE `" . DATABASE_NAME . "`.`schemaVersion` set vValue = '2
 								for( $i = 0; $i < count( $queryArray ); $i++ )
 								{
 									$sql = $dbSchema[$queryArray[$i]];
-									if ( ! $DB->query($sql)->queryResult() )
+									
+									if (is_callable($sql))
 									{
-										$errors[] = sprintf('<p><b>Update ID:</b> %s</p><p><b>Database Error:</b> <pre>%s</pre></p><p><b>Database SQL:</b> <pre>%s</pre></p><hr />', "$currentSchema - $i", $DB->error(), $sql);
+										$result = $sql();
+										
+										if (is_string($result))
+										{
+											$errors[] = sprintf('<p><b>Update ID:</b> %s</p><p><b>Function Error:</b> <pre>%s</pre></p><p><b>Function:</b> <pre>%s</pre></p>', "$currentSchema - $i", $result, print_r($sql, 1));
+										}
+									}
+									else if (!$DB->query($sql)->queryResult())
+									{
+										$errors[] = sprintf('<p><b>Update ID:</b> %s</p><p><b>Database Error:</b> <pre>%s</pre></p><p><b>Database SQL:</b> <pre>%s</pre></p>', "$currentSchema - $i", $DB->error(), $sql);
 									}
 								}
 								$currentSchema++;
@@ -1143,7 +1184,7 @@ $dbSchema[216] = "UPDATE `" . DATABASE_NAME . "`.`schemaVersion` set vValue = '2
 							if (count($errors))
 							{
 								printf('<h2>%s</h2>', _('The following errors occured'));
-								print implode("\n", $errors);
+								print implode("\n<hr />\n", $errors);
 							}
 						}
 						else
