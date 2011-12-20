@@ -72,8 +72,6 @@ class HostManager extends FOGManagerController
 
 	const UPDATE_ALL = 7;
 
-	protected $db;
-
 	public static function parseMacList( $stringlist )
 	{
 		if ( $stringlist != null && strlen( $stringlist ) > 0 )
@@ -104,7 +102,7 @@ class HostManager extends FOGManagerController
 
 	public function addMACToPendingForHost( $host, $mac )
 	{
-		if ( $this->db != null && $host != null && $mac != null && $mac->isValid() )
+		if ( $this->DB != null && $host != null && $mac != null && $mac->isValid() )
 		{
 			// make sure it doesn't exist in the pending table
 			$macs = $this->getPendingMacAddressesForHost( $host );
@@ -124,24 +122,24 @@ class HostManager extends FOGManagerController
 			$sql = "INSERT INTO
 					pendingMACS (pmAddress, pmHostID)
 				VALUES
-					('" . $this->db->sanitize((String)$mac) . "', '" . $this->db->sanitize($host->getID()) . "')";
-			return $this->db->query($sql)->affected_rows() == 1;
+					('" . $this->DB->sanitize((String)$mac) . "', '" . $this->DB->sanitize($host->getID()) . "')";
+			return $this->DB->query($sql)->affected_rows() == 1;
 		}
 		return false;
 	}
 
 	public function deletePendingMacAddressForHost( $host, $mac )
 	{
-		if ( $this->db != null && $host != null && $mac != null && $mac->isValid() )
+		if ( $this->DB != null && $host != null && $mac != null && $mac->isValid() )
 		{
 			$sql = "DELETE
 				FROM 
 					pendingMACS 
 				WHERE
-					pmHostID = '" . $this->db->sanitize($host->getID()) . "' AND
-					pmAddress = '" . $this->db->sanitize($mac->getMACWithColon()) . "'";
+					pmHostID = '" . $this->DB->sanitize($host->getID()) . "' AND
+					pmAddress = '" . $this->DB->sanitize($mac->getMACWithColon()) . "'";
 
-			return $this->db->query($sql)->affected_rows() > 0;
+			return $this->DB->query($sql)->affected_rows() > 0;
 		
 		}
 		return false;
@@ -149,7 +147,7 @@ class HostManager extends FOGManagerController
 
 	public function getAllHostsWithPendingMacs()
 	{
-		if ( $this->db != null )
+		if ( $this->DB != null )
 		{
 			$sql = "SELECT 
 					pmHostID
@@ -158,9 +156,9 @@ class HostManager extends FOGManagerController
 					
 			$arHostsIds = array();	
 			
-			if ( $this->db->query($sql) )
+			if ( $this->DB->query($sql) )
 			{
-				while( $ar = $this->db->fetch()->get() )
+				while( $ar = $this->DB->fetch()->get() )
 				{
 					$arHostsIds[] = $ar["pmHostID"];
 				}	
@@ -181,20 +179,20 @@ class HostManager extends FOGManagerController
 
 	public function getPendingMacAddressesForHost( $host )
 	{
-		if ( $this->db != null && $host != null  )
+		if ( $this->DB != null && $host != null  )
 		{
 			$sql = "SELECT
 					pmAddress 
 				FROM 
 					pendingMACS 
 				WHERE
-					pmHostID = '" . $this->db->sanitize($host->getID()) . "'
+					pmHostID = '" . $this->DB->sanitize($host->getID()) . "'
 				GROUP BY
 					pmAddress";
-			if ( $this->db->query($sql) )
+			if ( $this->DB->query($sql) )
 			{
 				$arMacs = array();
-				while( $ar = $this->db->fetch()->get() )
+				while( $ar = $this->DB->fetch()->get() )
 				{
 					 $mac = new MACAddress($ar["pmAddress"]);
 					 if ( $mac->isValid() )
@@ -208,19 +206,19 @@ class HostManager extends FOGManagerController
 
 	public function getHostByMacAddress($mac, $primaryOnly = false)
 	{
-		if ( $this->db != null && $mac != null && $mac->isValid() )
+		if ( $this->DB != null && $mac != null && $mac->isValid() )
 		{
 			$sql = "SELECT
 					* 
 				FROM 
 					hosts 
 				WHERE
-					hostMAC = '" . $this->db->sanitize($mac->getMACWithColon()) . "'";
+					hostMAC = '" . $this->DB->sanitize($mac->getMACWithColon()) . "'";
 			
 			
-			if ( $this->db->query($sql) )
+			if ( $this->DB->query($sql) )
 			{
-				while( $ar = $this->db->fetch()->get() )
+				while( $ar = $this->DB->fetch()->get() )
 				{
 					return new Host($ar);
 				}
@@ -233,11 +231,11 @@ class HostManager extends FOGManagerController
 					FROM 
 						hostMAC 
 					WHERE
-						hmMAC = '" . $this->db->sanitize($mac->getMACWithColon()) . "'";
+						hmMAC = '" . $this->DB->sanitize($mac->getMACWithColon()) . "'";
 					
-				if ( $this->db->query($sql) )
+				if ( $this->DB->query($sql) )
 				{
-					while( $ar = $this->db->fetch()->get() )
+					while( $ar = $this->DB->fetch()->get() )
 					{
 						return new Host($ar);
 					}		
@@ -326,18 +324,18 @@ class HostManager extends FOGManagerController
 	
 	public function isServiceModuleEnabledForHost( $host, $modKey )
 	{
-		if ( $this->db != null && $host != null && $modKey != null )
+		if ( $this->DB != null && $host != null && $modKey != null )
 		{
 			$sql = "SELECT 
 					msState 
 				FROM
 					moduleStatusByHost
 				WHERE
-					msHostID = '" . $this->db->sanitize( $host->getID() ) . "' and
-					msModuleID = '" . $this->db->sanitize( $modKey ) . "'";
-			if ( $this->db->query($sql) )
+					msHostID = '" . $this->DB->sanitize( $host->getID() ) . "' and
+					msModuleID = '" . $this->DB->sanitize( $modKey ) . "'";
+			if ( $this->DB->query($sql) )
 			{
-				while( $ar = $this->db->fetch()->get() )
+				while( $ar = $this->DB->fetch()->get() )
 				{
 					if ( $ar["msState"] == "0" ) return false;
 				}
@@ -350,7 +348,7 @@ class HostManager extends FOGManagerController
 	
 	public function deleteHost( $id )
 	{
-		if ( $this->db == null )
+		if ( $this->DB == null )
 			throw new Exception( _("Database connection is null.") );
 		
 		if ( $id == null )
@@ -361,25 +359,25 @@ class HostManager extends FOGManagerController
 			
 		// clean up potential orphans
 		// Clean up printers
-		$this->db->query( "DELETE FROM printerAssoc WHERE paHostID = '" . $this->db->sanitize($id) . "'" );		
+		$this->DB->query( "DELETE FROM printerAssoc WHERE paHostID = '" . $this->DB->sanitize($id) . "'" );		
 		// clean up inventory
-		$this->db->query( "DELETE FROM inventory WHERE iHostID = '" . $this->db->sanitize($id) . "'" );		
+		$this->DB->query( "DELETE FROM inventory WHERE iHostID = '" . $this->DB->sanitize($id) . "'" );		
 		// clean up pending mac addresses
-		$this->db->query( "DELETE FROM pendingMACS WHERE pmHostID = '" . $this->db->sanitize($id) . "'" );		
+		$this->DB->query( "DELETE FROM pendingMACS WHERE pmHostID = '" . $this->DB->sanitize($id) . "'" );		
 		// clean assoc macs
-		$this->db->query( "DELETE FROM hostMAC WHERE hmHostID = '" . $this->db->sanitize($id) . "'" );
+		$this->DB->query( "DELETE FROM hostMAC WHERE hmHostID = '" . $this->DB->sanitize($id) . "'" );
 		// clean up associated snapins
-		$this->db->query( "DELETE FROM snapinAssoc WHERE saHostID = '" . $this->db->sanitize($id) . "'" );
+		$this->DB->query( "DELETE FROM snapinAssoc WHERE saHostID = '" . $this->DB->sanitize($id) . "'" );
 		
 		
 		// finally remove the host object
-		return $this->db->query( "DELETE FROM hosts WHERE hostID = '" . $this->db->sanitize($id) . "'" ) == 1;
+		return $this->DB->query( "DELETE FROM hosts WHERE hostID = '" . $this->DB->sanitize($id) . "'" ) == 1;
 	}
 	
 	// Adds a new host to the database
 	public function addHost( $host, $user=null )
 	{
-		if ( $this->db == null )
+		if ( $this->DB == null )
 			throw new Exception( _("Database connection is null.") );
 		
 		if ( $host == null )
@@ -394,23 +392,23 @@ class HostManager extends FOGManagerController
 		if ( $host->isHostnameSafe() )
 		{
 			$sql = "insert into hosts(hostMAC, hostIP, hostName, hostDesc, hostCreateDate, hostImage, hostCreateBy, hostOS, hostUseAD, hostADDomain, hostADOU, hostADUser, hostADPass, hostKernelArgs, hostKernel, hostDevice) 
-					  values('" . $this->db->sanitize($host->get('mac')->getMACWithColon() ) . "',
-					  	 '" . $this->db->sanitize($host->getIPAddress() ) . "', 
-					  	 '" . $this->db->sanitize($host->getHostname() ) . "', 
-					  	 '" . $this->db->sanitize($host->getDescription() ) . "', 
+					  values('" . $this->DB->sanitize($host->get('mac')->getMACWithColon() ) . "',
+					  	 '" . $this->DB->sanitize($host->getIPAddress() ) . "', 
+					  	 '" . $this->DB->sanitize($host->getHostname() ) . "', 
+					  	 '" . $this->DB->sanitize($host->getDescription() ) . "', 
 					  	 NOW(), 
-					  	 '" . $this->db->sanitize($host->getImage() != null ? $host->getImage()->getID() : '' ) . "', 
-					  	 '" . $this->db->sanitize($user != null ? $user->get('name') : '' ) . "', 
-					  	 '" . $this->db->sanitize($host->getOS()) . "', 
-					  	 '" . $this->db->sanitize($host->usesAD() ? '1' : '0') . "', 
-					  	 '" . $this->db->sanitize($host->getDomain()) . "', 
-					  	 '" . $this->db->sanitize($host->getOU()) . "', 
-					  	 '" . $this->db->sanitize($host->getUser()) . "', 
-					  	 '" . $this->db->sanitize($host->getPassword()) . "', 
-					  	 '" . $this->db->sanitize($host->getKernelArgs()) . "', 
-					  	 '" . $this->db->sanitize($host->getKernel()) . "', 
-					  	 '" . $this->db->sanitize($host->getDiskDevice()) . "' )";
-			return $this->db->query($sql)->affected_rows() == 1;
+					  	 '" . $this->DB->sanitize($host->getImage() != null ? $host->getImage()->getID() : '' ) . "', 
+					  	 '" . $this->DB->sanitize($user != null ? $user->get('name') : '' ) . "', 
+					  	 '" . $this->DB->sanitize($host->getOS()) . "', 
+					  	 '" . $this->DB->sanitize($host->usesAD() ? '1' : '0') . "', 
+					  	 '" . $this->DB->sanitize($host->getDomain()) . "', 
+					  	 '" . $this->DB->sanitize($host->getOU()) . "', 
+					  	 '" . $this->DB->sanitize($host->getUser()) . "', 
+					  	 '" . $this->DB->sanitize($host->getPassword()) . "', 
+					  	 '" . $this->DB->sanitize($host->getKernelArgs()) . "', 
+					  	 '" . $this->DB->sanitize($host->getKernel()) . "', 
+					  	 '" . $this->DB->sanitize($host->getDiskDevice()) . "' )";
+			return $this->DB->query($sql)->affected_rows() == 1;
 		}
 		else
 			throw new Exception( _("Invalid hostname.") );			
@@ -420,7 +418,7 @@ class HostManager extends FOGManagerController
 	// function either returns true or throws an exception
 	public function updateHost( $host, $flags )
 	{
-		if ( $this->db != null && $host != null )
+		if ( $this->DB != null && $host != null )
 		{
 			if ( ( self::UPDATE_GENERAL & $flags ) == 1 )
 			{
@@ -444,7 +442,7 @@ class HostManager extends FOGManagerController
 	{
 		try
 		{
-			if ( $this->db == null )
+			if ( $this->DB == null )
 			{
 				throw new Exception(_("No Database Connection"));
 			}
@@ -489,24 +487,24 @@ class HostManager extends FOGManagerController
 			$sql = "UPDATE 
 					hosts 
 				SET 
-					hostKernel = '" . $this->db->sanitize( $host->getKernel() ) . "', 
-					hostDevice = '" . $this->db->sanitize( $host->getDiskDevice() ) . "', 
-					hostKernelArgs = '" . $this->db->sanitize( $host->getKernelArgs() ) . "', 
-					hostMAC = '" . $this->db->sanitize( $host->get('mac')->getMACWithColon() ) . "', 
-					hostIP = '" . $this->db->sanitize( $host->getIPAddress() ) . "', 
-					hostOS = '" . $this->db->sanitize( $host->getOS() ) . "', 
-					hostName = '" . $this->db->sanitize( $host->getHostname() ) . "', 
-					hostDesc = '" . $this->db->sanitize( $host->getDescription() ) . "', 
-					hostImage = '" . $this->db->sanitize( $imageID ) . "' 
+					hostKernel = '" . $this->DB->sanitize( $host->getKernel() ) . "', 
+					hostDevice = '" . $this->DB->sanitize( $host->getDiskDevice() ) . "', 
+					hostKernelArgs = '" . $this->DB->sanitize( $host->getKernelArgs() ) . "', 
+					hostMAC = '" . $this->DB->sanitize( $host->get('mac')->getMACWithColon() ) . "', 
+					hostIP = '" . $this->DB->sanitize( $host->getIPAddress() ) . "', 
+					hostOS = '" . $this->DB->sanitize( $host->getOS() ) . "', 
+					hostName = '" . $this->DB->sanitize( $host->getHostname() ) . "', 
+					hostDesc = '" . $this->DB->sanitize( $host->getDescription() ) . "', 
+					hostImage = '" . $this->DB->sanitize( $imageID ) . "' 
 				WHERE 
-					hostID = '" . $this->db->sanitize( $host->getID() ) . "'";
+					hostID = '" . $this->DB->sanitize( $host->getID() ) . "'";
 			
-			$this->db->query($sql)->affected_rows();
+			$this->DB->query($sql)->affected_rows();
 			
 			// update the additional mac addresses
-			$sql = "DELETE FROM hostMAC where hmHostID = '" . $this->db->sanitize( $host->getID() ) . "'";
+			$sql = "DELETE FROM hostMAC where hmHostID = '" . $this->DB->sanitize( $host->getID() ) . "'";
 
-			$this->db->query($sql)->affected_rows();
+			$this->DB->query($sql)->affected_rows();
 			
 			$addMacs = $host->get('additionalMACs');
 			if ( $addMacs != null )
@@ -519,8 +517,8 @@ class HostManager extends FOGManagerController
 					{
 						if ( ! $this->doesHostExistWithMac( $curMac ) )
 						{
-							$sql = "INSERT INTO hostMAC (hmHostID, hmMAC) VALUES('" . $this->db->sanitize( $host->getID() ) . "','" . $this->db->sanitize( $curMac->getMACWithColon() ) . "')";
-							if ( $this->db->query($sql)->affected_rows() != 1 )
+							$sql = "INSERT INTO hostMAC (hmHostID, hmMAC) VALUES('" . $this->DB->sanitize( $host->getID() ) . "','" . $this->DB->sanitize( $curMac->getMACWithColon() ) . "')";
+							if ( $this->DB->query($sql)->affected_rows() != 1 )
 								$exception = new Exception( "Error adding additional MAC address: " . $curMac->getMACWithColon() );
 						}
 						else

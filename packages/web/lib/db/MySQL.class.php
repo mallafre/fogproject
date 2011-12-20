@@ -13,6 +13,7 @@ class MySQL
 	public $ROW_BOTH = 3;	// MYSQL_BOTH
 	
 	public $debug = false;
+	public $info = false;
 	
 	function __construct($host, $user, $pass, $db = '')
 	{
@@ -37,7 +38,7 @@ class MySQL
 		}
 		catch (Exception $e)
 		{
-			$this->debug(sprintf('Could not %s(): %s', __FUNCTION__, $e->getMessage()));
+			FOGCore::error(sprintf('Failed to %s: %s', __FUNCTION__, $e->getMessage()));
 		}
 	}
 	
@@ -57,7 +58,7 @@ class MySQL
 		}
 		catch (Exception $e)
 		{
-			$this->debug(sprintf('Could not %s(): %s', __FUNCTION__, $e->getMessage()));
+			FOGCore::debug(sprintf('Failed to %s: %s', __FUNCTION__, $e->getMessage()));
 		}
 	}
 	
@@ -87,7 +88,7 @@ class MySQL
 		}
 		catch (Exception $e)
 		{
-			$this->debug(sprintf('Could not %s(): %s', __FUNCTION__, $e->getMessage()));
+			FOGCore::debug(sprintf('Failed to %s: %s', __FUNCTION__, $e->getMessage()));
 		}
 		
 		return $this;
@@ -111,14 +112,14 @@ class MySQL
 			
 			// Query
 			$this->query = $sql;
-			$this->queryResult = mysql_query($this->query, $this->link) or $this->debug($this->error(), $this->query);
+			$this->queryResult = mysql_query($this->query, $this->link) or FOGCore::debug($this->error(), $this->query);
 			
 			// INFO
-			$this->info($this->query);
+			FOGCore::info($this->query);
 		}
 		catch (Exception $e)
 		{
-			$this->debug(sprintf('Could not %s(): %s', __FUNCTION__, $e->getMessage()));
+			FOGCore::debug(sprintf('Failed to %s: %s', __FUNCTION__, $e->getMessage()));
 		}
 		
 		return $this;
@@ -153,7 +154,7 @@ class MySQL
 		}
 		catch (Exception $e)
 		{
-			$this->debug(sprintf('Could not %s(): %s', __FUNCTION__, $e->getMessage()));
+			FOGCore::debug(sprintf('Failed to %s: %s', __FUNCTION__, $e->getMessage()));
 		}
 		
 		//return false;
@@ -188,7 +189,7 @@ class MySQL
 		}
 		catch (Exception $e)
 		{
-			$this->debug(sprintf('Could not %s(): %s', __FUNCTION__, $e->getMessage()));
+			FOGCore::debug(sprintf('Failed to %s: %s', __FUNCTION__, $e->getMessage()));
 		}
 		
 		return false;
@@ -207,7 +208,7 @@ class MySQL
 		}
 		catch (Exception $e)
 		{
-			$this->debug(sprintf('Could not %s(): %s', __FUNCTION__, $e->getMessage()));
+			FOGCore::debug(sprintf('Failed to %s: %s', __FUNCTION__, $e->getMessage()));
 		}
 		
 		return $this;
@@ -245,7 +246,7 @@ class MySQL
 		}
 		catch (Exception $e)
 		{
-			$this->debug(sprintf('Could not %s(): %s', __FUNCTION__, $e->getMessage()));
+			FOGCore::debug(sprintf('Failed to %s: %s', __FUNCTION__, $e->getMessage()));
 		}
 		
 		return 0;
@@ -297,23 +298,5 @@ class MySQL
 	public function getLink()
 	{
 		return $this->link;
-	}
-	
-	// Error
-	private function debug($txt, $data = array())
-	{
-		if ($this->debug)
-		{
-			$GLOBALS['FOGCore']->error('%s: %s', array(get_class($this), (count($data) ? vsprintf($txt, $data) : $txt)));
-		}
-	}
-	
-	// Info
-	private function info($txt, $data = array())
-	{
-		if ($this->debug)
-		{
-			$GLOBALS['FOGCore']->info('%s: %s', array(get_class($this), (count($data) ? vsprintf($txt, $data) : $txt)));
-		}
 	}
 }

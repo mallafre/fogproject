@@ -4,6 +4,9 @@
 class MACAddress
 {
 	private $MAC;
+	
+	public $debug = false;
+	public $info = false;
 
 	public function __construct($MAC)
 	{
@@ -42,7 +45,10 @@ class MACAddress
 		}
 		catch (Exception $e)
 		{
-			$GLOBALS['FOGCore']->error('Invalid MAC Address: MAC: %s', $MAC);
+			if ($this->debug)
+			{
+				$GLOBALS['FOGCore']->debug('Invalid MAC Address: MAC: %s', $MAC);
+			}
 		}
 		
 		return $this;

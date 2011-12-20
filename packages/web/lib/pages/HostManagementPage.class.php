@@ -253,13 +253,13 @@ class HostManagementPage extends FOGPage
 						<h2><?php print _("Basic Imaging Tasks"); ?></h2>
 						<table cellpadding="0" cellspacing="0" border="0" width="100%">
 							<tr>
-								<td class="c" width="50"><a href="?node=tasks&type=host&direction=down&noconfirm=<?php echo $id; ?>"><img src="./images/senddebug.png" /><p><?php echo(_("Deploy")); ?></p></a></td>
+								<td class="c" width="50"><a href="?node=tasks&type=host&direction=down&noconfirm=<?php echo $Host->get('id'); ?>"><img src="./images/senddebug.png" /><p><?php echo(_("Deploy")); ?></p></a></td>
 								<td><p><?php echo(_("Deploy action will send an image saved on the FOG server to the client computer with all included snapins.")); ?></p></td></tr>
 							<tr>
-								<td class="c" width="50"><a href="?node=tasks&type=host&direction=up&noconfirm=<?php echo $id; ?>"><img src="./images/restoredebug.png" /><p><?php echo(_("Upload")); ?></p></a></td>
+								<td class="c" width="50"><a href="?node=tasks&type=host&direction=up&noconfirm=<?php echo $Host->get('id'); ?>"><img src="./images/restoredebug.png" /><p><?php echo(_("Upload")); ?></p></a></td>
 								<td><p><?php echo(_("Upload will pull an image from a client computer that will be saved on the server.")); ?></p></td></tr>
 							<tr>
-								<td class="c" width="50"><a href="?node=tasks&sub=advanced&hostid=<?php echo $id; ?>"><img src="./images/host-advanced.png" /><p><?php echo(_("Advanced")); ?></p></a></td>
+								<td class="c" width="50"><a href="?node=tasks&sub=advanced&hostid=<?php echo $Host->get('id'); ?>"><img src="./images/host-advanced.png" /><p><?php echo(_("Advanced")); ?></p></a></td>
 								<td><p><?php echo(_("View advanced tasks for this host.")); ?></p></td>
 							</tr>
 						</table>
@@ -296,41 +296,55 @@ class HostManagementPage extends FOGPage
 						</p>
 						
 						<table cellpadding=0 cellspacing=0 border=0 width=100%>
-								<tr class="header"><td>&nbsp;<b><?php print _("Default"); ?></b></td><td>&nbsp;<b><?php print _("Printer Alias"); ?></b></td><td>&nbsp;<b><?php print _("Printer Model"); ?></b></td><td><b><?php print _("Remove"); ?></b></td></tr>
-						<?php
-						// TODO: Complete
-						/*
-								$sql = "SELECT 
-										* 
-									FROM 
-										printerAssoc
-										inner join printers on ( printerAssoc.paPrinterID = printers.pID )
-									WHERE
-										printerAssoc.paHostID = '$id'
-									ORDER BY
-										printers.pAlias";
-								$res = mysql_query( $sql ) or die( mysql_error() );
-								if ( mysql_num_rows( $res ) > 0 )
-								{
-									$i = 0;
-									while ( $ar = mysql_fetch_array( $res ) )
-									{
-										$bgcolor = "alt1";
-										if ( $i++ % 2 == 0 ) $bgcolor = "alt2";
-										
-										$default = "<a href="?node=$_GET[node]&sub=$_GET[sub]&id=$_GET[id]&default=$ar[paID]"><img src=\<?php print /images/no.png" class="noBorder" /></a>";
-										if ( $ar["paIsDefault"] == "1" )
-											$default = "<img src=\<?php print /images/yes.png" class="noBorder" />";
-										
-										<tr class="$bgcolor"><td>&nbsp;<?php print $default; ?></td><td>&nbsp;<?php print trimString( $ar["pAlias"], 30 ); ?></td><td>&nbsp;<?php print trimString( $ar["pModel"], 30 ); ?></td><td><a href="?node=$_GET[node]&sub=$_GET[sub]&id=<?php print $id; ?>&dellinkid=<?php print $ar["paID"]; ?>"><img src="images/deleteSmall.png" class="link" /></a></td></tr>
-									}
-								}
-								else
-								{
-									<tr><td colspan="4" class="c"><?php print _("No printers linked to this host; ?>); ?></td></tr>
-								}
-						*/
-						?>
+							<thead>
+								<tr class="header">
+									<td>&nbsp;<b><?php print _("Default"); ?></b></td>
+									<td>&nbsp;<b><?php print _("Printer Alias"); ?></b></td>
+									<td>&nbsp;<b><?php print _("Printer Model"); ?></b></td>
+									<td><b><?php print _("Remove"); ?></b></td>
+								</tr>
+							</thead>
+							<tbody>
+								<?php
+								
+								var_dump($Host->get('printers'));
+								var_dump($Host->get('printers'));
+								
+								
+								// TODO: Complete
+								/*
+										$sql = "SELECT 
+												* 
+											FROM 
+												printerAssoc
+												inner join printers on ( printerAssoc.paPrinterID = printers.pID )
+											WHERE
+												printerAssoc.paHostID = '$id'
+											ORDER BY
+												printers.pAlias";
+										$res = mysql_query( $sql ) or die( mysql_error() );
+										if ( mysql_num_rows( $res ) > 0 )
+										{
+											$i = 0;
+											while ( $ar = mysql_fetch_array( $res ) )
+											{
+												$bgcolor = "alt1";
+												if ( $i++ % 2 == 0 ) $bgcolor = "alt2";
+												
+												$default = "<a href="?node=$_GET[node]&sub=$_GET[sub]&id=$_GET[id]&default=$ar[paID]"><img src=\<?php print /images/no.png" class="noBorder" /></a>";
+												if ( $ar["paIsDefault"] == "1" )
+													$default = "<img src=\<?php print /images/yes.png" class="noBorder" />";
+												
+												<tr class="$bgcolor"><td>&nbsp;<?php print $default; ?></td><td>&nbsp;<?php print trimString( $ar["pAlias"], 30 ); ?></td><td>&nbsp;<?php print trimString( $ar["pModel"], 30 ); ?></td><td><a href="?node=$_GET[node]&sub=$_GET[sub]&id=<?php print $id; ?>&dellinkid=<?php print $ar["paID"]; ?>"><img src="images/deleteSmall.png" class="link" /></a></td></tr>
+											}
+										}
+										else
+										{
+											<tr><td colspan="4" class="c"><?php print _("No printers linked to this host; ?>); ?></td></tr>
+										}
+								*/
+								?>
+							</tbody>
 						</table>			
 						
 						<br /><br />

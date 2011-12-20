@@ -1,7 +1,7 @@
 <?php
 
 // Blackout - 10:02 AM 25/09/2011
-abstract class FOGManagerController
+abstract class FOGManagerController extends FOGBase
 {
 	// Table
 	public $databaseTable = '';
@@ -9,14 +9,8 @@ abstract class FOGManagerController
 	// Search query
 	public $searchQuery = '';
 	
-	// DEBUG mode - print all Errors & SQL queries
-	protected $debug = true;	
-	
-	// FOG Database Class
-	protected $db;
-	
-	// FOG Core Class
-	protected $FOGCore;
+	// DEBUG mode - print all debug messages
+	public $debug = true;
 	
 	// Child class name variables
 	protected $childClass;
@@ -26,10 +20,9 @@ abstract class FOGManagerController
 	// Construct
 	public function __construct()
 	{
-		// Legacy
-		$this->db = $GLOBALS['db'];
-		$this->FOGCore = $GLOBALS['FOGCore'];
-	
+		// FOGBase contstructor
+		parent::__construct();
+		
 		// Set child classes name
 		$this->childClass = preg_replace('#Manager$#', '', get_class($this));
 		
@@ -62,8 +55,8 @@ abstract class FOGManagerController
 			$query = preg_replace(array('#\$\{keyword\}#'), array($keyword), $this->searchQuery);
 			
 			// Execute query -> Build new object -> Push into data array
-			$allSearchResults = $this->db->query($query);
-			while ($searchResult = $this->db->fetch()->get())
+			$allSearchResults = $this->DB->query($query);
+			while ($searchResult = $this->DB->fetch()->get())
 			{
 				$data[] = new $this->childClass($searchResult);
 			}
@@ -73,7 +66,7 @@ abstract class FOGManagerController
 		}
 		catch (Exception $e)
 		{
-			$this->error('Search failed! Class: %s, Error: %s', array(get_class($this), $e->getMessage()));
+			$this->debug('Search failed! Class: %s, Error: %s', array(get_class($this), $e->getMessage()));
 		}
 		
 		return false;
@@ -105,14 +98,14 @@ abstract class FOGManagerController
 			}
 
 			// Select all
-			$this->db->query("SELECT * FROM `%s`%s ORDER BY `%s` %s", array(
+			$this->DB->query("SELECT * FROM `%s`%s ORDER BY `%s` %s", array(
 				$this->databaseTable,
 				(count($whereArray) ? ' WHERE ' . implode(' ' . $whereOperator . ' ', $whereArray) : ''),
 				$this->databaseFields[$orderBy],
 				$sort
 			));
 			
-			while ($row = $this->db->fetch()->get())
+			while ($row = $this->DB->fetch()->get())
 			{
 				//$data[] = $row;
 				$data[] = new $this->childClass($row);
@@ -123,7 +116,7 @@ abstract class FOGManagerController
 		}
 		catch (Exception $e)
 		{
-			$this->error('Find all failed! Class: %s, Error: %s', array(get_class($this), $e->getMessage()));
+			$this->debug('Find all failed! Class: %s, Error: %s', array(get_class($this), $e->getMessage()));
 		}
 		
 		return false;
@@ -136,7 +129,7 @@ abstract class FOGManagerController
 		{
 			$elementName = strtolower($this->childClass);
 		}
-	
+		
 		foreach ($this->find() AS $Object)
 		{
 			$listArray[] = sprintf('<option value="%s"%s>[%s] %s</option>', $Object->get('id'), ($matchID == $Object->get('id') ? ' selected="selected"' : ''), $Object->get('id'), $Object->get('name'));
@@ -148,7 +141,7 @@ abstract class FOGManagerController
 	// TODO: Read DB fields from child class
 	function exists($name, $id = 0)
 	{
-		$this->db->query("SELECT COUNT(%s) AS total FROM `%s` WHERE `%s` = '%s' AND `%s` <> '%s'", 
+		$this->DB->query("SELECT COUNT(%s) AS total FROM `%s` WHERE `%s` = '%s' AND `%s` <> '%s'", 
 			array(	
 				$this->databaseFields['id'],
 				$this->databaseTable,
@@ -159,7 +152,7 @@ abstract class FOGManagerController
 			)
 		);
 		
-		return ($this->db->fetch()->get('total') ? true : false);
+		return ($this->DB->fetch()->get('total') ? true : false);
 	}
 	
 	// Key
@@ -179,22 +172,5 @@ abstract class FOGManagerController
 		*/
 		
 		return $key;
-	}
-	
-	// Error
-	protected function error($txt, $data = array())
-	{
-		if ($this->debug)
-		{
-			$this->FOGCore->error('%s: %s', array(get_class($this), (count($data) ? vsprintf($txt, $data) : $txt)));
-		}
-	}
-	// Info
-	protected function info($txt, $data = array())
-	{
-		if ($this->debug)
-		{
-			$this->FOGCore->info('%s: %s', array(get_class($this), (count($data) ? vsprintf($txt, $data) : $txt)));
-		}
 	}
 }

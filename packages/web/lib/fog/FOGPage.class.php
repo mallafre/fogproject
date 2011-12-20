@@ -1,7 +1,7 @@
 <?php
 
 // Blackout - 12:38 PM 25/09/2011
-abstract class FOGPage
+abstract class FOGPage extends FOGBase
 {
 	// Name
 	public $name = '';
@@ -25,6 +25,9 @@ abstract class FOGPage
 		
 	);
 	
+	// Debug
+	public $debug = true;
+	
 	// Variables
 	// Page title
 	public $titleDisplay = true;
@@ -45,20 +48,11 @@ abstract class FOGPage
 	protected $request = array();
 	protected $formAction;
 	
-	// FOG Class Variables
-	protected $db;
-	protected $FOGCore;
-	protected $HookManager;
-	protected $FOGUser;
-	
 	// __construct
 	public function __construct($name = '')
 	{
-		// Setup Classes
-		$this->db = $GLOBALS['db'];
-		$this->FOGCore = $GLOBALS['FOGCore'];
-		$this->HookManager = $GLOBALS['HookManager'];
-		$this->FOGUser = $GLOBALS['currentUser'];
+		// FOGBase contstructor
+		parent::__construct();
 		
 		// Set name
 		if (!empty($name))

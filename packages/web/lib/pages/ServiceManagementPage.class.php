@@ -112,11 +112,11 @@ class ServiceManagementPage extends FOGPage
 						<tr class="header"><td><b><?php print _("Path"); ?></b></td><td><b><?php print _("Remove"); ?></b></td></tr>
 						<?php
 						
-						$this->db->query('SELECT * FROM dirCleaner ORDER BY dcID');
+						$this->DB->query('SELECT * FROM dirCleaner ORDER BY dcID');
 						
-						if ($this->db->num_rows())
+						if ($this->DB->num_rows())
 						{
-							while ($row = $this->db->fetch()->get())
+							while ($row = $this->DB->fetch()->get())
 							{
 								printf('<tr%s><td>%s</td><td><a href="%s"><span class="icon icon-kill"></span></a></td></tr>',
 									(++$i % 2 ? ' class="alt"' : ''),
@@ -188,11 +188,11 @@ class ServiceManagementPage extends FOGPage
 						<tr class="header"><td><b><?php print _("Time"); ?></b></td><td><b><?php print _("Action"); ?></b></td><td><b><?php print _("Remove"); ?></b></td></tr>
 						<?php
 					
-						$this->db->query('SELECT * FROM greenFog order by gfHour, gfMin');
+						$this->DB->query('SELECT * FROM greenFog order by gfHour, gfMin');
 						
-						if ($this->db->num_rows())
+						if ($this->DB->num_rows())
 						{
-							while ($row = $this->db->fetch()->get())
+							while ($row = $this->DB->fetch()->get())
 							{
 								printf('<tr%s><td>%s:%s</td><td>%s</td><td><a href="%s"><span class="icon icon-kill"></span></a></td></tr>',
 									(++$i % 2 ? ' class="alt"' : ''),
@@ -331,11 +331,11 @@ class ServiceManagementPage extends FOGPage
 						<tr class="header"><td><b>User</b></td><td><b><?php print _("Remove"); ?></b></td></tr>
 						<?php
 						
-						$this->db->query('SELECT * FROM userCleanup ORDER BY ucID');
+						$this->DB->query('SELECT * FROM userCleanup ORDER BY ucID');
 						
-						if ($this->db->num_rows())
+						if ($this->DB->num_rows())
 						{
-							while ($row = $this->db->fetch()->get())
+							while ($row = $this->DB->fetch()->get())
 							{
 								printf('<tr%s><td>%s</td><td><a href="%s"><span class="icon icon-kill"></span></a></td></tr>',
 									(++$i % 2 ? ' class="alt"' : ''),

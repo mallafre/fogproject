@@ -35,7 +35,8 @@ class Host extends FOGController
 		'additionalMACs',
 		'groups',
 		'primayGroup',
-		'primayGroupID'
+		'primayGroupID',
+		'printers'
 	);
 	
 	// Required database fields
@@ -61,7 +62,33 @@ class Host extends FOGController
 		return new OS($this->get('osID'));
 	}
 	
+	public function getPrinters()
+	{
+		return $this->get('printers');
+	}
+	
 	// Overrides
+	public function get($key)
+	{
+		// Printers
+		if ($this->key($key) == 'printers' && !$this->isLoaded('printers'))
+		{
+			if ($this->get('id'))
+			{
+				$this->DB->query("SELECT * FROM  printerAssoc inner join printers on ( printerAssoc.paPrinterID = printers.pID ) WHERE printerAssoc.paHostID = '%s' ORDER BY printers.pAlias", $this->get('id'));
+				
+				while ($printer = $this->DB->fetch()->get())
+				{
+					$printers[] = new Printer($printer);
+				}
+			}
+			
+			$this->set('printers', (array)$printers);
+		}
+		
+		return parent::get($key);
+	}
+	
 	public function set($key, $value)
 	{
 		// MAC Address
@@ -93,6 +120,8 @@ class Host extends FOGController
 			$value = new MACAddress($value);
 		}
 		
+		
+		
 		// Add
 		return parent::add($key, $value);
 	}
@@ -103,14 +132,14 @@ class Host extends FOGController
 		parent::save();
 
 		// Remove existing Additional MAC Addresses
-		$this->db->query("DELETE FROM `hostMAC` WHERE `hmHostID`='%s'", array($this->get('id')));
+		$this->DB->query("DELETE FROM `hostMAC` WHERE `hmHostID`='%s'", array($this->get('id')));
 		
 		// Add new Additional MAC Addresses
 		foreach ((array)$this->get('additionalMACs') AS $MAC)
 		{
 			if (($MAC instanceof MACAddress) && $MAC->isValid())
 			{
-				$this->db->query("INSERT INTO `hostMAC` (`hmHostID`, `hmMAC`) VALUES('%s', '%s')", array($this->get('id'), $MAC));
+				$this->DB->query("INSERT INTO `hostMAC` (`hmHostID`, `hmMAC`) VALUES('%s', '%s')", array($this->get('id'), $MAC));
 			}
 		}
 		
@@ -124,8 +153,8 @@ class Host extends FOGController
 		parent::load();
 
 		// Load 'additionalMACs'
-		$this->db->query("SELECT * FROM `hostMAC` WHERE `hmHostID`='%s'", array($this->get('id')));
-		while ($MAC = $this->db->fetch()->get('hmMAC'))
+		$this->DB->query("SELECT * FROM `hostMAC` WHERE `hmHostID`='%s'", array($this->get('id')));
+		while ($MAC = $this->DB->fetch()->get('hmMAC'))
 		{
 			$this->add('additionalMACs', $MAC);
 		}

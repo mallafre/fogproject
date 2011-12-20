@@ -123,7 +123,7 @@ table {}
 table p { line-height: 15px; margin: 2px 0; }
 table td { padding: 2px 5px; }
 table tr.header { color: #ededed; }
-table tr.header td { padding: 4px; border: 0; background: #7386ad; }
+table tr.header td { padding: 8px; border: 0; background: #7386ad; }
 table tr.header td:first-child { border-radius: 3px 0 0 0; }
 table tr.header td:last-child { border-radius: 0 3px 0 0; }
 table tr.header td.toggle { width: 25px; }

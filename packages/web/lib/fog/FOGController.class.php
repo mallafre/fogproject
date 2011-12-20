@@ -1,7 +1,7 @@
 <?php
 
 // Blackout - 1:28 PM 23/09/2011
-abstract class FOGController
+abstract class FOGController extends FOGBase
 {
 	// Table
 	public $databaseTable = '';
@@ -28,18 +28,15 @@ abstract class FOGController
 	public $autoSave = false;
 	
 	// DEBUG mode - print all Errors & SQL queries
-	protected $debug = true;
-	protected $info = false;
-	
-	// FOG Database Class
-	protected $db;
-	
-	// FOG Core Class
-	protected $FOGCore;
+	public $debug = true;
+	public $info = false;
 	
 	// Construct
 	public function __construct($data)
 	{
+		// FOGBase contstructor
+		parent::__construct();
+		
 		try
 		{
 			// Error checking
@@ -50,10 +47,6 @@ abstract class FOGController
 			
 			// Flip database fields and common name - used multiple times
 			$this->databaseFieldsFlipped = array_flip($this->databaseFields);
-			
-			// Database
-			$this->db = $GLOBALS['db'];
-			$this->FOGCore = $GLOBALS['FOGCore'];
 			
 			// Created By
 			if (array_key_exists('createdBy', $this->databaseFields) && !empty($_SESSION['FOG_USER']))
@@ -89,11 +82,8 @@ abstract class FOGController
 		}
 		catch (Exception $e)
 		{
-			$this->error('Create Class Failed: Class: %s, Error: %s', array(get_class($this), $e->getMessage()));
+			$this->debug('Create Class Failed: Class: %s, Error: %s', array(get_class($this), $e->getMessage()));
 		}
-		
-		//var_dump($this);
-		//exit;
 		
 		return $this;
 	}
@@ -127,7 +117,7 @@ abstract class FOGController
 		}
 		catch (Exception $e)
 		{
-			$this->error('Set Failed: Class: %s, Key: %s, Value: %s, Error: %s', array(get_class($this), $key, $value, $e->getMessage()));
+			$this->debug('Set Failed: Class: %s, Key: %s, Value: %s, Error: %s', array(get_class($this), $key, $value, $e->getMessage()));
 		}
 		
 		return $this;
@@ -158,7 +148,7 @@ abstract class FOGController
 		}
 		catch (Exception $e)
 		{
-			$this->error('Add Failed: Class: %s, Key: %s, Value: %s, Error: %s', array(get_class($this), $key, $value, $e->getMessage()));
+			$this->debug('Add Failed: Class: %s, Key: %s, Value: %s, Error: %s', array(get_class($this), $key, $value, $e->getMessage()));
 		}
 		
 		return $this;
@@ -191,7 +181,7 @@ abstract class FOGController
 		}
 		catch (Exception $e)
 		{
-			$this->error('Remove Failed: Class: %s, Key: %s, Object: %s, Error: %s', array(get_class($this), $key, $object, $e->getMessage()));
+			$this->debug('Remove Failed: Class: %s, Key: %s, Object: %s, Error: %s', array(get_class($this), $key, $object, $e->getMessage()));
 		}
 		
 		return $this;
@@ -227,8 +217,8 @@ abstract class FOGController
 			{
 				if ($this->get($name) != '')
 				{
-					$insertKeys[] = $this->db->sanitize($fieldName);
-					$insertValues[] = $this->db->sanitize($this->get($name));
+					$insertKeys[] = $this->DB->sanitize($fieldName);
+					$insertValues[] = $this->DB->sanitize($this->get($name));
 				}
 			}
 			
@@ -237,28 +227,28 @@ abstract class FOGController
 			{
 				if ($this->get($name) != '')
 				{
-					$updateData[] = sprintf("`%s`='%s'", $this->db->sanitize($fieldName), $this->db->sanitize($this->get($name)));
+					$updateData[] = sprintf("`%s`='%s'", $this->DB->sanitize($fieldName), $this->DB->sanitize($this->get($name)));
 				}
 			}
 			
 			// Insert & Update query all-in-one
 			$query = sprintf("INSERT INTO `%s` (`%s`) VALUES ('%s') ON DUPLICATE KEY UPDATE %s",
-				$this->db->sanitize($this->databaseTable),
+				$this->DB->sanitize($this->databaseTable),
 				implode("`, `", $insertKeys),
 				implode("', '", $insertValues),
 				implode(', ', $updateData)
 			);
 
-			if (!$this->db->query($query))
+			if (!$this->DB->query($query))
 			{
 				// Query failed
-				throw new Exception($this->db->error());
+				throw new Exception($this->DB->error());
 			}
 			
 			// Database query was successful - set ID if ID was not set
 			if (!$this->get('id'))
 			{
-				$this->set('id', $this->db->insert_id());
+				$this->set('id', $this->DB->insert_id());
 			}
 			
 			// Success
@@ -266,7 +256,7 @@ abstract class FOGController
 		}
 		catch (Exception $e)
 		{
-			$this->error('Database Save Failed: Class: %s, ID: %s, Error: %s', array(get_class($this), $this->get('id'), $e->getMessage()));
+			$this->debug('Database Save Failed: Class: %s, ID: %s, Error: %s', array(get_class($this), $this->get('id'), $e->getMessage()));
 		}
 	
 		// Fail
@@ -297,11 +287,11 @@ abstract class FOGController
 				// Multiple values
 				foreach ($this->get($field) AS $fieldValue)
 				{
-					$fieldData[] = sprintf("`%s`='%s'", $this->db->sanitize($this->databaseFields[$field]), $this->db->sanitize($fieldValue));
+					$fieldData[] = sprintf("`%s`='%s'", $this->DB->sanitize($this->databaseFields[$field]), $this->DB->sanitize($fieldValue));
 				}
 				
 				$query = sprintf("SELECT * FROM `%s` WHERE %s",
-					$this->db->sanitize($this->databaseTable),
+					$this->DB->sanitize($this->databaseTable),
 					implode(' OR ', $fieldData)
 				);
 			}
@@ -309,16 +299,16 @@ abstract class FOGController
 			{
 				// Single value
 				$query = sprintf("SELECT * FROM `%s` WHERE `%s`='%s'",
-					$this->db->sanitize($this->databaseTable),
-					$this->db->sanitize($this->databaseFields[$field]),
-					$this->db->sanitize($this->get($field))
+					$this->DB->sanitize($this->databaseTable),
+					$this->DB->sanitize($this->databaseFields[$field]),
+					$this->DB->sanitize($this->get($field))
 				);
 			}
 			
 			// Did we find a row in the database?
-			if (!$queryData = $this->db->query($query)->fetch()->get())
+			if (!$queryData = $this->DB->query($query)->fetch()->get())
 			{
-				throw new Exception(($this->db->error() ? $this->db->error() : 'Row not found'));
+				throw new Exception(($this->DB->debug() ? $this->DB->debug() : 'Row not found'));
 			}
 			
 			// Loop returned rows -> Set new data
@@ -332,7 +322,7 @@ abstract class FOGController
 		}
 		catch (Exception $e)
 		{
-			$this->error('Database Load Failed: Class: %s, ID: %s, Error: %s', array(get_class($this), $this->get('id'), $e->getMessage()));
+			$this->debug('Database Load Failed: Class: %s, ID: %s, Error: %s', array(get_class($this), $this->get('id'), $e->getMessage()));
 		}
 	
 		// Fail
@@ -359,13 +349,13 @@ abstract class FOGController
 			
 			// Query row data
 			$query = sprintf("DELETE FROM `%s` WHERE `%s`='%s'",
-				$this->db->sanitize($this->databaseTable),
-				$this->db->sanitize($this->databaseFields[$field]),
-				$this->db->sanitize($this->get($field))
+				$this->DB->sanitize($this->databaseTable),
+				$this->DB->sanitize($this->databaseFields[$field]),
+				$this->DB->sanitize($this->get($field))
 			);
 			
 			// Did we find a row in the database?
-			if (!$queryData = $this->db->query($query)->fetch()->get())
+			if (!$queryData = $this->DB->query($query)->fetch()->get())
 			{
 				throw new Exception('Failed to delete');
 			}
@@ -375,7 +365,7 @@ abstract class FOGController
 		}
 		catch (Exception $e)
 		{
-			$this->error('Database Destroy Failed: Class: %s, ID: %s, Error: %s', array(get_class($this), $this->get('id'), $e->getMessage()));
+			$this->debug('Database Destroy Failed: Class: %s, ID: %s, Error: %s', array(get_class($this), $this->get('id'), $e->getMessage()));
 		}
 	
 		// Fail
@@ -391,23 +381,6 @@ abstract class FOGController
 		}
 		
 		return $key;
-	}
-	
-	// Error
-	protected function error($txt, $data = array())
-	{
-		if ($this->debug)
-		{
-			$this->FOGCore->error('%s: %s', array(get_class($this), (count($data) ? vsprintf($txt, $data) : $txt)));
-		}
-	}
-	// Info
-	protected function info($txt, $data = array())
-	{
-		if ($this->info)
-		{
-			$this->FOGCore->info('%s: %s', array(get_class($this), (count($data) ? vsprintf($txt, $data) : $txt)));
-		}
 	}
 	
 	// isValid
@@ -430,7 +403,7 @@ abstract class FOGController
 		}
 		catch (Exception $e)
 		{
-			$this->error('isValid Failed: Class: %s, Error: %s', array(get_class($this), $e->getMessage()));
+			$this->debug('isValid Failed: Class: %s, Error: %s', array(get_class($this), $e->getMessage()));
 		}
 		
 		return false;

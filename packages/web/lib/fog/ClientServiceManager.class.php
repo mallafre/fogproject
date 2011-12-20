@@ -1,18 +1,11 @@
 <?php
 
 // Blackout - 11:25 AM 26/09/2011
-class ClientServiceManager
+class ClientServiceManager extends FOGBase
 {
-	protected $db;
-	
-	function __construct()
-	{
-		$this->db = $GLOBALS['db'];
-	}
-
 	public function getGreenFOGActions()
 	{
-		if ( $this->db != null )
+		if ( $this->DB != null )
 		{
 			$sql = "SELECT 
 					gfHour, 
@@ -23,9 +16,9 @@ class ClientServiceManager
 
 
 			$arEntries = array();
-			if ( $this->db->query($sql) )
+			if ( $this->DB->query($sql) )
 			{
-				while( $ar = $this->db->fetch()->get() )
+				while( $ar = $this->DB->fetch()->get() )
 				{
 					$arEntries[] = new GreenFOG($ar["gfHour"], $ar["gfMin"], $ar["gfAction"]);
 				}
@@ -37,10 +30,10 @@ class ClientServiceManager
 
 	public function completeSnapinTask( $snapintask, $exitCode, $exitDesc )
 	{
-		if ( $this->db != null && $snapintask != null && $snapintask->getId() >= 0 )
+		if ( $this->DB != null && $snapintask != null && $snapintask->getId() >= 0 )
 		{
-			$exitcode = $this->db->sanitize( $exitCode );
-			$exitdesc = base64_decode($this->db->sanitize( $exitDesc ) );
+			$exitcode = $this->DB->sanitize( $exitCode );
+			$exitdesc = base64_decode($this->DB->sanitize( $exitDesc ) );
 			$sql = "UPDATE 
 					snapinTasks 
 				SET 
@@ -50,14 +43,14 @@ class ClientServiceManager
 				WHERE 
 					stID = '" . $snapintask->getId() . "'";
 
-			return $this->db->query($sql)->affected_rows() == 1;
+			return $this->DB->query($sql)->affected_rows() == 1;
 		}
 		return false;
 	}
 
 	public function checkInSnapinTask( $snapin )
 	{
-		if ( $this->db != null && $snapin != null && $snapin->getId() >= 0 )
+		if ( $this->DB != null && $snapin != null && $snapin->getId() >= 0 )
 		{
 			$sql = "UPDATE 
 					snapinTasks 
@@ -66,14 +59,14 @@ class ClientServiceManager
 					stCheckinDate = NOW() 
 				WHERE 
 					stID = '" . $snapin->getId() . "'";
-			return $this->db->query($sql)->affected_rows() == 1;
+			return $this->DB->query($sql)->affected_rows() == 1;
 		}
 		return false;
 	}
 
 	public function getSnapinTaskById( $id )
 	{
-		if ( $this->db != null && $id >= 0 )
+		if ( $this->DB != null && $id >= 0 )
 		{
 			$sql = "SELECT 
 			 		snapins.*,
@@ -88,11 +81,11 @@ class ClientServiceManager
 					inner join snapinJobs on ( snapinTasks.stJobID = snapinJobs.sjID )
 					inner join snapins on ( snapins.sID = snapinTasks.stSnapinID )
 				WHERE
-					stID = '" . $this->db->sanitize($id) . "'";
+					stID = '" . $this->DB->sanitize($id) . "'";
 			$entries = null;
-			if ( $this->db->query($sql) )
+			if ( $this->DB->query($sql) )
 			{
-				while( $ar = $this->db->fetch()->get() )
+				while( $ar = $this->DB->fetch()->get() )
 				{	
 					$snapin = new Snapin($ar);
 					$entries = new SnapinTask( $ar["stID"], $ar["stJobID"], $ar["sjHostID"], $ar["stState"], new Date($ar["cin"]), new Date($ar["comp"]), new Date($ar["sj"]), $snapin, $ar["stReturnCode"], $ar["stReturnDetails"]  );
@@ -105,20 +98,20 @@ class ClientServiceManager
 
 	public function addLoginEntry( $loginEntry )
 	{
-		if ( $this->db != null && $loginEntry != null && $loginEntry->isComplete() )
+		if ( $this->DB != null && $loginEntry != null && $loginEntry->isComplete() )
 		{
 			$sql = "INSERT INTO 
 					userTracking(utHostID, utUserName, utAction, utDateTime, utDesc, utDate)
-					values( '" . $this->db->sanitize($loginEntry->getHostId()) . "', '" . $this->db->sanitize($loginEntry->getUsername()) . "', '" . $this->db->sanitize( $loginEntry->getAction() )  . "', FROM_UNIXTIME(" . $loginEntry->getDate()->getLong() . "),  '" . $loginEntry->getDescription() . "', DATE('" . $loginEntry->getDate()->toString( "Y-m-d" ) . "') )";	
+					values( '" . $this->DB->sanitize($loginEntry->getHostId()) . "', '" . $this->DB->sanitize($loginEntry->getUsername()) . "', '" . $this->DB->sanitize( $loginEntry->getAction() )  . "', FROM_UNIXTIME(" . $loginEntry->getDate()->getLong() . "),  '" . $loginEntry->getDescription() . "', DATE('" . $loginEntry->getDate()->toString( "Y-m-d" ) . "') )";	
 
-			return $this->db->query($sql)->affected_rows() == 1;	
+			return $this->DB->query($sql)->affected_rows() == 1;	
 		}
 		return false;
 	}
 
 	public function getAllPrintersForHost( $host )
 	{
-		if ( $this->db != null && $host != null && $host->getID() >= 0 )
+		if ( $this->DB != null && $host != null && $host->getID() >= 0 )
 		{
 			$sql = "SELECT 
 					* 
@@ -126,12 +119,12 @@ class ClientServiceManager
 					printerAssoc
 					inner join printers on ( printerAssoc.paPrinterID = printers.pID )
 				WHERE
-					paHostID = '" . $this->db->sanitize( $host->getID() ) . "'";
+					paHostID = '" . $this->DB->sanitize( $host->getID() ) . "'";
 
 			$arPrinters = array();
-			if ( $this->db->query($sql) )
+			if ( $this->DB->query($sql) )
 			{
-				while( $ar = $this->db->fetch()->get() )
+				while( $ar = $this->DB->fetch()->get() )
 				{
 					$printer = new Printer($ar);
 					$printer->set('default', ($ar["paIsDefault"] == "1" ? true : false));
@@ -145,17 +138,17 @@ class ClientServiceManager
 
 	public function getAutoLogOutTimeForHost( $host )
 	{
-		if ( $this->db != null && $host != null && $host->getID() >= 0 )
+		if ( $this->DB != null && $host != null && $host->getID() >= 0 )
 		{
 			$sql = "SELECT
 					haloTime 
 				FROM
 					hostAutoLogOut
 				WHERE
-					haloHostID = '" . $this->db->sanitize( $host->getID() ) . "'";
-			if ( $this->db->query($sql) )
+					haloHostID = '" . $this->DB->sanitize( $host->getID() ) . "'";
+			if ( $this->DB->query($sql) )
 			{
-				while( $ar = $this->db->fetch()->get() )
+				while( $ar = $this->DB->fetch()->get() )
 				{					
 					return $ar["haloTime"];
 				}
@@ -166,7 +159,7 @@ class ClientServiceManager
 
 	public function getAllActiveSnapinsForHost( $host )
 	{
-		if ( $this->db != null && $host != null && $host->getID() >= 0 )
+		if ( $this->DB != null && $host != null && $host->getID() >= 0 )
 		{
 			$sql = "SELECT 
 			 		stID
@@ -179,9 +172,9 @@ class ClientServiceManager
 					stState in ( '0', '1' ) and
 					sjHostID = '" . $host->getID() . "'";
 			$arEntries = array();
-			if ( $this->db->query($sql) )
+			if ( $this->DB->query($sql) )
 			{
-				while( $ar = $this->db->fetch()->get() )
+				while( $ar = $this->DB->fetch()->get() )
 				{	
 					$arEntries[] = $ar["stID"];
 				}
@@ -209,7 +202,7 @@ class ClientServiceManager
 
 	public function getScreenResolutionSettingsForHost( $host )
 	{
-		if ( $this->db != null && $host != null && $host->getID() >= 0 )
+		if ( $this->DB != null && $host != null && $host->getID() >= 0 )
 		{
 			$sql = "SELECT
 					* 
@@ -217,9 +210,9 @@ class ClientServiceManager
 					hostScreenSettings
 				WHERE
 					hssHostID = '" . $host->getID() . "'";
-			if ( $this->db->query($sql) )
+			if ( $this->DB->query($sql) )
 			{
-				while( $ar = $this->db->fetch()->get() )
+				while( $ar = $this->DB->fetch()->get() )
 				{
 					return new ScreenResolution($ar["hssWidth"], $ar["hssHeight"], $ar["hssRefresh"]);
 				}

@@ -1,25 +1,16 @@
 <?php
 
 // Blackout - 9:08 AM 4/10/2011
-class FOGPageManager
+class FOGPageManager extends FOGBase
 {
 	private $nodes = array();
 	private $nodeVariable = 'node';
 	private $subVariable = 'sub';
 	
-	private $FOGCore;
-	
-	private $debug = true;
-	private $info = false;
+	public $debug = true;
+	public $info = false;
 	
 	private $pageTitle;
-	
-	private $loadedPageClasses = false;
-	
-	public function __construct()
-	{
-		$this->FOGCore = $GLOBALS['FOGCore'];
-	}
 	
 	public function getFOGPageClass()
 	{
@@ -63,7 +54,7 @@ class FOGPageManager
 		}
 		catch (Exception $e)
 		{
-			$this->error('Failed to add Page: Node: %s, Class: %s, Error: %s', array($node, $class, $e->getMessage()));
+			$this->debug('Failed to add Page: Node: %s, Class: %s, Error: %s', array($node, $class, $e->getMessage()));
 		}
 		
 		return $this;
@@ -72,10 +63,7 @@ class FOGPageManager
 	// Call FOGPage->method based on $node and $sub
 	public function render()
 	{
-		if (!$this->loadedPageClasses)
-		{
-			$this->loadPageClasses();
-		}
+		$this->loadPageClasses();
 		
 		try
 		{
@@ -95,7 +83,7 @@ class FOGPageManager
 			{
 				if (!empty($sub) && $sub != 'list')
 				{
-					$this->error('Class: %s, Method: %s, Error: Method not found in class, defaulting to index()', array(get_class($class), $sub));
+					$this->debug('Class: %s, Method: %s, Error: Method not found in class, defaulting to index()', array(get_class($class), $sub));
 				}
 				
 				$method = 'index';
@@ -134,7 +122,7 @@ class FOGPageManager
 		}
 		catch (Exception $e)
 		{
-			$this->error('Failed to Render Page: Node: %s, Error: %s', array($node, $e->getMessage()));
+			$this->debug('Failed to Render Page: Node: %s, Error: %s', array($node, $e->getMessage()));
 		}
 		
 		return false;
@@ -143,9 +131,9 @@ class FOGPageManager
 	// Load FOGPage classes
 	private function loadPageClasses()
 	{
-		if ($loadedPageClasses)
+		if ($this->isLoaded('PageClasses'))
 		{
-			return $this;
+			return;
 		}
 	
 		// This variable is required as each class file uses it
@@ -160,26 +148,6 @@ class FOGPageManager
 			{
 				require_once($path . '/' . $fileInfo->getFilename());
 			}
-		}
-		
-		return $this;
-	}
-	
-	// Error
-	protected function error($txt, $data = array())
-	{
-		if ($this->debug)
-		{
-			$this->FOGCore->error('%s: %s', array(get_class($this), (count($data) ? vsprintf($txt, $data) : $txt)));
-		}
-	}
-	
-	// Info
-	protected function info($txt, $data = array())
-	{
-		if ($this->info)
-		{
-			$this->FOGCore->info('%s: %s', array(get_class($this), (count($data) ? vsprintf($txt, $data) : $txt)));
 		}
 	}
 }

@@ -18,7 +18,7 @@
  *
  *
  */
-class FOGCore
+class FOGCore extends FOGBase
 {
 	const TASK_UNICAST_SEND 	= 'd';
 	const TASK_UNICAST_UPLOAD 	= 'u';
@@ -34,15 +34,6 @@ class FOGCore
 	const TASK_ALL_SNAPINS	 	= 's';
 	const TASK_SINGLE_SNAPIN 	= 'l';
 	const TASK_WAKE_ON_LAN	 	= 'o';
-
-	public $db;
-	
-	public function __construct()
-	{
-		$this->conn = $GLOBALS['conn'];
-		$this->db = $GLOBALS['db'];
-		$this->FOGCore = $GLOBALS['FOGCore'];
-	}
 	
 	private function cleanOldUnrunScheduledTasks()
 	{
@@ -241,12 +232,12 @@ class FOGCore
 	
 	public function getSetting($key)
 	{
-		return $this->db->query("SELECT settingValue FROM globalSettings WHERE settingKey = '%s' LIMIT 1", array($key))->fetch()->get('settingValue');
+		return $this->DB->query("SELECT settingValue FROM globalSettings WHERE settingKey = '%s' LIMIT 1", array($key))->fetch()->get('settingValue');
 	}
 	
 	public function setSetting($key, $value)
 	{
-		return $this->db->query("UPDATE globalSettings SET settingValue = '%s' WHERE settingKey = '%s'", array($value, $key))->queryResult();
+		return $this->DB->query("UPDATE globalSettings SET settingValue = '%s' WHERE settingKey = '%s'", array($value, $key))->queryResult();
 	}
 	
 	public function getClass($class)
@@ -280,6 +271,7 @@ class FOGCore
 		return (strtolower(@$_SERVER['REQUEST_METHOD']) == 'post' ? true : false);
 	}
 	
+	/*
 	public function error($txt, $data = array())
 	{
 		//if (!$this->isAJAXRequest() && !preg_match('#/service/#', $_SERVER['PHP_SELF']))
@@ -296,6 +288,7 @@ class FOGCore
 			printf('<div class="debug-info">FOG INFO: %s</div>%s', (count($data) ? vsprintf($txt, $data) : $txt), "\n");
 		}
 	}
+	*/
 	
 	
 	// From Core.class.php
@@ -309,10 +302,10 @@ class FOGCore
 				FROM 
 					oui
 				WHERE
-					ouiMACPrefix = '" . $this->db->sanitize( $macprefix ) . "'";
-			if ( $this->db->query($sql) )
+					ouiMACPrefix = '" . $this->DB->sanitize( $macprefix ) . "'";
+			if ( $this->DB->query($sql) )
 			{
-				while( $ar = $this->db->fetch()->get() )
+				while( $ar = $this->DB->fetch()->get() )
 				{	
 					return $ar["ouiMan"];
 				}
@@ -331,10 +324,10 @@ class FOGCore
 				$sql = "UPDATE
 						oui
 					SET
-						ouiMan = '" . $this->db->sanitize( $strMan ) . "'
+						ouiMan = '" . $this->DB->sanitize( $strMan ) . "'
 					WHERE
-						ouiMACPrefix = '" . $this->db->sanitize( $macprefix ) . "'";
-				$this->db->query($sql)->affected_rows();
+						ouiMACPrefix = '" . $this->DB->sanitize( $macprefix ) . "'";
+				$this->DB->query($sql)->affected_rows();
 				return true;
 			}
 			else
@@ -344,8 +337,8 @@ class FOGCore
 						oui
 							(ouiMACPrefix, ouiMan)
 						VALUES
-							('" . $this->db->sanitize( $macprefix ) . "', '" . $this->db->sanitize( $strMan ) . "')";
-				return $this->db->query($sql)->affected_rows() == 1;
+							('" . $this->DB->sanitize( $macprefix ) . "', '" . $this->DB->sanitize( $strMan ) . "')";
+				return $this->DB->query($sql)->affected_rows() == 1;
 			}
 		}
 		return false;
@@ -362,10 +355,10 @@ class FOGCore
 					FROM 
 						oui
 					WHERE
-						ouiMACPrefix = '" . $this->db->sanitize( $macprefix ) . "'";
-				if ( $this->db->query($sql) )
+						ouiMACPrefix = '" . $this->DB->sanitize( $macprefix ) . "'";
+				if ( $this->DB->query($sql) )
 				{
-					while( $ar = $this->db->fetch()->get() )
+					while( $ar = $this->DB->fetch()->get() )
 					{	
 						return $ar["cnt"] > 0;
 					}
@@ -389,7 +382,7 @@ class FOGCore
 					oui
 				WHERE
 					1=1";
-			return ( $this->db->query($sql)->affected_rows() );
+			return ( $this->DB->query($sql)->affected_rows() );
 
 		}
 		return false;
@@ -403,9 +396,9 @@ class FOGCore
 					COUNT(*) AS cnt
 				FROM 
 					oui";
-			if ( $this->db->query($sql) )
+			if ( $this->DB->query($sql) )
 			{
-				while( $ar = $this->db->fetch()->get() )
+				while( $ar = $this->DB->fetch()->get() )
 				{
 					return $ar["cnt"];
 				}
@@ -419,7 +412,7 @@ class FOGCore
 	// TODO: Make a FOG Utilities Class - include this
 	public function fetchURL($URL)
 	{
-		if ($this->db && $GLOBALS['FOGCore']->getSetting('FOG_PROXY_IP'))
+		if ($this->DB && $GLOBALS['FOGCore']->getSetting('FOG_PROXY_IP'))
 		{
 			$Proxy = $GLOBALS['FOGCore']->getSetting('FOG_PROXY_IP') . ':' . $GLOBALS['FOGCore']->getSetting('FOG_PROXY_PORT');
 		}

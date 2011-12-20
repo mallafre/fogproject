@@ -35,13 +35,13 @@ class TaskManager extends FOGManagerController
 		);
 		
 		/*
-			$sql = "SELECT count(*) as cnt FROM tasks WHERE taskHostID = '" . $this->db->sanitize( $host->getID() ) . "' and tasks.taskState in (0,1)";	
+			$sql = "SELECT count(*) as cnt FROM tasks WHERE taskHostID = '" . $this->DB->sanitize( $host->getID() ) . "' and tasks.taskState in (0,1)";	
 		*/
 	}
 	
 	function getCountOfActiveTasksWithMAC($mac)
 	{
-		$count = $this->db->query("SELECT
+		$count = $this->DB->query("SELECT
 						COUNT(*) AS count
 					FROM
 						tasks

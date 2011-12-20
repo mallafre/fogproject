@@ -4,7 +4,7 @@ class Timer
 {
 	const TASK_SINGLE_FLEXTIME = 180;
 
-	private $debug;
+	public $debug;
 	private $blSingle;
 	private $strMin, $strHour, $strDOM, $strMonth, $strDOW;
 	private $lngSingle;

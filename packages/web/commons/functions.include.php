@@ -2724,7 +2724,7 @@ function createImagePackage($conn, $member, $taskName, &$reason, $debug=false, $
 	}
 	catch (Exception $e)
 	{
-		$GLOBALS['FOGCore']->error('Could not %s(): %s', array(__FUNCTION__, $e->getMessage()));
+		FOGCore::debug('Could not %s(): %s', array(__FUNCTION__, $e->getMessage()));
 	}
 	
 	return false;

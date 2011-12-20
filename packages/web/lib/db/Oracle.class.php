@@ -33,7 +33,7 @@ class Oracle
 		}
 		catch (Exception $e)
 		{
-			$this->log(sprintf('Could not %s(): %s', __FUNCTION__, $e->getMessage()));
+			FOGCore::error(sprintf('Failed to %s: %s', __FUNCTION__, $e->getMessage()));
 		}
 	}
 	
@@ -53,7 +53,7 @@ class Oracle
 		}
 		catch (Exception $e)
 		{
-			$this->log(sprintf('Could not %s(): %s', __FUNCTION__, $e->getMessage()));
+			FOGCore::debug(sprintf('Failed to %s: %s', __FUNCTION__, $e->getMessage()));
 		}
 	}
 	
@@ -84,7 +84,7 @@ class Oracle
 		}
 		catch (Exception $e)
 		{
-			$this->log(sprintf('Could not %s(): %s', __FUNCTION__, $e->getMessage()));
+			FOGCore::error(sprintf('Failed to %s: %s', __FUNCTION__, $e->getMessage()));
 		}
 		
 		return $this;
@@ -98,11 +98,11 @@ class Oracle
 		
 			if (count($data))
 			{
-				$this->queryResult = oci_parse(vsprintf($this->query, $data), $this->link) or $this->log($this->error(), $this->query);
+				$this->queryResult = oci_parse(vsprintf($this->query, $data), $this->link) or FOGCore::debug($this->error(), $this->query);
 			}
 			else
 			{
-				$this->queryResult = oci_parse($this->query, $this->link) or $this->log($this->error(), $this->query);
+				$this->queryResult = oci_parse($this->query, $this->link) or FOGCore::debug($this->error(), $this->query);
 			}
 			
 			if (!oci_execute($this->queryResult))
@@ -112,7 +112,7 @@ class Oracle
 		}
 		catch (Exception $e)
 		{
-			$this->log(sprintf('Could not %s(): %s', __FUNCTION__, $e->getMessage()));
+			FOGCore::debug(sprintf('Failed to %s: %s', __FUNCTION__, $e->getMessage()));
 		}
 		
 		return $this;
@@ -133,7 +133,7 @@ class Oracle
 		}
 		catch (Exception $e)
 		{
-			$this->log(sprintf('Could not %s(): %s', __FUNCTION__, $e->getMessage()));
+			FOGCore::debug(sprintf('Failed to %s: %s', __FUNCTION__, $e->getMessage()));
 		}
 		
 		//return false;
@@ -168,7 +168,7 @@ class Oracle
 		}
 		catch (Exception $e)
 		{
-			$this->log(sprintf('Could not %s(): %s', __FUNCTION__, $e->getMessage()));
+			FOGCore::debug(sprintf('Failed to %s: %s', __FUNCTION__, $e->getMessage()));
 		}
 		
 		return false;
@@ -185,7 +185,7 @@ class Oracle
 		}
 		catch (Exception $e)
 		{
-			$this->log(sprintf('Could not %s(): %s', __FUNCTION__, $e->getMessage()));
+			FOGCore::debug(sprintf('Failed to %s: %s', __FUNCTION__, $e->getMessage()));
 		}
 		
 		return $this;
@@ -194,11 +194,6 @@ class Oracle
 	public function error()
 	{
 		return oci_error();
-	}
-	
-	private function log($txt='')
-	{
-		printf('Database ERROR: Class: %s, Info: %s', get_class($this), $txt);
 	}
 	
 	public function insert_id()
@@ -228,7 +223,7 @@ class Oracle
 		}
 		catch (Exception $e)
 		{
-			$this->log(sprintf('Could not %s(): %s', __FUNCTION__, $e->getMessage()));
+			FOGCore::debug(sprintf('Failed to %s: %s', __FUNCTION__, $e->getMessage()));
 		}
 		
 		return 0;

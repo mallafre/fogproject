@@ -25,14 +25,14 @@ class GroupManager extends FOGManagerController
 	// Legacy - remove when all updated
 	public function createGroup($name, $user)
 	{
-		if ($this->db != null && ! $this->doesGroupExist( $name ) && $name != null && strlen( $name ) > 0 && $user != null)
+		if ($this->DB != null && ! $this->doesGroupExist( $name ) && $name != null && strlen( $name ) > 0 && $user != null)
 		{
 			$sql = "INSERT 
 						into 
 					groups(groupName, groupCreateBy, groupDateTime) 
-					values( '" . $this->db->sanitize($name) . "', '" . $this->db->sanitize($user->get('name')) . "', NOW() )";
-			if ( $this->db->query($sql)->affected_rows() == 1 )
-				return $this->db->getInsertID();
+					values( '" . $this->DB->sanitize($name) . "', '" . $this->DB->sanitize($user->get('name')) . "', NOW() )";
+			if ( $this->DB->query($sql)->affected_rows() == 1 )
+				return $this->DB->getInsertID();
 						
 		}
 		return -1;
@@ -40,31 +40,31 @@ class GroupManager extends FOGManagerController
 	
 	public function addHostToGroup($groupid, $hostid)
 	{
-		if ( $this->db != null && $groupid >= 0 && $hostid >= 0  && is_numeric( $groupid ) && is_numeric($hostid))
+		if ( $this->DB != null && $groupid >= 0 && $hostid >= 0  && is_numeric( $groupid ) && is_numeric($hostid))
 		{
 			$sql = "INSERT 
 						into 
 					groupMembers(gmHostID, gmGroupID) 
 					values( '" . $hostid . "', '" . $groupid . "' )";
-			return ( $this->db->query($sql)->affected_rows() == 1 );			
+			return ( $this->DB->query($sql)->affected_rows() == 1 );			
 		}
 		return false;
 	}
 	
 	public function doesGroupExist( $name, $excludeid=-1)
 	{
-		if ( $this->db != null )
+		if ( $this->DB != null )
 		{
 			$sql = "SELECT 
 						COUNT(*) AS c 
 					FROM 
 						groups
 					WHERE 
-						groupName = '" . $this->db->sanitize( $name ) . "' and
-						groupID <> '" . $this->db->sanitize( $excludeid ) . "'";
-			if ( $this->db->query($sql) )
+						groupName = '" . $this->DB->sanitize( $name ) . "' and
+						groupID <> '" . $this->DB->sanitize( $excludeid ) . "'";
+			if ( $this->DB->query($sql) )
 			{
-				while( $ar = $this->db->fetch()->get() )
+				while( $ar = $this->DB->fetch()->get() )
 					return $ar["c"] > 0;
 			}
 		}
@@ -73,9 +73,9 @@ class GroupManager extends FOGManagerController
 	
 	public function getGroupsWithMember($hostid)
 	{
-		$this->db->query("SELECT `gmGroupID` FROM `groupMembers` WHERE `gmHostID` = '%s'", array($hostid));
+		$this->DB->query("SELECT `gmGroupID` FROM `groupMembers` WHERE `gmHostID` = '%s'", array($hostid));
 		
-		while ($groupID = $this->db->fetch()->get('gmGroupID'))
+		while ($groupID = $this->DB->fetch()->get('gmGroupID'))
 		{
 			//$groups[] = new Group($groupID);
 			//$groups[] = $groupID;
@@ -88,14 +88,14 @@ class GroupManager extends FOGManagerController
 		/*
 		return ($count ? $count : 0);
 		
-		if ( $this->db != null && $hostid !== null && is_numeric( $hostid ) && $hostid >= 0 )
+		if ( $this->DB != null && $hostid !== null && is_numeric( $hostid ) && $hostid >= 0 )
 		{
 			$sql = " = '" . $hostid . "'";
 			
 			$arGroupIDs = array();
-			if ( $this->db->query($sql) )
+			if ( $this->DB->query($sql) )
 			{
-				while( $ar = $this->db->fetch()->get() )
+				while( $ar = $this->DB->fetch()->get() )
 				{
 					$arGroupIDs[] = $ar["gmGroupID"];
 				}
@@ -123,7 +123,7 @@ class GroupManager extends FOGManagerController
 	public function updateGroup( $group )
 	{
 		throw new Exception( _("Not implemented") );
-		if ( $this->db != null && $host != null )
+		if ( $this->DB != null && $host != null )
 		{
 			if ( ( self::UPDATE_GENERAL & $flags ) == 1 )
 			{

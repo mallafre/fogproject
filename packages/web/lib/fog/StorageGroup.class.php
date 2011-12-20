@@ -34,10 +34,10 @@ class StorageGroup extends FOGController
 		$this->data['storageNodes'] = array();
 		
 		// Query
-		$this->db->query("SELECT * FROM nfsGroupMembers WHERE ngmGroupID='%s' AND ngmIsEnabled='1'", array($this->get('id')));
+		$this->DB->query("SELECT * FROM nfsGroupMembers WHERE ngmGroupID='%s' AND ngmIsEnabled='1'", array($this->get('id')));
 		
 		// Loop all Storage Nodes -> Push into data array
-		while ($storageNode = $this->db->fetch()->get())
+		while ($storageNode = $this->DB->fetch()->get())
 		{
 			$this->add('storageNodes', new StorageNode($storageNode));
 		}

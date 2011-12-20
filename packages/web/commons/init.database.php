@@ -11,35 +11,10 @@
 require_once(BASEPATH . '/commons/init.php');
 
 // Database
-// Use this when reflection class arg call works
-//$db = $FOGCore->getClass('DatabaseManager', DATABASE_TYPE, DATABASE_HOST, DATABASE_USERNAME, DATABASE_PASSWORD, DATABASE_NAME)->connect();
-
 $DatabaseManager = new DatabaseManager(DATABASE_TYPE, DATABASE_HOST, DATABASE_USERNAME, DATABASE_PASSWORD, DATABASE_NAME);
-$db = $DatabaseManager->connect();
 
-// Legacy - Clean up when DB classes have been normalized
-$conn = $db->getLink();
-if ($FOGCore)
-{
-	$FOGCore->conn = $conn;
-	$FOGCore->db = $db;
-}
-if ($conn)
-{
-	// Database Schema version check
-	if ($DatabaseManager->getVersion() < FOG_SCHEMA)
-	{
-		if ($_GET['redir'] != '1')
-		{
-			$FOGCore->redirect('../commons/schemaupdater/index.php?redir=1');
-			exit;
-		}
-	}
-}
-else
-{
-	die(_('Unable to connect to Database'));
-}
+// Update FOGCore with new database connection
+$DB = $FOGCore->DB = $DatabaseManager->connect();
 
 // FOG Locales
 if (!isset($_SESSION['locale']))
@@ -50,4 +25,22 @@ if (!isset($_SESSION['locale']))
 	// Set locale
 	putenv('LC_ALL=' . $_SESSION['locale']);
 	setlocale(LC_ALL, $_SESSION['locale']);
+}
+
+
+
+
+
+
+// Legacy - Clean up when DB classes have been normalized
+$conn = $FOGCore->DB->getLink();
+if ($FOGCore)
+{
+	// LEGACY
+	$FOGCore->conn = $conn;
+	$FOGCore->db = $FOGCore->DB;
+}
+if (!$conn)
+{
+	die(_('Unable to connect to Database'));
 }

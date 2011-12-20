@@ -215,11 +215,11 @@ class GroupManagementPage extends FOGPage
 					<h2><?php print _("Basic Imaging Tasks"); ?></h2>
 					<table cellpadding="0" cellspacing="0" border="0" width="100%">
 					<tr>
-					<td class="c" width="50"><a href="?node=tasks&type=group&direction=down&noconfirm=<?php echo $groupid; ?>"><img src="./images/senddebug.png" /><p><?php echo(_("Deploy")); ?></p></a></td>
+					<td class="c" width="50"><a href="?node=tasks&type=group&direction=down&noconfirm=<?php print $this->request['id']; ?>"><img src="./images/senddebug.png" /><p><?php echo(_("Deploy")); ?></p></a></td>
 					<td><p><?php echo(_("Deploy action will send an image saved on the FOG server to the client computer with all included snapins.")); ?></p></td>
 					</tr>
 					<tr>
-					<td class="c" width="50"><a href="?node=tasks&sub=advanced&groupid=<?php echo $groupid; ?>"><img src="./images/host-advanced.png" /><p><?php echo(_("Advanced")); ?></p></a></td>
+					<td class="c" width="50"><a href="?node=tasks&sub=advanced&groupid=<?php print $this->request['id']; ?>"><img src="./images/host-advanced.png" /><p><?php echo(_("Advanced")); ?></p></a></td>
 					<td><p><?php echo(_("View advanced tasks for this group.")); ?></p></td>
 					</tr>
 					</table>
@@ -230,19 +230,16 @@ class GroupManagementPage extends FOGPage
 					<h2><?php print _("Modify Membership for ") . $Group->get('name'); ?></h2>
 					<table cellpadding=0 cellspacing=0 border=0 width=100%>
 					<?php
-					if ( $_GET["delhostid"] != null && is_numeric( $_GET["delhostid"] ) )
-					{
-						$sql = "delete from groupMembers where gmGroupID = '" . mysql_real_escape_string( $groupid ) . "' and gmHostID = '" . mysql_real_escape_string( $_GET["delhostid"] ) . "'";
-						if ( !mysql_query( $sql, $GLOBALS['conn'] ) )
-							msgBox( _("Failed to remove host from group!") );
-
-					}
-
-
-					//$members = getImageMembersByGroupID( $GLOBALS['conn'], $Group->get('id') );
+					
 					foreach ($Group->get('hosts') AS $Host)
 					{
-						printf('<tr class="%s"><td>%s</td><td>%s</td><td>%s</td><td><a href="%s"><img src="images/deleteSmall.png" class="link" /></a></td></tr>', (++$i % 2 ? 'alt': ''), $Host->get('name'), $Host->get('ip'), $Host->get('mac'), "?node=" . $this->node . "&sub=" . $this->sub . "&groupid=" . $this->request['id'] . "&id=" . $Host->get('id'));
+						printf('<tr class="%s"><td>%s</td><td>%s</td><td>%s</td><td><a href="%s"><img src="images/deleteSmall.png" class="link" /></a></td></tr>',
+							(++$i % 2 ? 'alt': ''),
+							$Host->get('name'),
+							$Host->get('ip'),
+							$Host->get('mac'),
+							$this->formAction . '&id=' . $Host->get('id')
+						);
 					}
 					?>
 					</table>
@@ -254,12 +251,8 @@ class GroupManagementPage extends FOGPage
 					<form method="POST" action="?node=$node&sub=$sub&groupid=$groupid&tab=$tab">
 					<?php
 					
-					printf('<select name="image"><option value="">%s</option>', _('Do Nothing'));
+					print $this->FOGCore->getClass('ImageManager')->buildSelectBox();
 					
-					foreach ($this->FOGCore->getClass('ImageManager')->find() AS $image)
-					{
-						printf('<option value="%s">%s</option>', $image->get('id'), $image->get('name'));
-					}
 					?>
 					</select>
 					<p><input type="submit" value="<?php print _("Update Images"); ?>" /></p>
@@ -280,7 +273,7 @@ class GroupManagementPage extends FOGPage
 				<!-- Add Snap-ins -->
 				<div id="group-snap-add">
 					<h2><?php print _("Add Snapin to all hosts in ") . $Group->get('name'); ?></h2>
-					<form method="POST" action="?node=" . $node . "&sub=" . $sub . "&groupid=" . $groupid . "&tab=$tab">
+					<form method="POST" action="<?php print $this->formAction; ?>">
 					<?php
 					print $this->FOGCore->getClass('SnapinManager')->buildSelectBox();
 					?>
@@ -291,7 +284,7 @@ class GroupManagementPage extends FOGPage
 				<!-- Remove Snap-ins -->
 				<div id="group-snap-delete">
 					<h2><?php print _("Remove Snapin to all hosts in ") . $Group->get('name'); ?></h2>
-					<form method="POST" action="?node=" . $node . "&sub=" . $sub . "&groupid=" . $groupid . "&tab=$tab">
+					<form method="POST" action="<?php print $this->formAction; ?>">
 					<?php
 					print $this->FOGCore->getClass('SnapinManager')->buildSelectBox();
 					?>
@@ -302,7 +295,7 @@ class GroupManagementPage extends FOGPage
 				<!-- Service Settings -->
 				<div id="group-service">
 					<h2><?php print _("Service Configuration"); ?></h2>
-					<form method="post" action="?node=$node&sub=$sub&groupid=$groupid&tab=$tab&updatemodulestatus=1">
+					<form method="post" action="<?php print $this->formAction; ?>">
 						<fieldset>
 							<legend>General</legend>
 							<table cellpadding=0 cellspacing=0 border=0 width=100%>
@@ -370,7 +363,7 @@ class GroupManagementPage extends FOGPage
 				<!-- Active Directory -->
 				<div id="group-active-directory">
 					<h2><?php print _("Modify AD information for ") . $Group->get('name'); ?></h2>
-					<form method="POST" action="?node=" . $node . "&sub=" . $sub . "&groupid=" . $groupid . "&tab=$tab">
+					<form method="POST" action="<?php print $this->formAction; ?>">
 					<table cellpadding=0 cellspacing=0 border=0 width=100%>
 						<tr><td><?php print _("Join Domain after image task"); ?></td><td><input id='adEnabled' type="checkbox" name="domain" /></td></tr>
 						<tr><td><?php print _("Domain name"); ?></td><td><input id="adDomain" type="text" name="domainname" /></td></tr>
@@ -384,7 +377,7 @@ class GroupManagementPage extends FOGPage
 				
 				<!-- Printers -->
 				<div id="group-printers">
-					<form method="POST" action="?node=$_GET[node]&sub=$_GET[sub]&groupid=$_GET[groupid]">
+					<form method="POST" action="<?php print $this->formAction; ?>">
 					<h2><?php print _("Select Management Level for all Hosts in this group"); ?></h2>
 					<p class="l">
 							
@@ -429,6 +422,17 @@ class GroupManagementPage extends FOGPage
 		// POST
 		try
 		{
+			/*
+			// Membership
+						if ( $_GET["delhostid"] != null && is_numeric( $_GET["delhostid"] ) )
+						{
+							$sql = "delete from groupMembers where gmGroupID = '" . mysql_real_escape_string( $groupid ) . "' and gmHostID = '" . mysql_real_escape_string( $_GET["delhostid"] ) . "'";
+							if ( !mysql_query( $sql, $GLOBALS['conn'] ) )
+								msgBox( _("Failed to remove host from group!") );
+
+						}
+			*/
+		
 			// Error checking
 			if (empty($_POST[$this->id]))
 			{

@@ -101,10 +101,10 @@ class Group extends FOGController
 		$this->set('hosts', array());
 		
 		// Find all group members
-		$this->db->query("SELECT hosts.* FROM groups INNER JOIN groupMembers ON ( groups.groupID = groupMembers.gmGroupID ) LEFT JOIN hosts ON (groupMembers.gmHostID = hosts.hostID) WHERE groupID='%s' ORDER BY groupName", array($this->get('id')));
+		$this->DB->query("SELECT hosts.* FROM groups INNER JOIN groupMembers ON ( groups.groupID = groupMembers.gmGroupID ) LEFT JOIN hosts ON (groupMembers.gmHostID = hosts.hostID) WHERE groupID='%s' ORDER BY groupName", array($this->get('id')));
 		
 		// Iterate group member data -> Create new Host object using data
-		while ($host = $this->db->fetch()->get())
+		while ($host = $this->DB->fetch()->get())
 		{
 			$this->add('hosts', new Host($host));
 		}

@@ -3,10 +3,10 @@
 // Blackout - 9:02 PM 27/09/2011
 class DatabaseManager
 {
-	public $type, $host, $user, $pass, $db;
+	public $type, $host, $user, $pass, $database;
 	private $valid = false;
 
-	function __construct($type, $host, $user, $pass, $db) 
+	function __construct($type, $host, $user, $pass, $database) 
 	{
 		try
 		{
@@ -26,7 +26,7 @@ class DatabaseManager
 			{
 				throw new Exception('Pass not set');
 			}
-			if (!$db)
+			if (!$database)
 			{
 				throw new Exception('Database not set');
 			}
@@ -35,7 +35,7 @@ class DatabaseManager
 			$this->host = $host;
 			$this->user = $user;
 			$this->pass = $pass;
-			$this->db = $db;
+			$this->database = $database;
 			
 			$this->valid = true;
 		}
@@ -43,7 +43,7 @@ class DatabaseManager
 		{
 			$this->valid = false;
 		
-			$GLOBALS['FOGCore']->error('Failed: %s->%s(): Error: %s', array(get_class($this), __FUNCTION__, $e->getMessage()));
+			FOGCore::error('Failed: %s->%s(): Error: %s', array(get_class($this), __FUNCTION__, $e->getMessage()));
 		}
 		
 		return false;
@@ -53,17 +53,17 @@ class DatabaseManager
 	{
 		try
 		{
+			// Error checking
 			if (!$this->valid)
 			{
 				throw new Exception('Class not constructed correctly');
 			}
-		
+			
+			// Determine database host type
 			switch($this->type)
 			{
 				case 'mysql':
-					$this->db = new MySQL($this->host, $this->user, $this->pass, $this->db);
-					
-					return $this->db;	
+					$this->DB = new MySQL($this->host, $this->user, $this->pass, $this->database);
 					
 					break;
 				case 'mssql':
@@ -72,21 +72,29 @@ class DatabaseManager
 					$db = new OracleOLD();
 					$db->setCredentials( $this->user, $this->pass );
 					$db->setHost( $this->host );
-					$db->setSchema( $this->db );
+					$db->setSchema( $this->DB );
 					if ( $db->connect() )
 					{
 					
-						$this->db = $db;
-						return $db;				
+						$this->DB = $db;			
 					}
 					break;								
 				default:
 					throw new Exception(sprintf('Unknown database type. Check that DATABASE_TYPE is being set in "%s/commons/config.php"', rtrim($_SERVER['DOCUMENT_ROOT'], '/') . dirname($_SERVER['PHP_SELF'])));
 			}
+			
+			// Database Schema version check
+			if ($this->getVersion() < FOG_SCHEMA && $_GET['redir'] != '1')
+			{
+				FOGCore::redirect('../commons/schemaupdater/index.php?redir=1');
+			}
+			
+			// Return database connection
+			return $this->DB;
 		}
 		catch (Exception $e)
 		{
-			$GLOBALS['FOGCore']->error('Failed: %s->%s(): Error: %s', array(get_class($this), __FUNCTION__, $e->getMessage()));
+			FOGCore::error('Failed: %s->%s(): Error: %s', array(get_class($this), __FUNCTION__, $e->getMessage()));
 		}
 	}
  
@@ -94,16 +102,17 @@ class DatabaseManager
 	{
 		try
 		{
-			if (!$this->db)
+			// Error checking
+			if (!$this->DB)
 			{
 				throw new Exception('Database not connected');
 			}
 			
-			return $this->db->query('SELECT vValue FROM schemaVersion LIMIT 1')->fetch()->get('vValue');
+			return $this->DB->query('SELECT vValue FROM schemaVersion LIMIT 1')->fetch()->get('vValue');
 		}
 		catch (Exception $e)
 		{
-			$GLOBALS['FOGCore']->error('Failed: %s->%s(): Error: %s', array(get_class($this), __FUNCTION__, $e->getMessage()));
+			FOGCore::error('Failed: %s->%s(): Error: %s', array(get_class($this), __FUNCTION__, $e->getMessage()));
 		}
 		
 		return false;

@@ -107,12 +107,12 @@ class UserManager extends FOGManagerController
 				FROM 
 					users 
 				WHERE 
-					uName = '" . $this->db->sanitize($username) . "' and 
+					uName = '" . $this->DB->sanitize($username) . "' and 
 					uPass = '" . md5( $password ) . "'";
 					
-			if ( $this->db->query($sql) )
+			if ( $this->DB->query($sql) )
 			{
-				while( $ar = $this->db->fetch()->get() )
+				while( $ar = $this->DB->fetch()->get() )
 				{
 					return new User($ar);
 				}
@@ -123,7 +123,7 @@ class UserManager extends FOGManagerController
 	
 	public function getAllUsers($ordering=self::ORDERBY_USERNAME)
 	{
-		if ( $this->db != null && $ordering !== null && is_numeric( $ordering ) && $ordering >= 0 )
+		if ( $this->DB != null && $ordering !== null && is_numeric( $ordering ) && $ordering >= 0 )
 		{
 			$orderby = "";
 			if ( $ordering = self::ORDERBY_USERNAME )
@@ -135,10 +135,10 @@ class UserManager extends FOGManagerController
 					users 
 				" . $orderby;
 
-			if ( $this->db->query($sql) )
+			if ( $this->DB->query($sql) )
 			{
 				$arUserIds = array();
-				while( $ar = $this->db->fetch()->get() )
+				while( $ar = $this->DB->fetch()->get() )
 				{
 					$arUserIds[] = $ar["uId"];
 				}
@@ -162,30 +162,30 @@ class UserManager extends FOGManagerController
 
 	public function deleteUser( $user )
 	{
-		if ( $this->db != null && $user != null && $user->get('id') >= 0 )
+		if ( $this->DB != null && $user != null && $user->get('id') >= 0 )
 		{
-			$sql = "DELETE FROM users WHERE uId = '" . $this->db->sanitize( $user->get('id') ) . "'";
-			return $this->db->query($sql)->affected_rows() == 1;
+			$sql = "DELETE FROM users WHERE uId = '" . $this->DB->sanitize( $user->get('id') ) . "'";
+			return $this->DB->query($sql)->affected_rows() == 1;
 		}
 		return false;
 	}
 
 	public function updateUser( $user )
 	{
-		if ( $this->db != null && $user != null && $user->get('id') >= 0 )
+		if ( $this->DB != null && $user != null && $user->get('id') >= 0 )
 		{
 			if ( ! $this->exists( $user->get('name'), $user->get('id') ) )
 			{
 				$sql = "UPDATE 
 						users 
 					SET 
-						uName = '" . $this->db->sanitize( $user->get('name') ) . "', 
-						" . (($user->get('password') != null &&  strlen(trim( $user->get('password') )) > 0) ? "uPass = MD5('" . $this->db->sanitize( $user->get('password') ) . "'), " : "" ) . "
-						uType = '" . $this->db->sanitize($user->get('type')) . "' 
+						uName = '" . $this->DB->sanitize( $user->get('name') ) . "', 
+						" . (($user->get('password') != null &&  strlen(trim( $user->get('password') )) > 0) ? "uPass = MD5('" . $this->DB->sanitize( $user->get('password') ) . "'), " : "" ) . "
+						uType = '" . $this->DB->sanitize($user->get('type')) . "' 
 					WHERE 
 						uId = " . $user->get('id');
 						
-				return $this->db->query($sql)->affected_rows() == 1;
+				return $this->DB->query($sql)->affected_rows() == 1;
 			}
 			else
 				throw new Exception( _("A user with this name already exists!") );
@@ -195,14 +195,14 @@ class UserManager extends FOGManagerController
 
 	public function addUser( $user, $strCreator )
 	{
-		if ( $this->db != null && $user != null )
+		if ( $this->DB != null && $user != null )
 		{
 			if ( ! $this->exists( $user->get('name') ) )
 			{
 				$sql = "INSERT INTO 
 						users( uName, uPass, uCreateDate, uCreateBy, uType ) 
-						values( '" . $this->db->sanitize($user->get('name')) . "', MD5('" . $this->db->sanitize($user->getPassword()) . "'), NOW(), '" . $this->db->sanitize($strCreator) . "', '" . (($user->get('type') == User::TYPE_MOBILE) ? '1' : '0') . "')";	
-				return $this->db->query($sql)->affected_rows() == 1;
+						values( '" . $this->DB->sanitize($user->get('name')) . "', MD5('" . $this->DB->sanitize($user->getPassword()) . "'), NOW(), '" . $this->DB->sanitize($strCreator) . "', '" . (($user->get('type') == User::TYPE_MOBILE) ? '1' : '0') . "')";	
+				return $this->DB->query($sql)->affected_rows() == 1;
 			}
 			else
 				throw new Exeption(_("User already exists!"));
