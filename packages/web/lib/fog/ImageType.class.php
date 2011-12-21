@@ -9,6 +9,7 @@ class ImageType extends FOGController
 	// Name -> Database field name
 	public $databaseFields = array(
 		'id'		=> 'imageTypeID',
-		'name'		=> 'imageTypeName'
-	);	
+		'name'		=> 'imageTypeName',
+		'type'		=> 'imageTypeValue'
+	);
 }

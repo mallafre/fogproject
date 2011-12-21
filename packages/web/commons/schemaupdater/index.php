@@ -61,6 +61,7 @@ $installPath[25] = array( 195, 196, 197, 198 );
 $installPath[26] = array( 199, 200, 201, 202, 203, 204, 205, 206, 207, 208, 209, 210, 211, 212, 213 );
 $installPath[27] = array( 214, 215, 216 );
 $installPath[28] = array( 217, 218 );
+$installPath[29] = array( 219, 220, 221, 222, 223, 224, 225 );
 
 $dbSchema[0] = "CREATE DATABASE " . DATABASE_NAME ;
 
@@ -1090,19 +1091,17 @@ $dbSchema[217] = function()
 };
 $dbSchema[218] = "UPDATE `" . DATABASE_NAME . "`.`schemaVersion` set vValue = '29'";
 
-
-
-
-// Blackout - 1:52 PM 1/12/2011
-// TODO: Search 'hosts' -> compare with 'images.osID' -> update 'osID' in 'hosts'
-// TODO: Search 'images' -> Get image type -> +1 to image type value
-/*
-	const IMAGE_TYPE_SINGLE_PARTITION_NTFS = 0;
-	const IMAGE_TYPE_DD = 1;
-	const IMAGE_TYPE_MULTIPARTITION_SINGLE_DISK = 2;
-	const IMAGE_TYPE_MULTIPARTITION_MULTIDISK = 3;
-*/
-
+// 30 - Blackout - 10:54 AM 21/12/2011
+// Add 'imageTypeValue' field to `imageTypes`
+// Add default data for `imageTypeValue`
+// Update 'imageDD' (imageType) values to 'imageDD'+1 for new imageType IDs
+$dbSchema[219] = "ALTER TABLE `" . DATABASE_NAME . "`.`imageTypes` ADD `imageTypeValue` VARCHAR( 10 ) NOT NULL";
+$dbSchema[220] = "UPDATE `" . DATABASE_NAME . "`.`imageTypes` SET `imageTypeValue` = 'n' WHERE `imageTypes`.`imageTypeID` =1";
+$dbSchema[221] = "UPDATE `" . DATABASE_NAME . "`.`imageTypes` SET `imageTypeValue` = 'mps' WHERE `imageTypes`.`imageTypeID` =2";
+$dbSchema[222] = "UPDATE `" . DATABASE_NAME . "`.`imageTypes` SET `imageTypeValue` = 'mpa' WHERE `imageTypes`.`imageTypeID` =3";
+$dbSchema[223] = "UPDATE `" . DATABASE_NAME . "`.`imageTypes` SET `imageTypeValue` = 'dd' WHERE `imageTypes`.`imageTypeID` =4";
+$dbSchema[224] = "UPDATE `" . DATABASE_NAME . "`.`images` SET `imageDD` = `imageDD` + 1";	// If this is ran more than one there will be problems :\
+$dbSchema[225] = "UPDATE `" . DATABASE_NAME . "`.`schemaVersion` set vValue = '30'";
 
 
 

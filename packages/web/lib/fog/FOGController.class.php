@@ -27,7 +27,7 @@ abstract class FOGController extends FOGBase
 	// Auto save class data on __destruct
 	public $autoSave = false;
 	
-	// DEBUG mode - print all Errors & SQL queries
+	// Debug & Info
 	public $debug = true;
 	public $info = false;
 	

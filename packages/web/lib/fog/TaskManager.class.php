@@ -19,7 +19,7 @@ class TaskManager extends FOGManagerController
 
         public function getActiveTasks()
         {
-		return $this->find(array('taskState' => array('0', '1')));
+		return (array)$this->find(array('state' => array('0', '1')));
 	}
 	
 	// Move this to $Host->getTasks()
@@ -28,8 +28,8 @@ class TaskManager extends FOGManagerController
 		return count(
 			$this->find(
 				array(
-					'taskState'	=> array('0', '1'),
-					'taskHostID'	=> ($host instanceof Host ? $host->get('id') : $host)
+					'state'		=> array('0', '1'),
+					'hostID'	=> ($host instanceof Host ? $host->get('id') : $host)
 				)
 			)
 		);

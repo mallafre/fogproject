@@ -45,25 +45,33 @@ abstract class FOGBase
 			printf('<div class="debug-error">FOG ERROR: %s: %s</div>%s', get_clasS($this), (count($data) ? vsprintf($txt, $data) : $txt), "\n");
 			exit;
 		}
+		
+		// TODO: Log to Database
 	}
 	
 	// Debug - message is shown if debug is enabled for that class
 	public function debug($txt, $data = array())
 	{
-		//if (!$this->isAJAXRequest() && !preg_match('#/service/#', $_SERVER['PHP_SELF']))
-		if ($this->debug && !FOGCore::isAJAXRequest() && !preg_match('#/service/#', $_SERVER['PHP_SELF']))
+		if ((!isset($this) || (isset($this->debug) && $this->debug === true)) && !FOGCore::isAJAXRequest() && !preg_match('#/service/#', $_SERVER['PHP_SELF']))
 		{
 			printf('<div class="debug-error">FOG DEBUG: %s: %s</div>%s', get_clasS($this), (count($data) ? vsprintf($txt, $data) : $txt), "\n");
 		}
+		
+		// TODO: Log to Database
 	}
 	
 	// Info - message is shown if info is enabled for that class
 	public function info($txt, $data = array())
 	{
-		if ($this->info && !FOGCore::isAJAXRequest() && !preg_match('#/service/#', $_SERVER['PHP_SELF']))
+		//printf('Class: %s, Info: %s', get_class($this), ($this->info === true ? 'true' : 'false'));
+		
+		// !isset gets used when a call is made without a class context. i.e. FOGCore::info('foo bah');
+		if ((!isset($this) || (isset($this->info) && $this->info === true)) && !FOGCore::isAJAXRequest() && !preg_match('#/service/#', $_SERVER['PHP_SELF']))
 		{
 			printf('<div class="debug-info">FOG INFO: %s: %s</div>%s', get_clasS($this), (count($data) ? vsprintf($txt, $data) : $txt), "\n");
 		}
+		
+		// TODO: Log to Database
 	}
 	
 	// toString

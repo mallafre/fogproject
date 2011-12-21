@@ -3,12 +3,13 @@
 // Blackout - 9:08 AM 4/10/2011
 class FOGPageManager extends FOGBase
 {
+	// Debug & Info
+	public $debug = true;
+	public $info = false;
+	
 	private $nodes = array();
 	private $nodeVariable = 'node';
 	private $subVariable = 'sub';
-	
-	public $debug = true;
-	public $info = false;
 	
 	private $pageTitle;
 	

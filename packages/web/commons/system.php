@@ -12,7 +12,7 @@
 
 define('IS_INCLUDED', true);
 define('FOG_VERSION', '0.33B');
-define('FOG_SCHEMA', 29);
+define('FOG_SCHEMA', 30);
 define('BASEPATH', DetermineBasePath());
 
 // LEGACY - Database

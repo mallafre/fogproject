@@ -68,10 +68,11 @@ class StorageGroup extends FOGController
 		return ($storageNode ? $storageNode : false);
 	}
 	
-	function getRandomStorageNode()
+	function getOptimalStorageNode()
 	{
 		$StorageNodes = $this->getStorageNodes();
 		
+		// Change this to count client connections -> Return based on that (instead of random)
 		return (count($StorageNodes) ? $StorageNodes[rand(0, count($StorageNodes)-1)] : false);
 	}
 	

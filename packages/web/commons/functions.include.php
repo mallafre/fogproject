@@ -1264,7 +1264,7 @@ function getImageMemberFromHostID( $conn, $hostid )
 		$Task = new Task(array(
 			'hostID'	=> $hostid,
 			'NFSGroupID'	=> $Host->getImage()->getStorageGroup()->get('id'),
-			'NFSMemberID'	=> $Host->getImage()->getStorageGroup()->getRandomStorageNode()->get('id')
+			'NFSMemberID'	=> $Host->getImage()->getStorageGroup()->getOptimalStorageNode()->get('id')
 		));
 		
 		
@@ -1274,7 +1274,7 @@ function getImageMemberFromHostID( $conn, $hostid )
 		$Task = new Task(array(
 			'hostID'	=> $hostid,
 			'NFSGroupID'	=> $Host->getImage()->getStorageGroup()->get('id'),
-			'NFSMemberID'	=> $Host->getImage()->getStorageGroup()->getRandomStorageNode()->get('id')
+			'NFSMemberID'	=> $Host->getImage()->getStorageGroup()->getOptimalStorageNode()->get('id')
 		));
 		*/
 		
@@ -1320,11 +1320,14 @@ function createPXEFile( $contents )
 	$hndl = fopen( $tmp, "w" );	
 	if( $hndl )
 	{	
-		if ( fwrite( $hndl, $contents ) )
+		if ( ! fwrite( $hndl, $contents ) )
 		{
-			return $tmp;
+			FOGCore::error('Failed to write PXE file to tmp file: %s', $tmp);
 		}
-		fclose( $hndl );	
+		
+		fclose( $hndl );
+		
+		return $tmp;
 	}
 	return null;
 }

@@ -132,7 +132,7 @@ if ( $mac != null  )
 						@ftp_rmdir( $ftp, $dest );
 					}
 	
-					if (ftp_rename ( $ftp, $src, $dest ) || ftp_rename ( $ftp, $srcdd, $dest ))
+					if (@ftp_rename ( $ftp, $src, $dest ) || @ftp_rename ( $ftp, $srcdd, $dest ))
 					{
 						if ( checkOut( $conn, $jobid ) )
 						{
@@ -143,7 +143,9 @@ if ( $mac != null  )
 					}
 					else
 					{
-						echo _("unable to move $src to $dest");
+						$errorDetails = error_get_last();
+						printf('%s %s %s %s%s', _('Unable to move'), $src, _('to'), $dest, "\n");
+						printf('%s: %s, %s: %s%s', _('FTP Host'), getSetting($conn, "FOG_TFTP_HOST"), _('Error'), preg_replace(array('#\:(.*)\.$#', '#\[.*\]#', '#[[:space:]][[:space:]]#', '#\(\)#'), array('\\1', '', ' ', '():'), $errorDetails['message']), "\n\n");
 					}
 	
 					@ftp_close($ftp); 

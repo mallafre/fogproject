@@ -198,7 +198,7 @@ class StorageManagementPage extends FOGPage
 			$UserManager = $this->FOGCore->getClass('UserManager');
 			
 			// Error checking
-			if (count($UserManager->find(array('uName' => $_POST['name']))))
+			if (count($UserManager->find(array('name' => $_POST['name']))))
 			{
 				throw new Exception(_('Username already exists'));
 			}
@@ -415,7 +415,7 @@ class StorageManagementPage extends FOGPage
 			$UserManager = $this->FOGCore->getClass('UserManager');
 			
 			// Error checking
-			if ($UserCheck = $UserManager->find(array('uName' => $_POST['name'])) && is_array($UserCheck) && $UserCheck = end($UserCheck) && $UserCheck->get('id') != $User->get('id'))
+			if ($UserManager->exists($_POST['name'], $User->get('id')))
 			{
 				throw new Exception(_('Username already exists'));
 			}
@@ -657,7 +657,7 @@ class StorageManagementPage extends FOGPage
 			$UserManager = $this->FOGCore->getClass('UserManager');
 			
 			// Error checking
-			if (count($UserManager->find(array('uName' => $_POST['name']))))
+			if (count($UserManager->find(array('name' => $_POST['name']))))
 			{
 				throw new Exception(_('Username already exists'));
 			}
@@ -770,7 +770,7 @@ class StorageManagementPage extends FOGPage
 			$UserManager = $this->FOGCore->getClass('UserManager');
 			
 			// Error checking
-			if ($UserCheck = $UserManager->find(array('uName' => $_POST['name'])) && is_array($UserCheck) && $UserCheck = end($UserCheck) && $UserCheck->get('id') != $User->get('id'))
+			if ($UserManager->exists($_POST['name'], $User->get('id')))
 			{
 				throw new Exception(_('Username already exists'));
 			}
