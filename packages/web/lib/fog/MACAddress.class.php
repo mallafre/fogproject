@@ -69,6 +69,11 @@ class MACAddress
 		return '01-' . strtolower($this->getMACWithDash());
 	}
 	
+	public function getMACPXEPrefix()
+	{
+		return '01-' . strtolower($this->getMACWithDash());
+	}
+	
 	public function getMACPrefix()
 	{
 		return substr($this->getMACWithDash(), 0, 8);

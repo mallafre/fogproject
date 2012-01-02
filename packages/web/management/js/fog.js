@@ -224,14 +224,14 @@ var Loader;
 								for (var k in response['data'][i])
 								{
 									// New
-									row = row.replace(new RegExp('\$\{' + k + '\}', 'g'), (response['data'][i][k] ? response['data'][i][k] : ''));
+									row = row.replace(new RegExp('\\$\\{' + k + '\\}', 'g'), (response['data'][i][k] ? response['data'][i][k] : ''));
 									// Legacy
 									row = row.replace(new RegExp('%' + k + '%', 'g'), (response['data'][i][k] ? response['data'][i][k] : ''));
 								}
 								// New
-								row = row.replace(/\$\{\w+\}/g, '');
+								//row = row.replace(/\$\{\w+\}/g, '');
 								// LEGACY
-								row = row.replace(/%\w+%/g, '');
+								//row = row.replace(/%\w+%/g, '');
 								
 								// Add to rows
 								rows += row + "</tr>";
@@ -562,6 +562,12 @@ var Loader;
 	{
 		return this.length > 0;
 	}
+	jQuery.fn.isIE8 = function()
+	{
+		return $.browser.msie && parseInt($.browser.version, 10) <= 8;
+	}
+	
+	
 	
 	
 /*

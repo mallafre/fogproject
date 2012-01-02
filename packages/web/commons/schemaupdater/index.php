@@ -62,6 +62,7 @@ $installPath[26] = array( 199, 200, 201, 202, 203, 204, 205, 206, 207, 208, 209,
 $installPath[27] = array( 214, 215, 216 );
 $installPath[28] = array( 217, 218 );
 $installPath[29] = array( 219, 220, 221, 222, 223, 224, 225 );
+$installPath[30] = array( 226, 227 );
 
 $dbSchema[0] = "CREATE DATABASE " . DATABASE_NAME ;
 
@@ -1103,7 +1104,10 @@ $dbSchema[223] = "UPDATE `" . DATABASE_NAME . "`.`imageTypes` SET `imageTypeValu
 $dbSchema[224] = "UPDATE `" . DATABASE_NAME . "`.`images` SET `imageDD` = `imageDD` + 1";	// If this is ran more than one there will be problems :\
 $dbSchema[225] = "UPDATE `" . DATABASE_NAME . "`.`schemaVersion` set vValue = '30'";
 
-
+// 31 - Blackout - 10:56 AM 28/12/2011
+// scheduledTasks.stIsGroup now has a default of 0
+$dbSchema[226] = "ALTER TABLE `" . DATABASE_NAME . "`.`scheduledTasks` CHANGE `stIsGroup` `stIsGroup` VARCHAR( 2 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL DEFAULT '0'";
+$dbSchema[227] = "UPDATE `" . DATABASE_NAME . "`.`schemaVersion` set vValue = '31'";
 
 
 ?>

@@ -24,19 +24,25 @@ class ImageManagementPage extends FOGPage
 		
 		// Header row
 		$this->headerData = array(
-			_('Imagename'),
+			_('Image Name'),
+			_('Storage Group'),
+			_('O/S'),
 			_('Edit')
 		);
 		
 		// Row templates
 		$this->templates = array(
 			sprintf('<a href="?node=%s&sub=edit&%s=${id}">${name}</a>', $this->node, $this->id),
+			sprintf('${storageGroup}'),
+			sprintf('${os}'),
 			sprintf('<a href="?node=%s&sub=edit&%s=${id}"><span class="icon icon-edit"></span></a>', $this->node, $this->id)
 		);
 		
 		// Row attributes
 		$this->attributes = array(
 			array(),
+			array('width' => '100'),
+			array('width' => '100'),
 			array('class' => 'c', 'width' => '55'),
 		);
 	}
@@ -54,8 +60,13 @@ class ImageManagementPage extends FOGPage
 		foreach ($Images AS $Image)
 		{
 			$this->data[] = array(
-				'id'	=> $Image->get('id'),
-				'name'	=> $Image->get('name')
+				'id'		=> $Image->get('id'),
+				'name'		=> $Image->get('name'),
+				'description'	=> $Image->get('description'),
+				'storageGroup'	=> $Image->getStorageGroup()->get('name'),
+				'storageGroupID'=> $Image->get('storageGroupID'),
+				'osID'		=> $Image->get('osID'),
+				'os'		=> $Image->getOS()->get('name')
 			);
 		}
 		
@@ -72,10 +83,36 @@ class ImageManagementPage extends FOGPage
 		$this->title = _('Search');
 		
 		// Set search form
-		$this->searchFormURL = 'ajax/image.search.php';
+		$this->searchFormURL = sprintf('%s?node=%s&sub=search', $_SERVER['PHP_SELF'], $this->node);
 		
 		// Hook
 		$this->HookManager->processEvent('IMAGE_SEARCH');
+
+		// Output
+		$this->render();
+	}
+	
+	public function search_post()
+	{
+		// Variables
+		$keyword = preg_replace('#%+#', '%', '%' . preg_replace('#[[:space:]]#', '%', $this->REQUEST['crit']) . '%');
+		
+		// Find data -> Push data
+		foreach ($this->FOGCore->getClass('ImageManager')->find(array('name' => $keyword)) AS $Image)
+		{
+			$this->data[] = array(
+				'id'		=> $Image->get('id'),
+				'name'		=> $Image->get('name'),
+				'description'	=> $Image->get('description'),
+				'storageGroup'	=> $Image->getStorageGroup()->get('name'),
+				'storageGroupID'=> $Image->get('storageGroupID'),
+				'osID'		=> $Image->get('osID'),
+				'os'		=> $Image->getOS()->get('name')
+			);
+		}
+		
+		// Hook
+		$this->HookManager->processEvent('IMAGE_DATA', array('headerData' => &$this->headerData, 'data' => &$this->data, 'templates' => &$this->templates, 'attributes' => &$this->attributes));
 
 		// Output
 		$this->render();
@@ -144,7 +181,7 @@ class ImageManagementPage extends FOGPage
 				'storageGroupID'=> $_POST['storagegroup'],
 				'osID'		=> $_POST['os'],
 				'path'		=> $_POST['file'],
-				'type'		=> $_POST['imagetype']
+				'imageTypeID'	=> $_POST['imagetype']
 			));
 			
 			// Save
@@ -208,7 +245,7 @@ class ImageManagementPage extends FOGPage
 			<tr><td><?php print _("Storage Group"); ?></td><td><?php print $this->FOGCore->getClass('StorageGroupManager')->buildSelectBox($Image->get('storageGroupID')); ?></td></tr>
 			<tr><td><?php print _("Operating System"); ?></td><td><?php print $this->FOGCore->getClass('OSManager')->buildSelectBox($Image->get('osID')); ?></td></tr>
 			<tr><td><?php print _("Image Path"); ?></td><td>/images/ <input type="text" name="file" id="iFile" value="<?php print $Image->get('path'); ?>" /></td></tr>
-			<tr><td><?php print _("Image Type"); ?></td><td><?php print $this->FOGCore->getClass('ImageTypeManager')->buildSelectBox($Image->get('type')); ?></td></tr>				
+			<tr><td><?php print _("Image Type"); ?></td><td><?php print $this->FOGCore->getClass('ImageTypeManager')->buildSelectBox($Image->get('imageTypeID')); ?></td></tr>				
 			<tr><td colspan=2><center><input type="submit" value="<?php print _("Update"); ?>" /></center></td></tr>				
 		</table>
 		</form>
@@ -254,7 +291,7 @@ class ImageManagementPage extends FOGPage
 				->set('storageGroupID',	$_POST['storagegroup'])
 				->set('osID',		$_POST['os'])
 				->set('path',		$_POST['file'])
-				->set('type',		$_POST['imagetype']);
+				->set('imageTypeID',	$_POST['imagetype']);
 			
 			// Save
 			if ($Image->save())

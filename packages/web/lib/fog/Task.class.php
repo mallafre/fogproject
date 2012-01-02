@@ -64,6 +64,24 @@ class Task extends FOGController
 	}
 	
 	// Overrides
+	public function destroy()
+	{
+		// FTP: Create FTP object
+		$ftp = new FTP(array(	'host'		=> $this->FOGCore->getSetting('FOG_TFTP_HOST'),
+					'username'	=> $this->FOGCore->getSetting('FOG_TFTP_FTP_USERNAME'),
+					'password' 	=> $this->FOGCore->getSetting('FOG_TFTP_FTP_PASSWORD')
+				));
+		// FTP: Connect -> Upload new PXE file -> Disconnect
+		$ftp->connect()->delete(rtrim($this->FOGCore->getSetting('FOG_TFTP_PXE_CONFIG_DIR'), '/') . '/' . $this->getHost()->getMACAddress()->getMACPXEPrefix())->close();
+		
+		// TODO 
+		// Snapins: Cancel snapin tasks
+		
+		
+		// FOGController destroy
+		return parent::destroy();
+	}
+	
 	public function isValid()
 	{
 		$Host = $this->getHost();
@@ -101,7 +119,7 @@ class Task extends FOGController
 	public function  getImagePath()	{ return $this->getHost()->getImage()->get('path'); }
 	public function  getMAC()		{ return $this->getHost()->get('mac'); }
 	public function  getOSID()		{ return $this->getHost()->getOS()->get('id'); }
-	public function  getImageType()	{ return $this->getImage()->get('type'); }
+	public function  getImageTypeID()	{ return $this->getImage()->get('imageTypeID'); }
 	public function  getKernel()		{ return $this->getHost()->get('kernel'); }
 	public function  getDevice()		{ return $this->getHost()->get('kernelDevice'); }
 	public function  getMACColon()	{ return $this->getHost()->get('mac'); }

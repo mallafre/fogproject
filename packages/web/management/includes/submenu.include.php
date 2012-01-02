@@ -38,7 +38,7 @@ if ($currentUser != null && $currentUser->isLoggedIn())
 			if (!preg_match('#indexold#', $_SERVER['PHP_SELF']))
 			{
 				$FOGSubMenu->addItems('group', array(	_('General')		=> "$_SERVER[PHP_SELF]?node=$node&sub=edit&groupid=$groupid#group-general",
-									_('Basic Tasks')	=> "$_SERVER[PHP_SELF]?node=$node&sub=edit&groupid=$groupid#group-tasks",
+									_('Group Tasks')	=> "$_SERVER[PHP_SELF]?node=$node&sub=edit&groupid=$groupid#group-tasks",
 									_('Membership')		=> "$_SERVER[PHP_SELF]?node=$node&sub=edit&groupid=$groupid#group-membership",
 									_('Image Association')	=> "$_SERVER[PHP_SELF]?node=$node&sub=edit&groupid=$groupid#group-image",
 									_('OS Association')	=> "$_SERVER[PHP_SELF]?node=$node&sub=edit&groupid=$groupid#group-os",
@@ -105,7 +105,7 @@ if ($currentUser != null && $currentUser->isLoggedIn())
 			{
 				// NEW menu items - tab based, single page
 				$FOGSubMenu->addItems('host', array(	_('General')		=> "$_SERVER[PHP_SELF]?node=$node&sub=edit&id=$id#host-general",
-									_('Basic Tasks')	=> "$_SERVER[PHP_SELF]?node=$node&sub=edit&id=$id#host-tasks",
+									_('Host Tasks')		=> "$_SERVER[PHP_SELF]?node=$node&sub=edit&id=$id#host-tasks",
 									_('Active Directory')	=> "$_SERVER[PHP_SELF]?node=$node&sub=edit&id=$id#host-active-directory",
 									_('Printers')		=> "$_SERVER[PHP_SELF]?node=$node&sub=edit&id=$id#host-printers",
 									_('Snap-ins')		=> "$_SERVER[PHP_SELF]?node=$node&sub=edit&id=$id#host-snapins",

@@ -25,10 +25,24 @@ class StorageNode extends FOGController
 		'interface'	=> 'ngmInterface'
 	);
 	
-	// Allow setting / getting of these additional fields
-	public $additionalFields = array(
-		
+	// Required database fields
+	public $databaseFieldsRequired = array(
+		'ip',
+		'path'
 	);
+	
+	// Overrides
+	public function get($key = '')
+	{
+		// Path: Always remove trailing slash on NFS path
+		if ($this->key($key) == 'path')
+		{
+			return rtrim(parent::get($key), '/');
+		}
+		
+		// FOGController get()
+		return parent::get($key);
+	}
 	
 	// Custom functions
 	function isMaster()

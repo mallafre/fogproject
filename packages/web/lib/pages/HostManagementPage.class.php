@@ -29,7 +29,7 @@ class HostManagementPage extends FOGPage
 			_('Host Name'),
 			_('MAC'),
 			_('IP Address'),
-			_('Edit')
+			''
 		);
 		
 		// Row templates
@@ -39,7 +39,7 @@ class HostManagementPage extends FOGPage
 			'<a href="?node=host&sub=edit&id=${id}" title="Edit">${name}</a>',
 			'${mac}',
 			'${ip}',
-			'<a href="?node=host&sub=edit&id=${id}"><span class="icon icon-edit" title="Edit: ${hostname}"></span></a>'
+			'<a href="?node=host&sub=edit&id=${id}"><span class="icon icon-download" title="Deploy"></span></a> <a href="?node=host&sub=edit&id=${id}"><span class="icon icon-multicast" title="Multi-cast Deploy"></span></a> <a href="?node=host&sub=edit&id=${id}"><span class="icon icon-edit" title="Edit"></span></a>'
 		);
 		
 		// Row attributes
@@ -47,9 +47,9 @@ class HostManagementPage extends FOGPage
 			array('width' => 22),
 			array('width' => 20),
 			array(),
-			array('width' => 120),
-			array('width' => 120),
-			array('width' => 40, 'class' => 'c')
+			array('width' => 110),
+			array('width' => 110),
+			array('width' => 80, 'class' => 'c')
 		);
 	}
 	
@@ -59,11 +59,8 @@ class HostManagementPage extends FOGPage
 		// Set title
 		$this->title = _('All Hosts');
 		
-		// Find data
-		$Hosts = $this->FOGCore->getClass('HostManager')->find();
-		
-		// Row data
-		foreach ($Hosts AS $Host)
+		// Find data -> Push data
+		foreach ($this->FOGCore->getClass('HostManager')->find() AS $Host)
 		{
 			$this->data[] = array(
 				'id'	=> $Host->get('id'),
@@ -86,10 +83,38 @@ class HostManagementPage extends FOGPage
 		$this->title = _('Search');
 		
 		// Set search form
-		$this->searchFormURL = 'ajax/host.search.php';
+		//$this->searchFormURL = 'ajax/host.search.php';
+		//$this->searchFormURL = $this->formAction;
+		$this->searchFormURL = sprintf('%s?node=%s&sub=search', $_SERVER['PHP_SELF'], $this->node);
+
+		// Output
+		$this->render();
+	}
+	
+	public function search_post()
+	{
+		// Variables
+		$keyword = preg_replace('#%+#', '%', '%' . preg_replace('#[[:space:]]#', '%', $this->REQUEST['crit']) . '%');
+		$findWhere = array(
+			'name'		=> $keyword,
+			'mac'		=> $keyword,
+			'ip'		=> $keyword,
+			'description'	=> $keyword
+		);
+	
+		// Find data -> Push data
+		foreach ($this->FOGCore->getClass('HostManager')->find($findWhere, 'OR') AS $Host)
+		{
+			$this->data[] = array(
+				'id'	=> $Host->get('id'),
+				'name'	=> $Host->get('name'),
+				'mac'	=> $Host->get('mac')->__toString(),
+				'ip'	=> $Host->get('ip')
+			);
+		}
 		
 		// Hook
-		$this->HookManager->processEvent('HOST_SEARCH');
+		$this->HookManager->processEvent('HOST_DATA', array('headerData' => &$this->headerData, 'data' => &$this->data, 'templates' => &$this->templates, 'attributes' => &$this->attributes));
 
 		// Output
 		$this->render();
@@ -183,7 +208,7 @@ class HostManagementPage extends FOGPage
 				$this->FOGCore->setMessage(_('Host added'));
 			
 				// Redirect to new entry
-				$this->FOGCore->redirect(sprintf('?node=%s&sub=edit&%s=%s', $this->request['node'], $this->id, $Host->get('id')));
+				$this->FOGCore->redirect(sprintf('?node=%s&sub=edit&%s=%s', $this->REQUEST['node'], $this->id, $Host->get('id')));
 			}
 			else
 			{
@@ -210,7 +235,7 @@ class HostManagementPage extends FOGPage
 	public function edit()
 	{
 		// Find
-		$Host = new Host($this->request['id']);
+		$Host = new Host($this->REQUEST['id']);
 		
 		// Title - set title for page title in window
 		$this->title = sprintf('%s: %s', _('Edit'), $Host->get('name'));
@@ -225,12 +250,12 @@ class HostManagementPage extends FOGPage
 		// TODO: Rewrite HTML & PHP
 		?>
 		<!--<form method="POST" action="<?php print $this->formAction; ?>">
-			<input type="hidden" name="id" value="<?php print $this->request['id']; ?>" />-->
+			<input type="hidden" name="id" value="<?php print $this->REQUEST['id']; ?>" />-->
 			<div id="tab-container">
 				<!-- General -->
 				<div id="host-general">
 					<form method="POST" action="<?php print $this->formAction; ?>&tab=host-general">
-						<input type="hidden" name="id" value="<?php print $this->request['id']; ?>" />
+						<input type="hidden" name="id" value="<?php print $this->REQUEST['id']; ?>" />
 						<h2><?php print _("Edit host definition"); ?></h2>
 						<table cellpadding="0" cellspacing="0" border="0" width="100%">
 							<tr><td width="35%"><?php print _("Host Name"); ?></td><td><input type="text" name="host" value="<?php print $Host->get('name'); ?>" maxlength="15" class="hostname-input" /> *</td></tr>
@@ -249,34 +274,108 @@ class HostManagementPage extends FOGPage
 				<!-- Basic Tasks -->
 				<div id="host-tasks" class="organic-tabs-hidden">
 					<form method="POST" action="<?php print $this->formAction; ?>&tab=host-tasks">
-						<input type="hidden" name="id" value="<?php print $this->request['id']; ?>" />
-						<h2><?php print _("Basic Imaging Tasks"); ?></h2>
+						<input type="hidden" name="id" value="<?php print $this->REQUEST['id']; ?>" />
+						<h2><?php print _("Host Tasks"); ?></h2>
 						<table cellpadding="0" cellspacing="0" border="0" width="100%">
 							<tr>
-								<td class="c" width="50"><a href="?node=tasks&type=host&direction=down&noconfirm=<?php echo $Host->get('id'); ?>"><img src="./images/senddebug.png" /><p><?php echo(_("Deploy")); ?></p></a></td>
-								<td><p><?php echo(_("Deploy action will send an image saved on the FOG server to the client computer with all included snapins.")); ?></p></td></tr>
+								<td class="task-action"><a href="?node=host&sub=deploy&id=<?php echo $Host->get('id'); ?>"><img src="./images/senddebug.png" /><p><?php echo(_("Deploy")); ?></p></a></td>
+								<td><p><?php print _("Deploy action will send an image saved on the FOG server to the client computer with all included snapins."); ?></p></td></tr>
 							<tr>
-								<td class="c" width="50"><a href="?node=tasks&type=host&direction=up&noconfirm=<?php echo $Host->get('id'); ?>"><img src="./images/restoredebug.png" /><p><?php echo(_("Upload")); ?></p></a></td>
-								<td><p><?php echo(_("Upload will pull an image from a client computer that will be saved on the server.")); ?></p></td></tr>
+								<td class="task-action"><a href="?node=host&sub=upload&id=<?php echo $Host->get('id'); ?>"><img src="./images/restoredebug.png" /><p><?php echo(_("Upload")); ?></p></a></td>
+								<td><p><?php print _("Upload will pull an image from a client computer that will be saved on the server."); ?></p></td></tr>
 							<tr>
-								<td class="c" width="50"><a href="?node=tasks&sub=advanced&hostid=<?php echo $Host->get('id'); ?>"><img src="./images/host-advanced.png" /><p><?php echo(_("Advanced")); ?></p></a></td>
-								<td><p><?php echo(_("View advanced tasks for this host.")); ?></p></td>
+								<td class="task-action"><a href="<?php print $this->formAction; ?>#host-tasks" class="advanced-tasks-link"><img src="./images/host-advanced.png" /><p><?php echo(_("Advanced")); ?></p></a></td>
+								<td><p><?php print _("View advanced tasks for this host."); ?></p></td>
 							</tr>
 						</table>
+						
+						<div id="advanced-tasks" class="hidden">
+							<h2><?php print _('Advanced Actions'); ?></h2>
+							<table cellpadding="0" cellspacing="0" border="0" width="100%">
+								<tr>
+									<td class="task-action"><a href="?node=host&sub=debug&id=<?php print $Host->get('id'); ?>"><img src="./images/debug.png" /><p><?php print _('Debug'); ?></p></a></td>
+									<td><p><?php print _('Debug mode will load the boot image and load a prompt so you can run any commands you wish.  When you are done, you must remember to remove the PXE file, by clicking on "Active Tasks" and clicking on the "Kill Task" button.'); ?></p></td>
+								</tr>	
+								<tr>
+									<td class="task-action"><a href="?node=host&sub=deploy&debug=true&id=<?php print $Host->get('id'); ?>"><img src="./images/senddebug.png" /><p><?php print _('Deploy-Debug'); ?></p></a></td>
+									<td><p><?php print _('Deploy-Debug mode allows FOG to setup the environment to allow you send a specific image to a computer, but instead of sending the image, FOG will leave you at a prompt right before sending.  If you actually wish to send the image all you need to do is type "fog" and hit enter.'); ?></p></td>
+								</tr>		
+								<tr>
+									<td class="task-action"><a href="?node=host&sub=upload&debug=true&id=<?php print $Host->get('id'); ?>"><img src="./images/restoredebug.png" /><p><?php print _('Upload-Debug'); ?></p></a></td>
+									<td><p><?php print _('Upload-Debug mode allows FOG to setup the environment to allow you Upload a specific image to a computer, but instead of Upload the image, FOG will leave you at a prompt right before restoring.  If you actually wish to Upload the image all you need to do is type "fog" and hit enter.'); ?></p></td>
+								</tr>			
+								<tr>
+									<td class="task-action"><a href="?node=host&sub=deploy&snapins=false&id=<?php print $Host->get('id'); ?>"><img src="./images/sendnosnapin.png" /><p><?php print _('Deploy without Snapins'); ?></p></a></td>
+									<td><p><?php print _('Deploy without snapins allows FOG to image the workstation, but after the task is complete any snapins linked to the host or group will NOT be sent.'); ?></p></td>
+								</tr>		
+								<tr>
+									<td class="task-action"><a href="?node=host&sub=snapins&id=<?php print $Host->get('id'); ?>"><img src="./images/snap.png" /><p><?php print _('Deploy Snapins'); ?></p></a></td>
+									<td><p><?php print _('This option allows you to send all the snapins to host without imaging the computer.  (Requires FOG Service to be installed on client)'); ?></p></td>
+								</tr>		
+								<tr>
+									<td class="task-action"><a href="?node=host&sub=snapin-single&id=<?php print $Host->get('id'); ?>"><img src="./images/snap.png" /><p><?php print _('Deploy Single Snapin'); ?></p></a></td>
+									<td><p><?php print _('This option allows you to send a single snapin to a host.  (Requires FOG Service to be installed on client)'); ?></p></td>
+								</tr>			
+								<tr>
+									<td class="task-action"><a href="?node=host&sub=memtest&id=<?php print $Host->get('id'); ?>"><img src="./images/memtest.png" /><p><?php print _('Memtest86+'); ?></p></a></td>
+									<td><p><?php print _('Memtest86+ loads Memtest86+ on the client computer and will have it continue to run until stopped.  When you are done, you must remember to remove the PXE file, by clicking on "Active Tasks" and clicking on the "Kill Task" button.'); ?></p></td>
+								</tr>		
+								<tr>
+									<td class="task-action"><a href="?node=host&sub=wakeup&id=<?php print $Host->get('id'); ?>"><img src="./images/wake.png" /><p><?php print _('Wake Up'); ?></p></a></td>
+									<td><p><?php print _('Wake Up will attempt to send the Wake-On-LAN packet to the computer to turn the computer on.  In switched environments, you typically need to configure your hardware to allow for this (iphelper).'); ?></p></td>
+								</tr>			
+								<tr>
+									<td class="task-action"><a href="?node=host&sub=wipe-fast&id=<?php print $Host->get('id'); ?>"><img src="./images/veryfastwipe.png" /><p><?php print _('Fast Wipe'); ?></p></a></td>
+									<td><p><?php print _("Fast Wipe will boot the client computer and perform a quick and lazy disk wipe.  This method writes zero's to the start of the hard disk, destroying the MBR, but NOT overwritting everything on the disk."); ?></p></td>
+								</tr>					
+								<tr>
+									<td class="task-action"><a href="?node=host&sub=wipe-normal&id=<?php print $Host->get('id'); ?>"><img src="./images/quickwipe.png" /><p><?php print _('Normal Wipe'); ?></p></a></td>
+									<td><p><?php print _("Normal Wipe will boot the client computer and perform a simple disk wipe.  This method writes one pass of zero's to the hard disk."); ?></p></td>
+								</tr>				
+								<tr>
+									<td class="task-action"><a href="?node=host&sub=wipe-full&id=<?php print $Host->get('id'); ?>"><img src="./images/fullwipe.png" /><p><?php print _('Full Wipe'); ?></p></a></td>
+									<td><p><?php print _('Full Wipe will boot the client computer and perform a full disk wipe.  This method writes a few passes of random data to the hard disk.'); ?></p></td>
+								</tr>					
+								<tr>
+									<td class="task-action"><a href="?node=host&sub=surface-test&id=<?php print $Host->get('id'); ?>"><img src="./images/surfacetest.png" /><p><?php print _('Disk Surface Test'); ?></p></a></td>
+									<td><p><?php print _("Disk Surface Test checks the hard drive's surface sector by sector for any errors and reports back if errors are present."); ?></p></td>
+								</tr>							
+								<tr>
+									<td class="task-action"><a href="?node=host&sub=test-disk&id=<?php print $Host->get('id'); ?>"><img src="./images/testdisk.png" /><p><?php print _('Test Disk'); ?></p></a></td>
+									<td><p><?php print _('Test Disk loads the testdisk utility that can be used to check a hard disk and recover lost partitions.'); ?></p></td>
+								</tr>					
+								<tr>
+									<td class="task-action"><a href="?node=host&sub=recover&id=<?php print $Host->get('id'); ?>"><img src="./images/recover.png" /><p><?php print _('Recover'); ?></p></a></td>
+									<td><p><?php print _('Recover loads the photorec utility that can be used to recover lost files from a hard drisk.  When recovering files, make sure you save them to your NFS volume (ie: /images).'); ?></p></td>
+								</tr>								
+								<tr>
+									<td class="task-action"><a href="?node=host&sub=antivirus&id=<?php print $Host->get('id'); ?>"><img src="./images/clam.png" /><p><?php print _('Anti-Virus'); ?></p></a></td>
+									<td><p><?php print _('Anti-Virus loads Clam AV on the client boot image, updates the scanner and then scans the Windows partition.'); ?></p></td>
+								</tr>									
+								<tr>
+									<td class="task-action"><a href="?node=host&sub=inventory&id=<?php print $Host->get('id'); ?>"><img src="./images/inventory.png" /><p><?php print _('Hardware Inventory'); ?></p></a></td>
+									<td><p><?php print _('The hardware inventory task will boot the client computer and pull basic hardware informtation from it and report it back to the FOG server.'); ?></p></td>
+								</tr>									
+								<tr>
+									<td class="task-action"><a href="?node=host&sub=windows-password-reset&id=<?php print $Host->get('id'); ?>"><img src="./images/winpass.png" /><p><?php print _('Password Reset'); ?></p></a></td>
+									<td><p><?php print _('Password reset will blank out a Windows user password that may have been lost or forgotten.'); ?></p></td>
+								</tr>	
+							</table>
+						</div>
 					</form>
 				</div>
 				
 				<!-- Active Directory -->
 				<div id="host-active-directory" class="organic-tabs-hidden">
 					<form method="POST" action="<?php print $this->formAction; ?>&tab=host-active-directory">
-						<input type="hidden" name="id" value="<?php print $this->request['id']; ?>" />
+						<input type="hidden" name="id" value="<?php print $this->REQUEST['id']; ?>" />
 						<h2><?php print _("Active Directory"); ?></h2>
 						<table cellpadding=0 cellspacing=0 border=0 width="100%">
 							<tr><td><?php print _("Join Domain after image task"); ?></td><td><input id='adEnabled' type="checkbox" name="domain"<?php print ($Host->get('useAD') == '1' ? ' checked="checked"' : ''); ?> /></td></tr>
 							<tr><td><?php print _("Domain name"); ?></td><td><input id="adDomain" class="smaller" type="text" name="domainname" value="<?php print $Host->get('ADDomain'); ?>" /></td></tr>
-							<tr><td><?php print _("Organizational Unit"); ?><br> <span class="lightColor"><?php print _("(Blank for default)"); ?></span></td><td><input size="50" id="adOU" class="smaller" type="text" name="ou" value="<?php print $Host->get('ADOU'); ?>" /></td></tr>
+							<tr><td><?php print _("Organizational Unit"); ?><br> <span class="lightColor"><?php print _("(Blank for default)"); ?></span></td><td><input size="50" style="width: 350px" id="adOU" class="smaller" type="text" name="ou" value="<?php print $Host->get('ADOU'); ?>" /></td></tr>
 							<tr><td><?php print _("Domain Username"); ?></td><td><input id="adUsername" class="smaller" type="text" name="domainuser" value="<?php print $Host->get('ADUser'); ?>" /></td></tr>
-							<tr><td><?php print _("Domain Password"); ?></td><td><input id="adPassword" class="smaller" type="text" name="domainpassword" value="<?php print $Host->get('ADPass'); ?>" /> <span class="lightColor"><?php print _("(Must be encrypted)"); ?></span></td></tr>
+							<tr><td><?php print _("Domain Password"); ?><br /><?php print _("(Must be encrypted)"); ?></td><td><input id="adPassword" class="smaller" type="text" name="domainpassword" style="width: 250px" value="<?php print $Host->get('ADPass'); ?>" /></td></tr>
 							<tr><td colspan=2><center><br /><input type="hidden" name="updatead" value="1" /><input type="submit" value="<?php print _("Update"); ?>" /></td></tr>
 						</table>
 					</form>
@@ -285,14 +384,13 @@ class HostManagementPage extends FOGPage
 				<!-- Printers -->
 				<div id="host-printers" class="organic-tabs-hidden">
 					<form method="POST" action="<?php print $this->formAction; ?>&tab=host-printers">
-						<input type="hidden" name="id" value="<?php print $this->request['id']; ?>" />
+						<input type="hidden" name="id" value="<?php print $this->REQUEST['id']; ?>" />
 						<h2><?php print _("Host Printer Configuration"); ?></h2>
 						<p><?php print _("Select Management Level for this Host"); ?></p>
-						<p class="l">
-						
-						<input type="radio" name="level" value="0"<?php print ($Host->get('printerLevel') === '0' || $Host->get('printerLevel') === '' ? ' checked="checked"' : ''); ?> /><?php print _("No Printer Management"); ?><br/>
-						<input type="radio" name="level" value="1"<?php print ($Host->get('printerLevel') === '0' ? ' checked="checked"' : ''); ?> /><?php print _("Add Only"); ?><br/>
-						<input type="radio" name="level" value="2"<?php print ($Host->get('printerLevel') === '0' ? ' checked="checked"' : ''); ?> /><?php print _("Add and Remove"); ?><br/>
+						<p>
+							<input type="radio" name="level" value="0"<?php print ($Host->get('printerLevel') === '0' || $Host->get('printerLevel') === '' ? ' checked="checked"' : ''); ?> /><?php print _("No Printer Management"); ?><br/>
+							<input type="radio" name="level" value="1"<?php print ($Host->get('printerLevel') === '0' ? ' checked="checked"' : ''); ?> /><?php print _("Add Only"); ?><br/>
+							<input type="radio" name="level" value="2"<?php print ($Host->get('printerLevel') === '0' ? ' checked="checked"' : ''); ?> /><?php print _("Add and Remove"); ?><br/>
 						</p>
 						
 						<table cellpadding=0 cellspacing=0 border=0 width=100%>
@@ -307,9 +405,7 @@ class HostManagementPage extends FOGPage
 							<tbody>
 								<?php
 								
-								var_dump($Host->get('printers'));
-								var_dump($Host->get('printers'));
-								
+								//var_dump($Host->get('printers'));
 								
 								// TODO: Complete
 								/*
@@ -360,10 +456,10 @@ class HostManagementPage extends FOGPage
 				<!-- Snapins -->
 				<div id="host-snapins" class="organic-tabs-hidden">
 					<form method="POST" action="<?php print $this->formAction; ?>&tab=host-snapins">
-						<input type="hidden" name="id" value="<?php print $this->request['id']; ?>" />
+						<input type="hidden" name="id" value="<?php print $this->REQUEST['id']; ?>" />
 						<h2><?php print _("Snapins"); ?></h2>
 						<table cellpadding=0 cellspacing=0 border=0 width="100%">
-								<tr class="header"><td><font class="smaller">&nbsp;<b><?php print _("Snapin Name"); ?></b></font></td><td><font class="smaller"><b><?php print _("Remove"); ?></b></font></td></tr>
+								<tr class="header"><td>&nbsp;<b><?php print _("Snapin Name"); ?></b></td><td><b><?php print _("Remove"); ?></b></td></tr>
 								<?php
 								/*
 								$sql = "SELECT
@@ -404,7 +500,7 @@ class HostManagementPage extends FOGPage
 				<!-- Service Configuration -->
 				<div id="host-service" class="organic-tabs-hidden">
 					<form method="POST" action="<?php print $this->formAction; ?>&tab=host-service">
-						<input type="hidden" name="id" value="<?php print $this->request['id']; ?>" />
+						<input type="hidden" name="id" value="<?php print $this->REQUEST['id']; ?>" />
 						<h2><?php print _("Service Configuration"); ?></h2>
 						<?php
 						
@@ -545,7 +641,7 @@ class HostManagementPage extends FOGPage
 				<!-- Inventory -->
 				<div id="host-hardware-inventory" class="organic-tabs-hidden">
 					<form method="POST" action="<?php print $this->formAction; ?>&tab=host-hardware-inventory">
-						<input type="hidden" name="id" value="<?php print $this->request['id']; ?>" />
+						<input type="hidden" name="id" value="<?php print $this->REQUEST['id']; ?>" />
 						<h2><?php print _("Host Hardware Inventory"); ?></h2>
 						
 						<table cellpadding=0 cellspacing=0 border=0 width=100%>
@@ -610,7 +706,7 @@ class HostManagementPage extends FOGPage
 				<!-- Virus -->
 				<div id="host-virus-history" class="organic-tabs-hidden">
 					<form method="POST" action="<?php print $this->formAction; ?>&tab=host-virus-history">
-						<input type="hidden" name="id" value="<?php print $this->request['id']; ?>" />
+						<input type="hidden" name="id" value="<?php print $this->REQUEST['id']; ?>" />
 						<h2><?php print _("Virus History"); ?> (<a href="<?php print "?node=$GLOBALS[node]&sub=$GLOBALS[sub]&id=$GLOBALS[id]&delvid=all&tab=$GLOBALS[tab]"; ?>"><?php print _("clear all history"); ?></a>)</h2>
 						<table cellpadding=0 cellspacing=0 border=0 width=100%>
 							<tr class="header"><td>&nbsp;<b><?php print _("Virus Name"); ?></b></td><td><b><?php print _("File"); ?></b></td><td><b><?php print _("Mode"); ?></b></td><td><b><?php print _("Date"); ?></b></td><td><b><?php print _("Clear"); ?></b></td></tr>
@@ -648,7 +744,7 @@ class HostManagementPage extends FOGPage
 				<!-- Login History -->
 				<div id="host-login-history" class="organic-tabs-hidden">
 					<form method="POST" action="<?php print $this->formAction; ?>&tab=host-login-history">
-						<input type="hidden" name="id" value="<?php print $this->request['id']; ?>" />
+						<input type="hidden" name="id" value="<?php print $this->REQUEST['id']; ?>" />
 						<h2><?php print _("Host Login History"); ?></h2>
 						<?php
 						
@@ -705,7 +801,7 @@ class HostManagementPage extends FOGPage
 						
 						?>
 						<table cellpadding=0 cellspacing=0 border=0 width=100%>
-						<tr class="header"><td><b>&nbsp;<?php print _("Action"); ?></b></td><td><b>&nbsp;<?php print _("Username"); ?></b></font></td><td><b>&nbsp;<?php print _("Time"); ?></b></td><td><b>&nbsp;<?php print _("Description"); ?></b></td></tr>		
+						<tr class="header"><td><b>&nbsp;<?php print _("Action"); ?></b></td><td><b>&nbsp;<?php print _("Username"); ?></b></td><td><b>&nbsp;<?php print _("Time"); ?></b></td><td><b>&nbsp;<?php print _("Description"); ?></b></td></tr>		
 						
 						<?php
 						$cnt = 0;
@@ -770,7 +866,7 @@ class HostManagementPage extends FOGPage
 	public function edit_post()
 	{
 		// Find
-		$Host = new Host($this->request['id']);
+		$Host = new Host($this->REQUEST['id']);
 		
 		// Hook
 		$this->HookManager->processEvent('HOST_EDIT_POST', array('Host' => &$Host));
@@ -785,7 +881,7 @@ class HostManagementPage extends FOGPage
 			}
 			
 			// Tabs
-			if ($this->request['tab'] == 'host-general')
+			if ($this->REQUEST['tab'] == 'host-general')
 			{
 				// Error checking
 				if (empty($_POST['mac']))
@@ -816,7 +912,7 @@ class HostManagementPage extends FOGPage
 				// Add Additional MAC Addresses
 				$Host->set('additionalMACs', (array)$_POST['additionalMACs']);
 			}
-			elseif ($this->request['tab'] == 'host-active-directory')
+			elseif ($this->REQUEST['tab'] == 'host-active-directory')
 			{
 				$Host	->set('useAD',		($_POST["domain"] == "on" ? '1' : '0'))
 					->set('ADDomain',	$_POST['domainname'])
@@ -824,7 +920,7 @@ class HostManagementPage extends FOGPage
 					->set('ADUser',		$_POST['domainuser'])
 					->set('ADPass',		$_POST['domainpassword']);
 			}
-			elseif ($this->request['tab'] == 'host-printers')
+			elseif ($this->REQUEST['tab'] == 'host-printers')
 			{
 				/*
 				if ( $_POST["update"] == "1" )
@@ -833,13 +929,13 @@ class HostManagementPage extends FOGPage
 					{
 						$level = mysql_real_escape_string( $_POST["level"] );
 						$sql = "update hosts set hostPrinterLevel = '$level' where hostID = '$id'";
-						if ( mysql_query( $sql, $conn ) )
+						if ( mysql_query( $sql, $GLOBALS['conn'] ) )
 						{
 							if ( $_POST["prnt"] !== null && is_numeric( $_POST["prnt"] ) && $_POST["prnt"]  >=  0 )
 							{
 								$printer = mysql_real_escape_string( $_POST["prnt"] );
 								
-								if ( ! addPrinter( $conn, $id, $printer ) )
+								if ( ! addPrinter( $GLOBALS['conn'], $id, $printer ) )
 									msgBox( _("Failed to add printer") );
 														
 							}		
@@ -853,16 +949,16 @@ class HostManagementPage extends FOGPage
 				
 				if ( $_GET["default"] !== null )
 				{
-					setDefaultPrinter( $conn, $_GET["default"] );
+					setDefaultPrinter( $GLOBALS['conn'], $_GET["default"] );
 				}
 				
 				if ( $_GET["dellinkid"] !== null )
 				{
-					deletePrinter( $conn, $_GET["dellinkid"] );
+					deletePrinter( $GLOBALS['conn'], $_GET["dellinkid"] );
 				}
 				*/
 			}
-			elseif ($this->request['tab'] == 'host-snapins')
+			elseif ($this->REQUEST['tab'] == 'host-snapins')
 			{
 				// ADD
 				/*
@@ -871,7 +967,7 @@ class HostManagementPage extends FOGPage
 				
 				$snap = mysql_real_escape_string( $_POST["snap"] );
 				$ret = "";
-				if ( ! addSnapinToHost( $conn, $id, $snap, $ret ) )
+				if ( ! addSnapinToHost( $GLOBALS['conn'], $id, $snap, $ret ) )
 				{
 					// Hook
 					$HookManager->processEvent('HostEditAddSnapinUpdateFail');
@@ -893,7 +989,7 @@ class HostManagementPage extends FOGPage
 				
 				$snap = mysql_real_escape_string( $_GET["delsnaplinkid"] );
 				$ret = "";
-				if ( ! deleteSnapinFromHost( $conn, $id, $snap, $ret ) )
+				if ( ! deleteSnapinFromHost( $GLOBALS['conn'], $id, $snap, $ret ) )
 				{
 					// Hook
 					$HookManager->processEvent('HostEditRemoveSnapinUpdateFail');
@@ -907,7 +1003,7 @@ class HostManagementPage extends FOGPage
 				}
 				*/
 			}
-			elseif ($this->request['tab'] == 'host-service')
+			elseif ($this->REQUEST['tab'] == 'host-service')
 			{
 				/*
 				if ( $_GET["updatemodulestatus"] == "1" )
@@ -946,18 +1042,18 @@ class HostManagementPage extends FOGPage
 					if ( $_POST["taskreboot"] == "on" ) $trstate = "1";
 					if ( $_POST["usertracker"] == "on" ) $utstate = "1";
 
-					setHostModuleStatus( $conn, $dircleanupstate, $id, 'dircleanup' );
-					setHostModuleStatus( $conn, $usercleanupstate, $id, 'usercleanup' );
-					setHostModuleStatus( $conn, $displaymanagerstate, $id, 'displaymanager' );
-					setHostModuleStatus( $conn, $alostate, $id, 'autologout' );
-					setHostModuleStatus( $conn, $gfstate, $id, 'greenfog' );
-					setHostModuleStatus( $conn, $snapinstate, $id, 'snapin' );
-					setHostModuleStatus( $conn, $hncstate, $id, 'hostnamechanger' );
-					setHostModuleStatus( $conn, $custate, $id, 'clientupdater' );
-					setHostModuleStatus( $conn, $hrstate, $id, 'hostregister' );
-					setHostModuleStatus( $conn, $pmstate, $id, 'printermanager' );
-					setHostModuleStatus( $conn, $trstate, $id, 'taskreboot' );
-					setHostModuleStatus( $conn, $utstate, $id, 'usertracker' );
+					setHostModuleStatus( $GLOBALS['conn'], $dircleanupstate, $id, 'dircleanup' );
+					setHostModuleStatus( $GLOBALS['conn'], $usercleanupstate, $id, 'usercleanup' );
+					setHostModuleStatus( $GLOBALS['conn'], $displaymanagerstate, $id, 'displaymanager' );
+					setHostModuleStatus( $GLOBALS['conn'], $alostate, $id, 'autologout' );
+					setHostModuleStatus( $GLOBALS['conn'], $gfstate, $id, 'greenfog' );
+					setHostModuleStatus( $GLOBALS['conn'], $snapinstate, $id, 'snapin' );
+					setHostModuleStatus( $GLOBALS['conn'], $hncstate, $id, 'hostnamechanger' );
+					setHostModuleStatus( $GLOBALS['conn'], $custate, $id, 'clientupdater' );
+					setHostModuleStatus( $GLOBALS['conn'], $hrstate, $id, 'hostregister' );
+					setHostModuleStatus( $GLOBALS['conn'], $pmstate, $id, 'printermanager' );
+					setHostModuleStatus( $GLOBALS['conn'], $trstate, $id, 'taskreboot' );
+					setHostModuleStatus( $GLOBALS['conn'], $utstate, $id, 'usertracker' );
 
 					// update screen settings
 					$x = mysql_real_escape_string( $_POST["x"] );
@@ -966,7 +1062,7 @@ class HostManagementPage extends FOGPage
 					if ( $x == "" && $y == "" && $z == "" )
 					{
 						$sql = "DELETE FROM hostScreenSettings WHERE hssHostID = '$id'";
-						$res = mysql_query( $sql, $conn ) or criticalError( mysql_error(), _("FOG :: Database error!") );
+						$res = mysql_query( $sql, $GLOBALS['conn'] ) or criticalError( mysql_error(), _("FOG :: Database error!") );
 					}
 					else
 					{
@@ -976,7 +1072,7 @@ class HostManagementPage extends FOGPage
 								hostScreenSettings
 							WHERE
 								hssHostID = '$id'";
-						$res = mysql_query( $sql, $conn ) or criticalError( mysql_error(), _("FOG :: Database error!") );
+						$res = mysql_query( $sql, $GLOBALS['conn'] ) or criticalError( mysql_error(), _("FOG :: Database error!") );
 						$blFound = false;
 						while( $ar = mysql_fetch_array( $res ) )
 						{
@@ -998,7 +1094,7 @@ class HostManagementPage extends FOGPage
 						{
 							$sql = "INSERT INTO hostScreenSettings(hssHostID, hssWidth, hssHeight, hssRefresh) values('$id', '$x', '$y', '$r')";
 						}
-						if ( ! mysql_query( $sql, $conn ) )
+						if ( ! mysql_query( $sql, $GLOBALS['conn'] ) )
 							criticalError( mysql_error(), _("FOG :: Database error!") );
 					}
 					// Update auto log off times.
@@ -1009,7 +1105,7 @@ class HostManagementPage extends FOGPage
 							hostAutoLogOut
 						WHERE
 							haloHostID = '$id'";
-					$res = mysql_query( $sql, $conn ) or criticalError( mysql_error(), _("FOG :: Database error!") );
+					$res = mysql_query( $sql, $GLOBALS['conn'] ) or criticalError( mysql_error(), _("FOG :: Database error!") );
 					$blFound = false;
 					while( $ar = mysql_fetch_array( $res ) )
 					{
@@ -1029,13 +1125,13 @@ class HostManagementPage extends FOGPage
 					{
 						$sql = "INSERT INTO hostAutoLogOut(haloHostID, haloTime) values('$id', '$tme')";
 					}
-					if ( ! mysql_query( $sql, $conn ) )
+					if ( ! mysql_query( $sql, $GLOBALS['conn'] ) )
 						criticalError( mysql_error(), _("FOG :: Database error!") );
 
 				}
 				*/
 			}
-			elseif ($this->request['tab'] == 'host-hardware-inventory')
+			elseif ($this->REQUEST['tab'] == 'host-hardware-inventory')
 			{
 				/*
 				if ( $_POST["update"] == "1" )
@@ -1045,28 +1141,28 @@ class HostManagementPage extends FOGPage
 					$other1 = mysql_real_escape_string( $_POST["other1"] );
 					$other2 = mysql_real_escape_string( $_POST["other2"] );
 					$sql = "update inventory set iPrimaryUser = '$prim', iOtherTag = '$other1', iOtherTag1 ='$other2' where iHostID = '$id'";
-					if ( !mysql_query( $sql, $conn ) )
+					if ( !mysql_query( $sql, $GLOBALS['conn'] ) )
 					{
 						msgBox( mysql_error() );
 					}
 				}
 				*/
 			}
-			elseif ($this->request['tab'] == 'host-virus-history')
+			elseif ($this->REQUEST['tab'] == 'host-virus-history')
 			{
 				/*
 				if ( $_GET["delvid"] !== null && is_numeric( $_GET["delvid"] ) )
 				{		
 					$vid = mysql_real_escape_string( $_GET["delvid"] );
-					clearAVRecord( $conn, $vid );
+					clearAVRecord( $GLOBALS['conn'], $vid );
 				}
 
 				if ( $_GET["delvid"] == "all"  )
 				{
-					$member = getImageMemberFromHostID( $conn, $id );
+					$member = getImageMemberFromHostID( $GLOBALS['conn'], $id );
 					if ( $member != null )
 					{
-						clearAVRecordsForHost( $conn, $member->getMACColon() );
+						clearAVRecordsForHost( $GLOBALS['conn'], $member->getMACColon() );
 					}
 				}
 				*/
@@ -1079,13 +1175,13 @@ class HostManagementPage extends FOGPage
 				$this->HookManager->processEvent('HOST_EDIT_SUCCESS', array('host' => &$Host));
 				
 				// Log History event
-				$this->FOGCore->logHistory(sprintf('Host updated: ID: %s, Name: %s, Tab: %s', $Host->get('id'), $Host->get('name'), $this->request['tab']));
+				$this->FOGCore->logHistory(sprintf('Host updated: ID: %s, Name: %s, Tab: %s', $Host->get('id'), $Host->get('name'), $this->REQUEST['tab']));
 			
 				// Set session message
 				$this->FOGCore->setMessage('Host updated!');
 			
 				// Redirect to new entry
-				$this->FOGCore->redirect(sprintf('?node=%s&sub=edit&%s=%s#%s', $this->request['node'], $this->id, $Host->get('id'), $this->request['tab']));
+				$this->FOGCore->redirect(sprintf('?node=%s&sub=edit&%s=%s#%s', $this->REQUEST['node'], $this->id, $Host->get('id'), $this->REQUEST['tab']));
 			}
 			else
 			{
@@ -1099,20 +1195,20 @@ class HostManagementPage extends FOGPage
 			$this->HookManager->processEvent('HOST_EDIT_FAIL', array('Host' => &$Host));
 			
 			// Log History event
-			$this->FOGCore->logHistory(sprintf('%s update failed: Name: %s, Tab: %s, Error: %s', _('Host'), $_POST['name'], $this->request['tab'], $e->getMessage()));
+			$this->FOGCore->logHistory(sprintf('%s update failed: Name: %s, Tab: %s, Error: %s', _('Host'), $_POST['name'], $this->REQUEST['tab'], $e->getMessage()));
 		
 			// Set session message
 			$this->FOGCore->setMessage($e->getMessage());
 			
 			// Redirect
-			$this->FOGCore->redirect(sprintf('?node=%s&sub=edit&%s=%s#%s', $this->request['node'], $this->id, $Host->get('id'), $this->request['tab']));
+			$this->FOGCore->redirect(sprintf('?node=%s&sub=edit&%s=%s#%s', $this->REQUEST['node'], $this->id, $Host->get('id'), $this->REQUEST['tab']));
 		}
 	}
 
 	public function delete()
 	{	
 		// Find
-		$Host = new Host($this->request['id']);
+		$Host = new Host($this->REQUEST['id']);
 		
 		// Title
 		$this->title = sprintf('%s: %s', _('Remove'), $Host->get('name'));
@@ -1130,7 +1226,7 @@ class HostManagementPage extends FOGPage
 	public function delete_post()
 	{
 		// Find
-		$Host = new Host($this->request['id']);
+		$Host = new Host($this->REQUEST['id']);
 		
 		// Hook
 		$this->HookManager->processEvent('HOST_ADD_POST', array('Host' => &$Host));
@@ -1154,7 +1250,7 @@ class HostManagementPage extends FOGPage
 			$this->FOGCore->setMessage(sprintf('%s: %s', _('Host deleted'), $Host->get('name')));
 			
 			// Redirect
-			$this->FOGCore->redirect(sprintf('?node=%s', $this->request['node']));
+			$this->FOGCore->redirect(sprintf('?node=%s', $this->REQUEST['node']));
 		}
 		catch (Exception $e)
 		{
@@ -1180,8 +1276,8 @@ class HostManagementPage extends FOGPage
 		?>
 		<form enctype="multipart/form-data" method="POST" action="<?php print $this->formAction; ?>">
 		<table cellpadding=0 cellspacing=0 border=0 width=90%>
-			<tr><td><?php print _("CSV File"); ?></font></td><td><input class="smaller" type="file" name="file" value="" /></td></tr>
-			<tr><td colspan=2><font><center><br /><input class="smaller" type="submit" value="<?php print _("Upload CSV"); ?>" /></center></font></td></tr>				
+			<tr><td><?php print _("CSV File"); ?></td><td><input class="smaller" type="file" name="file" value="" /></td></tr>
+			<tr><td colspan=2><font><center><br /><input class="smaller" type="submit" value="<?php print _("Upload CSV"); ?>" /></center></td></tr>				
 		</table>
 		</form>
 		<p><?php print _('This page allows you to upload a CSV file of hosts into FOG to ease migration.  Right click <a href="./other/hostimport.csv">here</a> and select <strong>Save target as...</strong> or <strong>Save link as...</strong>  to download a template file.  The only fields that are required are hostname and MAC address.  Do <strong>NOT</strong> include a header row, and make sure you resave the file as a CSV file and not XLS!'); ?></p>
@@ -1270,7 +1366,7 @@ class HostManagementPage extends FOGPage
 		// Output
 		?>
 		<table cellpadding=0 cellspacing=0 border=0 width=100%>
-			<tr><td width="25%"><?php print _("Total Rows"); ?></font></td><td><?php print $totalRows; ?></td></tr>
+			<tr><td width="25%"><?php print _("Total Rows"); ?></td><td><?php print $totalRows; ?></td></tr>
 			<tr><td><?php print _("Successful Hosts"); ?></td><td><?php print $numSuccess; ?></td></tr>
 			<tr><td><?php print _("Failed Hosts"); ?></td><td><?php print $numFailed; ?></td></tr>				
 			<tr><td><?php print _("Errors"); ?></td><td><?php print $uploadErrors; ?></td></tr>						
@@ -1287,6 +1383,223 @@ class HostManagementPage extends FOGPage
 	public function export_post()
 	{
 	
+	}
+	
+	public function deploy()
+	{
+		// Find
+		$Host = new Host($this->REQUEST['id']);
+		
+		// Title
+		$this->title = "Deploy Image to Host";
+		
+		// Deploy
+		?>
+		<p class="c"><b><?php print _("Are you sure you wish to deploy these machines?"); ?></b></p>
+		<form method="POST" action="<?php print $this->formAction; ?>" id="deploy-container">
+			<div class="confirm-message">
+				<div class="advanced-settings">
+					<h2><?php print _("Advanced Settings"); ?></h2>
+					<p><input type="checkbox" name="shutdown" id="shutdown" value="1" autocomplete="off"> <label for="shutdown"><?php print _("Schedule <u>Shutdown</u> after task completion"); ?></label></p>
+					<?php
+					if ($_GET['debug'] != 'true')
+					{
+						?>
+						<p><input type="radio" name="scheduleType" id="scheduleInstant" value="instant" autocomplete="off" checked="checked" /> <label for="scheduleInstant"><?php print _("Schedule <u>Instant Deployment</u>"); ?></label></p>
+						<p><input type="radio" name="scheduleType" id="scheduleSingle" value="single" autocomplete="off" /> <label for="scheduleSingle"><?php print _("Schedule <u>Delayed Deployment</u>"); ?></label></p>
+						<p class="hidden" id="singleOptions"><input type="text" name="scheduleSingleTime" id="scheduleSingleTime" autocomplete="off" /></p>
+						<p><input type="radio" name="scheduleType" id="scheduleCron" value="cron" autocomplete="off"> <label for="scheduleCron"><?php print _("Schedule <u>Cron-style Deployment</u>"); ?></label></p>
+						<p class="hidden" id="cronOptions">
+							<input type="text" name="scheduleCronMin" id="scheduleCronMin" placeholder="min" autocomplete="off" />
+							<input type="text" name="scheduleCronHour" id="scheduleCronHour" placeholder="hour" autocomplete="off" />
+							<input type="text" name="scheduleCronDOM" id="scheduleCronDOM" placeholder="dom" autocomplete="off" />
+							<input type="text" name="scheduleCronMonth" id="scheduleCronMonth" placeholder="month" autocomplete="off" />
+							<input type="text" name="scheduleCronDOW" id="scheduleCronDOW" placeholder="dow" autocomplete="off" />
+						</p>
+						<?php
+					}
+					?>
+				</div>
+			</div>
+			
+			<h2><?php print _('Hosts in Task'); ?></h2>
+			<table width="100%" cellspacing="0" cellpadding="0" border="0">
+				<tbody>
+					<tr>
+						<td><?php print $Host->get('name'); ?></td>
+						<td><?php print $Host->get('mac') . ($Host->get('ip') ? sprintf('(%s)', $Host->get('ip')) : ''); ?></td>
+						<td><?php print $Host->getImage()->get('name'); ?></td>
+					</tr>
+				</tbody>
+			</table>
+			
+			<p class="c"><input type="submit" value="<?php print _("Deploy to") . ' ' . $Host->get('name'); ?>" /></p>
+		</form>
+		<?php
+	}
+	
+	public function deploy_post()
+	{
+		// Find
+		$Host = new Host($this->REQUEST['id']);
+		
+		// Title
+		$this->title = "Deploy Image to Host";
+		
+		// Variables
+		$enableShutdown = ($this->REQUEST['shutdown'] == 1 ? true : false);
+		$enableSnapins = ($this->REQUEST['deploySnapins'] == 'true' ? true : false);
+		$enableDebug = ($this->REQUEST['debug'] == 'true' ? true : false);
+		
+		$taskName = '';
+		
+		// Deploy
+		try
+		{
+			if ($this->REQUEST['scheduleType'] == 'single')
+			{
+				// Scheduled Deployment
+				$scheduledDeployTime = strtotime($this->REQUEST['scheduleSingleTime']);
+				
+				// NOTE: Function will throw an exception if it fails
+				$Host->createSingleRunScheduledPackage('D', $taskName, $scheduledDeployTime, $enableShutdown, $enableSnapins);
+				
+				// Success
+				printf('<div class="task-start-ok"><p>%s</p><p>%s</p></div>', sprintf(_('Successfully created task for deployment of <u>%s</u> to <u>%s</u>'), $Host->getImage()->get('name'), $Host->get('name')), _('Scheduled to start at:') . ' ' . $this->REQUEST['scheduleSingleTime']);
+			
+			}
+			else if ($this->REQUEST['scheduleType'] == 'cron')
+			{
+				// Cron Deployment
+				// NOTE: Function will throw an exception if it fails
+				$Host->createCronScheduledPackage('D', $taskName, $this->REQUEST['scheduleCronMin'], $this->REQUEST['scheduleCronHour'], $this->REQUEST['scheduleCronDOM'], $this->REQUEST['scheduleCronMonth'], $this->REQUEST['scheduleCronDOW'], $enableShutdown, $enableSnapins);
+				
+				// Success
+				printf('<div class="task-start-ok"><p>%s</p><p>%s</p></div>', sprintf(_('Successfully created task for deployment of <u>%s</u> to <u>%s</u>'), $Host->getImage()->get('name'), $Host->get('name')), _('Cron Schedule:') . ' ' . implode(' ', array($this->REQUEST['scheduleCronMin'], $this->REQUEST['scheduleCronHour'], $this->REQUEST['scheduleCronDOM'], $this->REQUEST['scheduleCronMonth'], $this->REQUEST['scheduleCronDOW'])));
+			}
+			else
+			{
+				// Instant Deployment
+				// NOTE: Function will throw an exception if it fails
+				$Host->createImagePackage('D', $taskName, $enableShutdown, $enableDebug, $enableSnapins);
+				
+				// Success
+				printf('<div class="task-start-ok"><p>%s</p></div>', sprintf(_('Successfully created task for deployment of <u>%s</u> to <u>%s</u>'), $Host->getImage()->get('name'), $Host->get('name')));
+			}
+		}
+		catch (Exception $e)
+		{
+			// Failure
+			printf('<div class="task-start-failed"><p>%s</p><p>%s</p></div>', _('Failed to create deploy task'), $e->getMessage());
+		}
+	}
+	
+	public function upload()
+	{
+		// Find
+		$Host = new Host($this->REQUEST['id']);
+		
+		// Title
+		$this->title = "Upload Image from Host";
+		
+		// Deploy
+		?>
+		<p class="c"><b><?php print _("Are you sure you wish to deploy these machines?"); ?></b></p>
+		<form method="POST" action="<?php print $this->formAction; ?>" id="deploy-container">
+			<div class="confirm-message">
+				<div class="advanced-settings">
+					<h2><?php print _("Advanced Settings"); ?></h2>
+					<p><input type="checkbox" name="shutdown" id="shutdown" value="1" autocomplete="off"> <label for="shutdown"><?php print _("Schedule <u>Shutdown</u> after task completion"); ?></label></p>
+					<?php
+					if ($_GET['debug'] != 'true')
+					{
+						?>
+						<p><input type="radio" name="scheduleType" id="scheduleInstant" value="instant" autocomplete="off" checked="checked" /> <label for="scheduleInstant"><?php print _("Schedule <u>Instant Deployment</u>"); ?></label></p>
+						<p><input type="radio" name="scheduleType" id="scheduleSingle" value="single" autocomplete="off" /> <label for="scheduleSingle"><?php print _("Schedule <u>Delayed Deployment</u>"); ?></label></p>
+						<p class="hidden" id="singleOptions"><input type="text" name="scheduleSingleTime" id="scheduleSingleTime" autocomplete="off" /></p>
+						<p><input type="radio" name="scheduleType" id="scheduleCron" value="cron" autocomplete="off"> <label for="scheduleCron"><?php print _("Schedule <u>Cron-style Deployment</u>"); ?></label></p>
+						<p class="hidden" id="cronOptions">
+							<input type="text" name="scheduleCronMin" id="scheduleCronMin" placeholder="min" autocomplete="off" />
+							<input type="text" name="scheduleCronHour" id="scheduleCronHour" placeholder="hour" autocomplete="off" />
+							<input type="text" name="scheduleCronDOM" id="scheduleCronDOM" placeholder="dom" autocomplete="off" />
+							<input type="text" name="scheduleCronMonth" id="scheduleCronMonth" placeholder="month" autocomplete="off" />
+							<input type="text" name="scheduleCronDOW" id="scheduleCronDOW" placeholder="dow" autocomplete="off" />
+						</p>
+						<?php
+					}
+					?>
+				</div>
+			</div>
+			
+			<h2><?php print _('Hosts in Task'); ?></h2>
+			<table width="100%" cellspacing="0" cellpadding="0" border="0">
+				<tbody>
+					<tr>
+						<td><?php print $Host->get('name'); ?></td>
+						<td><?php print $Host->get('mac') . ($Host->get('ip') ? sprintf('(%s)', $Host->get('ip')) : ''); ?></td>
+						<td><?php print $Host->getImage()->get('name'); ?></td>
+					</tr>
+				</tbody>
+			</table>
+			
+			<p class="c"><input type="submit" value="<?php print _("Upload from") . ' ' . $Host->get('name'); ?>" /></p>
+		</form>
+		<?php
+	}
+	
+	public function upload_post()
+	{
+		// Find
+		$Host = new Host($this->REQUEST['id']);
+		
+		// Title
+		$this->title = "Upload Image from Host";
+		
+		// Variables
+		$enableShutdown = ($this->REQUEST['shutdown'] == 1 ? true : false);
+		$enableSnapins = ($this->REQUEST['deploySnapins'] == 'true' ? true : false);
+		$enableDebug = ($this->REQUEST['debug'] == 'true' ? true : false);
+		
+		$taskName = '';
+		
+		// Deploy
+		try
+		{
+			if ($this->REQUEST['scheduleType'] == 'single')
+			{
+				// Scheduled Deployment
+				$scheduledDeployTime = strtotime($this->request['scheduleSingleTime']);
+				// NOTE: Function will throw an exception if it fails
+				$Host->createSingleRunScheduledPackage('U', $taskName, $scheduledDeployTime, $enableShutdown, $enableSnapins);
+				
+				// Success
+				printf('<div class="task-start-ok"><p>%s</p><p>%s</p></div>', sprintf(_('Successfully created task for upload of <u>%s</u> to <u>%s</u>'), $Host->get('name'), $Host->getImage()->get('name')), _('Scheduled to start at:') . ' ' . $this->request['scheduleSingleTime']);
+			
+			}
+			else if ($this->REQUEST['scheduleType'] == 'cron')
+			{
+				// Cron Deployment
+				// NOTE: Function will throw an exception if it fails
+				$Host->createCronScheduledPackage('U', $taskName, $this->REQUEST['scheduleCronMin'], $this->REQUEST['scheduleCronHour'], $this->REQUEST['scheduleCronDOM'], $this->REQUEST['scheduleCronMonth'], $this->REQUEST['scheduleCronDOW'], $enableShutdown, $enableSnapins);
+				
+				// Success
+				printf('<div class="task-start-ok"><p>%s</p><p>%s</p></div>', sprintf(_('Successfully created task for upload of <u>%s</u> to <u>%s</u>'), $Host->get('name'), $Host->getImage()->get('name')), _('Cron Schedule:') . ' ' . implode(' ', array($this->REQUEST['scheduleCronMin'], $this->REQUEST['scheduleCronHour'], $this->REQUEST['scheduleCronDOM'], $this->REQUEST['scheduleCronMonth'], $this->REQUEST['scheduleCronDOW'])));
+			}
+			else
+			{
+				// Instant Deployment
+				// NOTE: Function will throw an exception if it fails
+				$Host->createImagePackage('U', $taskName, $enableShutdown, $enableDebug, $enableSnapins);
+				
+				// Success
+				printf('<div class="task-start-ok"><p>%s</p></div>', sprintf(_('Successfully created task for upload of <u>%s</u> to <u>%s</u>'), $Host->get('name'), $Host->getImage()->get('name')));
+			}
+		}
+		catch (Exception $e)
+		{
+			// Failure
+			printf('<div class="task-start-failed"><p>%s</p><p>%s</p></div>', _('Failed to create upload task'), $e->getMessage());
+		}
 	}
 }
 

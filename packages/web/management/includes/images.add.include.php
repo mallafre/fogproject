@@ -39,7 +39,7 @@ if ($_POST['add'])
 			'createdTime'	=> time(),
 			'storageGroupID'=> $_POST['storagegroup'],
 			'osID'		=> $_POST['os'],
-			'type'		=> ($_POST['imagetype'] ? $_POST['imagetype'] : 0)
+			'imageTypeID'	=> ($_POST['imagetype'] ? $_POST['imagetype'] : 0)
 		));
 		
 		// Save to database

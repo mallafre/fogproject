@@ -3,11 +3,14 @@
 // Blackout - 2:54 PM 23/09/2011
 class Image extends FOGController
 {
-	// Variables
-	const IMAGE_TYPE_SINGLE_PARTITION_NTFS = 0;
-	const IMAGE_TYPE_DD = 1;
-	const IMAGE_TYPE_MULTIPARTITION_SINGLE_DISK = 2;
-	const IMAGE_TYPE_MULTIPARTITION_MULTIDISK = 3;
+	// LEGACY Variables
+	
+	// Blackout - 8:21 AM 26/12/2011
+	// Adjusted IDs to be consistent with new database rows
+	const IMAGE_TYPE_SINGLE_PARTITION_NTFS = 1;
+	const IMAGE_TYPE_DD = 2;
+	const IMAGE_TYPE_MULTIPARTITION_SINGLE_DISK = 3;
+	const IMAGE_TYPE_MULTIPARTITION_MULTIDISK = 4;
 	
 	// Table
 	public $databaseTable = 'images';
@@ -22,7 +25,7 @@ class Image extends FOGController
 		'createdBy'	=> 'imageCreateBy',
 		'building'	=> 'imageBuilding',
 		'size'		=> 'imageSize',
-		'type'		=> 'imageDD',
+		'imageTypeID'	=> 'imageDD',
 		'storageGroupID'=> 'imageNFSGroupID',
 		'osID'		=> 'imageOSID',
 		// TODO: Add 'size' for Image Size
@@ -40,14 +43,19 @@ class Image extends FOGController
 		return new OS($this->data['osID']);
 	}
 	
+	public function getImageType()
+	{
+		return new ImageType($this->data['imageTypeID']);
+	}
+	
 	// Legacy functions - remove once updated in other areas
 	public function setStorageGroup($id) 			{ }
 
 	public function setID( $id )				{ $this->set('id', $id); }
 	public function getID()				{ return $this->get('id'); 	}
 
-	public function setType( $t )				{ $this->set('type', $t); }
-	public function getType()				{ return $this->get('type'); 	}
+	public function setType( $t )				{ $this->set('imageTypeID', $t); }
+	public function getType()				{ return $this->get('imageTypeID'); 	}
 	
 	public function setName( $n )				{ $this->set('name', $n); }
 	public function getName()				{ return $this->get('name');}

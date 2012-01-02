@@ -8,6 +8,7 @@
  ***/
 
 // Init
+set_time_limit(0);
 @error_reporting(E_ALL & ~E_DEPRECATED & ~E_NOTICE);
 @header('Cache-Control: no-cache');
 session_cache_limiter('no-cache');
@@ -60,6 +61,7 @@ if (!function_exists('__autoload'))
 require_once(BASEPATH . '/commons/functions.include.php');
 
 // Core
+$FOGFTP = new FOGFTP();
 $FOGCore = new FOGCore();
 
 // Hook Manager - Init & Load Hooks

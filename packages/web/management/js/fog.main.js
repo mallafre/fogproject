@@ -18,6 +18,9 @@ $(function()
 	// Host Ping
 	$('.ping').fogPing();
 	
+	// Placeholder support
+	$('input[placeholder]').placeholder();
+	
 	// Nav Menu: Add hover label
 	$('#menu li a').each(function() {
 		// Variables
@@ -52,6 +55,9 @@ $(function()
 
 	// Search boxes
 	$('.search-input').fogAjaxSearch();
+	
+	// Disable text selection in <label> elements
+	$('label').disableSelection();
 	
 	// Task Search
 	/*
@@ -89,7 +95,7 @@ $(function()
 	*/
 	
 	// LEGACY - Task Confirm Date/time picker
-	$('#singlescheddatetime').dynDateTime({
+	$('#scheduleSingleTime').dynDateTime({
 		'showsTime':	true,
 		'ifFormat':	'%Y/%m/%d %H:%M',
 		'daFormat':	'%l;%M %p, %e %m,  %Y',

@@ -455,4 +455,21 @@ class FOGCore extends FOGBase
 		}
 	}
 
+	public function resolveHostname($host)
+	{
+		return ($this->getSetting('FOG_USE_SLOPPY_NAME_LOOKUPS') ? gethostbyname($host) : $host);
+	}
+	
+	public function makeTempFilePath()
+	{
+		return tempnam(sys_get_temp_dir(), 'FOG');
+	}
+	
+	public function wakeOnLAN($mac)
+	{
+		return; // DEBUG
+		
+		// HTTP request to WOL script
+		$this->fetchURL(sprintf('http://%s%s?wakeonlan=%s', $this->getSetting('FOG_WOL_HOST'), $this->getSetting('FOG_WOL_PATH'), ($mac instanceof MACAddress ? $mac->getMACWithColon() : $mac)));
+	}
 }

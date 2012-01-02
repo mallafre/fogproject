@@ -337,7 +337,7 @@ class PrinterManagementPage extends FOGPage
 			
 			// Update User Object
 			$Printer	->set('name',		$_POST['name'])
-				->set('type',		($_POST['isGuest'] == 'on' ? '1' : '0'));
+					->set('type',		($_POST['isGuest'] == 'on' ? '1' : '0'));
 			
 			// Set new password if password was passed
 			if ($_POST['password'] && $_POST['password_confirm'])

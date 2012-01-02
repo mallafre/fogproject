@@ -4,7 +4,7 @@
 class User extends FOGController
 {
 	// Variables
-	public $inactivitySessionTimeout = 1;		// In hours
+	public $inactivitySessionTimeout = 1;			// In hours
 	public $regenerateSessionTimeout = 0.5;		// In hours
 
 	// Table
@@ -30,7 +30,7 @@ class User extends FOGController
 	// Overrides
 	public function __construct($data)
 	{
-		// Construct - MUST contruct first
+		// FOGController constructor
 		parent::__construct($data);
 		
 		// Add password salt
@@ -74,6 +74,7 @@ class User extends FOGController
 			// Logged out
 			return false;
 		}
+		
 		// Update last activity
 		$_SESSION['LAST_ACTIVITY'] = time();
 		
@@ -98,8 +99,8 @@ class User extends FOGController
 	public function logout()
 	{
 		// Destroy session
-		session_destroy();
-		session_unset();
+		@session_destroy();
+		@session_unset();
 		
 		$_SESSION = array();
 	}

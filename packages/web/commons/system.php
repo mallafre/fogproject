@@ -12,7 +12,9 @@
 
 define('IS_INCLUDED', true);
 define('FOG_VERSION', '0.33B');
-define('FOG_SCHEMA', 30);
+define('FOG_SCHEMA', 31);
+define('FOG_SVN_REVISION', '$Revision$');
+define('FOG_SVN_LAST_UPDATE', '$LastChangedDate$');
 define('BASEPATH', DetermineBasePath());
 
 // LEGACY - Database

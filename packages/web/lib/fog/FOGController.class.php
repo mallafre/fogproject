@@ -31,6 +31,9 @@ abstract class FOGController extends FOGBase
 	public $debug = true;
 	public $info = false;
 	
+	// Database field to Class relationships
+	public $databaseFieldClassRelationships = array();
+	
 	// Construct
 	public function __construct($data)
 	{
@@ -105,7 +108,7 @@ abstract class FOGController extends FOGBase
 		{
 			if (!array_key_exists($key, $this->databaseFields) && !in_array($key, $this->additionalFields) && !array_key_exists($key, $this->databaseFieldsFlipped))
 			{
-				throw new Exception('Invalid data being set');
+				throw new Exception('Invalid key being set');
 			}
 			
 			if (array_key_exists($key, $this->databaseFieldsFlipped))

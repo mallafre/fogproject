@@ -20,12 +20,13 @@
 html, body { height: 100%; }
 body { margin: 0; padding: 0; background: #FFFFFF url(../images/body-bkg.gif) repeat-x; font-family: Ubuntu, Arial, Helvetica, sans-serif; font-size: 13px; color: #333333; }
 
-h1, h2, h3, h4, h5, h6 { margin: 0; /*text-transform: lowercase;*/ font-weight: normal; color: #4c68a0; }
+h1, h2, h3, h4, h5, h6 { margin: 13px 0; /*text-transform: lowercase;*/ font-weight: normal; color: #4c68a0; }
 h1 { font-size: 32px; }
 h2 { font-size: 23px; }
-h3 { font-weight: bold; line-height: 26px; margin: 15px 0; }
+h3 { font-weight: bold; line-height: 26px; }
 
 p { line-height: 26px; }
+u { }
 
 a:link, a:visited { color: #7BAA0F; }
 a:hover, a:active { text-decoration: none; color: #003448; }
@@ -51,9 +52,9 @@ input[type="text"] { width: 200px; }
 input[type="text"]:focus { width: 181px; padding-right: 27px; }
 textarea:focus { background-position: 95% 90%; }
 input:hover, textarea:hover, select:hover { border-color: #5372af; }
-input[type="submit"] { border: 1px solid #eee; border-radius: 5px 5px 5px 5px; box-shadow: 0 0 5px #666; box-shadow: 0 0 5px rgba(102, 102, 102, 0.5); text-shadow: 1px 1px 0 #6a97a6; color: #fff; font-weight: bold; cursor: pointer; font-size: 14px; font-variant: small-caps; letter-spacing: 1px; padding: 4px; min-width: 220px;  background: #94c3d3; /* Old browsers */ background: -moz-linear-gradient(top,  #94c3d3 0%, #6aa8dd 41%, #94c3d3 100%); /* FF3.6+ */ background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#94c3d3), color-stop(41%,#6aa8dd), color-stop(100%,#94c3d3)); /* Chrome,Safari4+ */ background: -webkit-linear-gradient(top,  #94c3d3 0%,#6aa8dd 41%,#94c3d3 100%); /* Chrome10+,Safari5.1+ */ background: -o-linear-gradient(top,  #94c3d3 0%,#6aa8dd 41%,#94c3d3 100%); /* Opera 11.10+ */ background: -ms-linear-gradient(top,  #94c3d3 0%,#6aa8dd 41%,#94c3d3 100%); /* IE10+ */ background: linear-gradient(top,  #94c3d3 0%,#6aa8dd 41%,#94c3d3 100%); /* W3C */ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#94c3d3', endColorstr='#94c3d3',GradientType=0 ); /* IE6-9 */   }
+input[type="submit"] { border: 1px solid #eee; border-radius: 5px 5px 5px 5px; box-shadow: 0 0 5px #666; box-shadow: 0 0 5px rgba(102, 102, 102, 0.5); text-shadow: 1px 1px 0 #6a97a6; color: #fff; font-weight: bold; cursor: pointer; font-size: 14px; font-variant: small-caps; letter-spacing: 1px; padding: 4px 10px; min-width: 220px;  background: #94c3d3; /* Old browsers */ background: -moz-linear-gradient(top,  #94c3d3 0%, #6aa8dd 41%, #94c3d3 100%); /* FF3.6+ */ background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#94c3d3), color-stop(41%,#6aa8dd), color-stop(100%,#94c3d3)); /* Chrome,Safari4+ */ background: -webkit-linear-gradient(top,  #94c3d3 0%,#6aa8dd 41%,#94c3d3 100%); /* Chrome10+,Safari5.1+ */ background: -o-linear-gradient(top,  #94c3d3 0%,#6aa8dd 41%,#94c3d3 100%); /* Opera 11.10+ */ background: -ms-linear-gradient(top,  #94c3d3 0%,#6aa8dd 41%,#94c3d3 100%); /* IE10+ */ background: linear-gradient(top,  #94c3d3 0%,#6aa8dd 41%,#94c3d3 100%); /* W3C */ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#94c3d3', endColorstr='#94c3d3',GradientType=0 ); /* IE6-9 */   }
 input[type="submit"]:hover { border: 1px solid #fff; text-shadow: 0 0 10px #fff, 1px 1px 0 #6a97a6; box-shadow: 0 0 3px #fff, 0 0 5px #666; }
-input[type="radio"], input[type="checkbox"] { cursor: pointer; border: 0; }
+input[type="radio"], input[type="checkbox"] { cursor: pointer; border: 0; background-image: none; }
 input.hostname-input { width: 160px; }
 input.hostname-input:focus { width: 141px; }
 .placeholder { font-style: italic; color: #bbb; text-align: center; }
@@ -80,8 +81,8 @@ fieldset table tbody td select { min-width: 220px; }
 #wrapper { width: 850px; margin: 0 auto; min-height: 100%; }
 #content { float: right; width: 620px; padding-bottom: 21px; background: url(../images/content-bkg.png) no-repeat center top; }
 #content-inner { padding: 0 10px; }
-#content h1 { text-align: center; height: 50px; line-height: 50px; color: #666; }
-#content h2 { font-size: 18px; margin: 0; padding: 0 0 15px 0; text-align: center; }
+#content h1 { text-align: center; height: 50px; line-height: 50px; color: #666; margin: 0; }
+#content h2 { font-size: 18px; text-align: center; margin: 7px 0; padding: 5px 0; }
 #content.dashboard { width: 795px; background-image: url('../images/content-bkg-dashboard.png'); float: none; margin: 0 auto; }
 #content-title.dashboard { width: 815px; }
 
@@ -106,7 +107,7 @@ fieldset table tbody td select { min-width: 220px; }
 #sidebar li { font-size: 13px; line-height: 18px; }
 #sidebar li ul { }
 #sidebar li li { margin: 0; }
-#sidebar h2 { margin-bottom: 10px; border-bottom: 1px solid #efefef; font-size: 16px; color: #666; }
+#sidebar h2 { margin: 0 0 10px 0; border-bottom: 1px solid #efefef; font-size: 16px; color: #666; }
 
 /* Search */
 #search { }
@@ -122,6 +123,7 @@ fieldset table tbody td select { min-width: 220px; }
 table {}
 table p { line-height: 15px; margin: 2px 0; }
 table td { padding: 2px 5px; }
+table td .icon { margin: 0 5px; }
 table tr.header { color: #ededed; }
 table tr.header td { padding: 8px; border: 0; background: #7386ad; }
 table tr.header td:first-child { border-radius: 3px 0 0 0; }
@@ -168,14 +170,14 @@ pre { white-space: pre-wrap; }
 .dashbaord p { line-height: 15px; margin: 2px 0; }
 .dashbaord p.infoTitle { padding: 0px; margin-top: 0px; margin-right: 0px; margin-left: 0px; margin-bottom: 4px; text-align: center; font-weight: bold; border-width: 0px 0px 1px 0px; border-style: solid; border-color: #000000; background-color: #bcbcbc;}
 
-.task-start-ok, .task-start-failed { text-align: center; border: 2px solid #CCCCCC; background-color: #EFEFEF; font-size: 16px; padding: 20px; }
-.task-start-ok { border-color: green; }
-.task-start-failed { border-color: red; }
+.task-start-ok,
+.task-start-failed {border: 2px solid #CCCCCC; background-color: #EFEFEF; font-size: 16px; padding: 20px; border-radius: 5px; margin: 0 0 5px 0; }
+.task-start-ok p,
+.task-start-failed p { text-align: center; }
+.task-start-ok { border-color: #008000; background: #dfffdf; color: #008000; }
+.task-start-failed { border-color: #ff0000; background: #ffd8d8; color: #ff0000; }
 
-.confirm-message { padding-left: 120px; padding-top: 10px; padding-right: 10px; margin: 5px 10px 5px 10px; min-height: 50px; border-width: 1px; border-style: dashed; border-color: #5f0000; /*background-color: #efefef;*/ font-size: 13px; font-weight: bold; }
-
-.advanced-settings { border: 1px solid #ddd; padding: 0 15px; background: #efefef; width: 300px; margin: 10px 0; font-weight: normal; }
-.advanced-settings h2 { text-align: center; margin: 7px 0; }
+.confirm-message { padding: 10px; margin: 5px 10px; min-height: 50px; border-width: 1px; border-style: dashed; border-color: #999; font-size: 13px; font-weight: bold; border-radius: 3px; }
 
 #search-wrapper { text-align: center; }
 #search-wrapper .search-input { width: 150px; height: 21px; background: #fff; }
@@ -300,3 +302,20 @@ pre { white-space: pre-wrap; }
 
 
 #additionalMACsRow { display: none; }
+
+/* Task Conformations */
+.advanced-settings { border: 1px solid #ccc; padding: 0 15px; background: #efefef; margin: 0 auto; width: 300px; font-weight: normal; border-radius: 5px; }
+.advanced-settings h2 { text-align: center; margin: 7px 0; background: #e9e9e9; }
+
+#deploy-container .advanced-settings h2 { padding: 5px 0; margin: 7px -16px; border-radius: 0; border-left: 1px solid #ccc; border-right: 1px solid #ccc; border-top: 1px solid #ddd; border-bottom: 1px solid #ddd; }
+#deploy-container .confirm-message p { margin: 5px 0; line-height: 24px; }
+#deploy-container input[type="text"]:focus { padding: 4px 8px; background-image: none; }
+#deploy-container input[type="checkbox"] { vertical-align: middle; }
+#deploy-container input.error { border: 1px solid red; }
+#deploy-container #cronOptions { text-align: center; }
+#deploy-container #cronOptions input,
+#deploy-container #cronOptions input:focus { width: 37px; text-align: center; }
+#deploy-container #scheduleSingleTime { width: 150px; margin: 0 auto; text-align: center; display: block; cursor: pointer; }
+
+.task-action { text-align: center; width: 100px; }
+.task-action a { display: block; }

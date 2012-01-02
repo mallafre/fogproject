@@ -25,25 +25,25 @@ class GroupManagementPage extends FOGPage
 		// Header row
 		$this->headerData = array(
 			_('Name'),
-			_('Description'),
+			//_('Description'),
 			_('Members'),
-			_('Edit')
+			'',
 		);
 		
 		// Row templates
 		$this->templates = array(
-			'<a href="?node=group&sub=edit&groupid=${id}" title="Edit">${name}</a>',
-			'${description}',
+			sprintf('<a href="?node=group&sub=edit&%s=${id}" title="${description}">${name}</a>', $this->id),
+			//'${description}',
 			'${count}',
-			'<a href="?node=group&sub=edit&groupid=${id}"><span class="icon icon-edit" title="Edit: ${name}"></span></a>'
+			sprintf('<a href="?node=group&sub=deploy&%s=${id}"><span class="icon icon-download" title="Deploy"></span></a> <a href="?node=group&sub=multicast&%s=${id}"><span class="icon icon-multicast" title="Multi-cast Deploy"></span></a> <a href="?node=group&sub=edit&%s=${id}"><span class="icon icon-edit" title="Edit"></span></a>', $this->id, $this->id, $this->id),
 		);
 		
 		// Row attributes
 		$this->attributes = array(
 			array(),
-			array('width' => 230),
+			//array('width' => 150),
 			array('width' => 40, 'class' => 'c'),
-			array('width' => 40, 'class' => 'c')
+			array('width' => 80, 'class' => 'c')
 		);
 	}
 	
@@ -63,7 +63,7 @@ class GroupManagementPage extends FOGPage
 				'id'		=> $Group->get('id'),
 				'name'		=> $Group->get('name'),
 				'description'	=> $Group->get('description'),
-				'members'	=> $Group->getHostCount()
+				'count'		=> $Group->getHostCount()
 			);
 		}
 		
@@ -80,10 +80,33 @@ class GroupManagementPage extends FOGPage
 		$this->title = _('Search');
 		
 		// Set search form
-		$this->searchFormURL = 'ajax/group.search.php';
+		$this->searchFormURL = sprintf('%s?node=%s&sub=search', $_SERVER['PHP_SELF'], $this->node);
 		
 		// Hook
 		$this->HookManager->processEvent('GROUP_SEARCH');
+
+		// Output
+		$this->render();
+	}
+	
+	public function search_post()
+	{
+		// Variables
+		$keyword = preg_replace('#%+#', '%', '%' . preg_replace('#[[:space:]]#', '%', $this->REQUEST['crit']) . '%');
+		
+		// Find data -> Push data
+		foreach ($this->FOGCore->getClass('GroupManager')->find(array('name' => $keyword)) AS $Group)
+		{
+			$this->data[] = array(
+				'id'		=> $Group->get('id'),
+				'name'		=> $Group->get('name'),
+				'description'	=> $Group->get('description'),
+				'count'		=> $Group->getHostCount()
+			);
+		}
+		
+		// Hook
+		$this->HookManager->processEvent('GROUP_DATA', array('headerData' => &$this->headerData, 'data' => &$this->data, 'templates' => &$this->templates, 'attributes' => &$this->attributes));
 
 		// Output
 		$this->render();
@@ -214,17 +237,87 @@ class GroupManagementPage extends FOGPage
 				<div id="group-tasks">
 					<h2><?php print _("Basic Imaging Tasks"); ?></h2>
 					<table cellpadding="0" cellspacing="0" border="0" width="100%">
-					<tr>
-					<td class="c" width="50"><a href="?node=tasks&type=group&direction=down&noconfirm=<?php print $this->request['id']; ?>"><img src="./images/senddebug.png" /><p><?php echo(_("Deploy")); ?></p></a></td>
-					<td><p><?php echo(_("Deploy action will send an image saved on the FOG server to the client computer with all included snapins.")); ?></p></td>
-					</tr>
-					<tr>
-					<td class="c" width="50"><a href="?node=tasks&sub=advanced&groupid=<?php print $this->request['id']; ?>"><img src="./images/host-advanced.png" /><p><?php echo(_("Advanced")); ?></p></a></td>
-					<td><p><?php echo(_("View advanced tasks for this group.")); ?></p></td>
-					</tr>
+						<tr>
+							<td class="task-action"><a href="?node=group&sub=deploy&<?php print $this->id . '=' . $this->request['id']; ?>"><img src="./images/senddebug.png" /><p><?php echo(_("Deploy")); ?></p></a></td>
+							<td><p><?php echo(_("Deploy action will send an image saved on the FOG server to the client computer with all included snapins.")); ?></p></td>
+						</tr>
+						<tr>
+							<td class="task-action"><a href="?node=group&sub=multicast&<?php print $this->id . '=' . $this->request['id']; ?>"><img src="./images/senddebug.png" /><p><?php echo(_("Deploy Multicast")); ?></p></a></td>
+							<td><p><?php echo(_("Deploy action will send an image saved on the FOG server to the client computer with all included snapins.")); ?></p></td>
+						</tr>
+						<tr>
+							<td class="task-action"><a href="?node=group&sub=edit&<?php print $this->id . '=' . $this->request['id']; ?>#group-tasks" class="advanced-tasks-link"><img src="./images/host-advanced.png" /><p><?php echo(_("Advanced")); ?></p></a></td>
+							<td><p><?php echo(_("View advanced tasks for this group.")); ?></p></td>
+						</tr>
 					</table>
+					
+					<div id="advanced-tasks" class="hidden">
+						<h2><?php print _('Advanced Actions'); ?></h2>
+						<table cellspacing="0" cellpadding="0" border="0" width="100%">
+							<tr>
+								<td class="task-action"><a href="?node=group&sub=deploy&mode=debug&<?php print $this->id . '=' . $this->REQUEST['id']; ?>"><img src="./images/debug.png" /><p>Debug</p></a></td>
+								<td><p><?php print _('Debug mode will load the boot image and load a prompt so you can run any commands you wish.  When you are done, you must remember to remove the PXE file, by clicking on "Active Tasks" and clicking on the "Kill Task" button.'); ?></p></td>
+							</tr>
+							<tr>
+								<td class="task-action"><a href="?node=group&sub=deploy&debug=true&<?php print $this->id . '=' . $this->REQUEST['id']; ?>"><img src="./images/senddebug.png" /><p><?php print _('Deploy-Debug'); ?></p></a></td>
+								<td><p><?php print _('Deploy-Debug mode allows FOG to setup the environment to allow you send a specific image to a computer, but instead of sending the image, FOG will leave you at a prompt right before sending.  If you actually wish to send the image all you need to do is type "fog" and hit enter.'); ?></p></td>
+							</tr>		
+							<tr>
+								<td class="task-action"><a href="?node=group&sub=deploy&snapins=false&<?php print $this->id . '=' . $this->REQUEST['id']; ?>"><img src="./images/sendnosnapin.png" /><p><?php print _('Deploy without Snapins'); ?></p></a></td>
+								<td><p><?php print _('Deploy without snapins allows FOG to image the workstation, but after the task is complete any snapins linked to the host or group will NOT be sent.'); ?></p></td>
+							</tr>		
+							<tr>
+								<td class="task-action"><a href="?node=group&sub=snapins&<?php print $this->id . '=' . $this->REQUEST['id']; ?>"><img src="./images/snap.png" /><p><?php print _('Deploy Snapins'); ?></p></a></td>
+								<td><p><?php print _('This option allows you to send all the snapins to host without imaging the computer.  (Requires FOG Service to be installed on client)'); ?></p></td>
+							</tr>		
+							<tr>
+								<td class="task-action"><a href="?node=group&sub=memtest&<?php print $this->id . '=' . $this->REQUEST['id']; ?>"><img src="./images/memtest.png" /><p><?php print _('Memtest86+'); ?></p></a></td>
+								<td><p><?php print _('Memtest86+ loads Memtest86+ on the client computer and will have it continue to run until stopped.  When you are done, you must remember to remove the PXE file, by clicking on "Active Tasks" and clicking on the "Kill Task" button.'); ?></p></td>
+							</tr>		
+							<tr>
+								<td class="task-action"><a href="?node=group&sub=wakeup&<?php print $this->id . '=' . $this->REQUEST['id']; ?>"><img src="./images/wake.png" /><p><?php print _('Wake Up'); ?></p></a></td>
+								<td><p><?php print _('Wake Up will attempt to send the Wake-On-LAN packet to the computer to turn the computer on.  In switched environments, you typically need to configure your hardware to allow for this (iphelper).'); ?></p></td>
+							</tr>			
+							<tr>
+								<td class="task-action"><a href="?node=group&sub=wipe-fast&<?php print $this->id . '=' . $this->REQUEST['id']; ?>"><img src="./images/veryfastwipe.png" /><p><?php print _('Fast Wipe'); ?></p></a></td>
+								<td><p><?php print _("Fast Wipe will boot the client computer and perform a quick and lazy disk wipe.  This method writes zero's to the start of the hard disk, destroying the MBR, but NOT overwritting everything on the disk."); ?></p></td>
+							</tr>					
+							<tr>
+								<td class="task-action"><a href="?node=group&sub=wipe-normal&<?php print $this->id . '=' . $this->REQUEST['id']; ?>"><img src="./images/quickwipe.png" /><p><?php print _('Normal Wipe'); ?></p></a></td>
+								<td><p><?php print _("Normal Wipe will boot the client computer and perform a simple disk wipe.  This method writes one pass of zero's to the hard disk."); ?></p></td>
+							</tr>				
+							<tr>
+								<td class="task-action"><a href="?node=group&sub=wipe-full&<?php print $this->id . '=' . $this->REQUEST['id']; ?>"><img src="./images/fullwipe.png" /><p><?php print _('Full Wipe'); ?></p></a></td>
+								<td><p><?php print _('Full Wipe will boot the client computer and perform a full disk wipe.  This method writes a few passes of random data to the hard disk.'); ?></p></td>
+							</tr>					
+							<tr>
+								<td class="task-action"><a href="?node=group&sub=surface-test&<?php print $this->id . '=' . $this->REQUEST['id']; ?>"><img src="./images/surfacetest.png" /><p><?php print _('Disk Surface Test'); ?></p></a></td>
+								<td><p><?php print _("Disk Surface Test checks the hard drive's surface sector by sector for any errors and reports back if errors are present."); ?></p></td>
+							</tr>								
+							<tr>
+								<td class="task-action"><a href="?node=group&sub=test-disk&<?php print $this->id . '=' . $this->REQUEST['id']; ?>"><img src="./images/testdisk.png" /><p><?php print _('Test Disk'); ?></p></a></td>
+								<td><p><?php print _('Test Disk loads the testdisk utility that can be used to check a hard disk and recover lost partitions.'); ?></p></td>
+							</tr>						
+							<tr>
+								<td class="task-action"><a href="?node=group&sub=recover&<?php print $this->id . '=' . $this->REQUEST['id']; ?>"><img src="./images/recover.png" /><p><?php print _('Recover'); ?></p></a></td>
+								<td><p><?php print _('Recover loads the photorec utility that can be used to recover lost files from a hard drisk.  When recovering files, make sure you save them to your NFS volume (ie: /images).'); ?></p></td>
+							</tr>						
+							<tr>
+								<td class="task-action"><a href="?node=group&sub=antivirus&<?php print $this->id . '=' . $this->REQUEST['id']; ?>"><img src="./images/clam.png" /><p><?php print _('Anti-Virus'); ?></p></a></td>
+								<td><p><?php print _('Anti-Virus loads Clam AV on the client boot image, updates the scanner and then scans the Windows partition.'); ?></p></td>
+							</tr>							
+							<tr>
+								<td class="task-action"><a href="?node=group&sub=inventory&<?php print $this->id . '=' . $this->REQUEST['id']; ?>"><img src="./images/inventory.png" /><p><?php print _('Hardware Inventory'); ?></p></a></td>
+								<td><p><?php print _('The hardware inventory task will boot the client computer and pull basic hardware informtation from it and report it back to the FOG server.'); ?></p></td>
+							</tr>	
+							<tr>
+								<td class="task-action"><a href="?node=group&sub=windows-password-reset&<?php print $this->id . '=' . $this->REQUEST['id']; ?>"><img src="./images/winpass.png" /><p><?php print _('Password Reset'); ?></p></a></td>
+								<td><p><?php print _('Password reset will blank out a Windows user password that may have been lost or forgotten.'); ?></p></td>
+							</tr>
+						</table>
+					</div>
 				</div>
-				
+								
 				<!-- Membership -->
 				<div id="group-membership">
 					<h2><?php print _("Modify Membership for ") . $Group->get('name'); ?></h2>
@@ -546,6 +639,143 @@ class GroupManagementPage extends FOGPage
 			$this->FOGCore->redirect($this->formAction);
 		}
 	}
+	
+	public function deploy()
+	{
+		// Find
+		$Group = new Group($this->REQUEST['id']);
+		
+		// Title
+		$this->title = "Deploy Image to Group of Hosts";
+		
+		// Deploy
+		?>
+		<p class="c"><b><?php print _("Are you sure you wish to deploy these machines?"); ?></b></p>
+		<form method="POST" action="<?php print $this->formAction; ?>" id="deploy-container">
+			<div class="confirm-message">
+				<div class="advanced-settings">
+					<h2><?php print _("Advanced Settings"); ?></h2>
+					<p><input type="checkbox" name="shutdown" id="shutdown" value="1" autocomplete="off"> <label for="shutdown"><?php print _("Schedule <u>Shutdown</u> after task completion"); ?></label></p>
+					<?php
+					if ($_GET['debug'] != 'true')
+					{
+						?>
+						<p><input type="radio" name="scheduleType" id="scheduleInstant" value="instant" autocomplete="off" checked="checked" /> <label for="scheduleInstant"><?php print _("Schedule <u>Instant Deployment</u>"); ?></label></p>
+						<p><input type="radio" name="scheduleType" id="scheduleSingle" value="single" autocomplete="off" /> <label for="scheduleSingle"><?php print _("Schedule <u>Delayed Deployment</u>"); ?></label></p>
+						<p class="hidden" id="singleOptions"><input type="text" name="scheduleSingleTime" id="scheduleSingleTime" autocomplete="off" /></p>
+						<p><input type="radio" name="scheduleType" id="scheduleCron" value="cron" autocomplete="off"> <label for="scheduleCron"><?php print _("Schedule <u>Cron-style Deployment</u>"); ?></label></p>
+						<p class="hidden" id="cronOptions">
+							<input type="text" name="scheduleCronMin" id="scheduleCronMin" placeholder="min" autocomplete="off" />
+							<input type="text" name="scheduleCronHour" id="scheduleCronHour" placeholder="hour" autocomplete="off" />
+							<input type="text" name="scheduleCronDOM" id="scheduleCronDOM" placeholder="dom" autocomplete="off" />
+							<input type="text" name="scheduleCronMonth" id="scheduleCronMonth" placeholder="month" autocomplete="off" />
+							<input type="text" name="scheduleCronDOW" id="scheduleCronDOW" placeholder="dow" autocomplete="off" />
+						</p>
+						<?php
+					}
+					?>
+				</div>
+			</div>
+			
+			<h2><?php print _('Hosts in Task'); ?></h2>
+			<table width="100%" cellspacing="0" cellpadding="0" border="0">
+				<tbody>
+					<?php
+					foreach ((array)$Group->get('hosts') AS $Host)
+					{
+						?>
+						<tr>
+							<td><?php print $Host->get('name'); ?></td>
+							<td><?php print $Host->get('mac') . ($Host->get('ip') ? sprintf('(%s)', $Host->get('ip')) : ''); ?></td>
+							<td><?php print $Host->getImage()->get('name'); ?></td>
+						</tr>
+						<?php
+					}
+					?>
+				</tbody>
+			</table>
+			
+			<p class="c"><input type="submit" value="<?php print _("Deploy to Group") . ' ' . $Group->get('name'); ?>" /></p>
+		</form>
+		<?php
+	}
+	
+	public function deploy_post()
+	{
+		// Find
+		$Group = new Group($this->REQUEST['id']);
+		
+		// Title
+		$this->title = "Deploy Image to Group of Hosts";
+		
+		// Variables
+		$enableShutdown = ($this->REQUEST['shutdown'] == 1 ? true : false);
+		$enableSnapins = ($this->REQUEST['deploySnapins'] == 'true' ? true : false);
+		$enableDebug = ($this->REQUEST['debug'] == 'true' ? true : false);
+		$scheduledDeployTime = strtotime($this->REQUEST['scheduleSingleTime']);
+		
+		$taskName = $Group->get('name');
+		
+		// Deploy
+		try
+		{
+			foreach ($Group->get('hosts') AS $Host)
+			{
+				try
+				{
+					// NOTE: These functions will throw an exception if they fail
+					if ($this->REQUEST['scheduleType'] == 'single')
+					{
+						// Scheduled Deployment
+						$Host->createSingleRunScheduledPackage('D', $taskName, $scheduledDeployTime, $enableShutdown, $enableSnapins, true);
+					}
+					else if ($this->REQUEST['scheduleType'] == 'cron')
+					{
+						// Cron Deployment
+						$Host->createCronScheduledPackage('D', $taskName, $this->REQUEST['scheduleCronMin'], $this->REQUEST['scheduleCronHour'], $this->REQUEST['scheduleCronDOM'], $this->REQUEST['scheduleCronMonth'], $this->REQUEST['scheduleCronDOW'], $enableShutdown, $enableSnapins, true);
+					}
+					else
+					{
+						// Instant Deployment
+						$Host->createImagePackage('D', $taskName, $enableShutdown, $enableDebug, $enableSnapins);
+					}
+					
+					$success[] = sprintf('<li>%s &ndash; %s</li>', $Host->get('name'), $Host->getImage()->get('name'));
+				}
+				catch (Exception $e)
+				{
+					$error[] = sprintf('%s: %s', $Host->get('name'), $e->getMessage());
+				}	
+			}
+			
+			// Failure
+			if (count($error))
+			{
+				throw new Exception('<ul><li>' . implode('</li><li>', $error) . '</li></ul>');
+			}
+		}
+		catch (Exception $e)
+		{
+			// Failure
+			printf('<div class="task-start-failed"><p>%s</p><p>%s</p></div>', _('Failed to create deployment tasks for the following Hosts'), $e->getMessage());
+		}
+				
+		// Success
+		if (count($success))
+		{
+			printf('<div class="task-start-ok"><p>%s</p><p>%s%s%s</p></div>',
+				sprintf(_('Successfully created tasks for deployment to the following Hosts'), $Host->getImage()->get('name')),
+				($this->REQUEST['scheduleType'] == 'cron'	? _('Cron Schedule:') . ' ' . implode(' ', array($this->REQUEST['scheduleCronMin'], $this->REQUEST['scheduleCronHour'], $this->REQUEST['scheduleCronDOM'], $this->REQUEST['scheduleCronMonth'], $this->REQUEST['scheduleCronDOW'])) : ''),
+				($this->REQUEST['scheduleType'] == 'single'	? _('Scheduled to start at:') . ' ' . $this->REQUEST['scheduleSingleTime'] : ''),
+				(count($success) ? '<ul>' . implode('', $success) . '</ul>' : '')
+			);
+		}
+		
+		// Manually disconnect FTP - the connection is kept open for Group tasks for performance
+		$this->FOGFTP->close();
+	}
+	
+	
 }
 
 // Register page with FOGPageManager

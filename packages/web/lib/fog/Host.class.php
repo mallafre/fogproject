@@ -36,7 +36,8 @@ class Host extends FOGController
 		'groups',
 		'primayGroup',
 		'primayGroupID',
-		'printers'
+		'printers',
+		'optimalStorageNode'
 	);
 	
 	// Required database fields
@@ -44,6 +45,12 @@ class Host extends FOGController
 		'id',
 		'name',
 		'mac'
+	);
+	
+	// Database field to Class relationships
+	public $databaseFieldClassRelationships = array(
+		'osID'		=> 'OS',
+		'imageID'	=> 'Image'
 	);
 	
 	// Custom functons
@@ -67,12 +74,17 @@ class Host extends FOGController
 		return $this->get('printers');
 	}
 	
-	// Overrides
-	public function get($key)
+	public function getMACAddress()
 	{
-		// Printers
+		return $this->get('mac');
+	}
+	
+	// Overrides
+	public function get($key = '')
+	{
 		if ($this->key($key) == 'printers' && !$this->isLoaded('printers'))
 		{
+			// Printers
 			if ($this->get('id'))
 			{
 				$this->DB->query("SELECT * FROM  printerAssoc inner join printers on ( printerAssoc.paPrinterID = printers.pID ) WHERE printerAssoc.paHostID = '%s' ORDER BY printers.pAlias", $this->get('id'));
@@ -84,6 +96,11 @@ class Host extends FOGController
 			}
 			
 			$this->set('printers', (array)$printers);
+		}
+		else if ($this->key($key) == 'optimalStorageNode' && !$this->isLoaded('optimalStorageNode'))
+		{
+			// Get Optimal Storage Node once - we must store this as we dont want different Storage Node's coming back after each call
+			$this->set($key, $this->getImage()->getStorageGroup()->getOptimalStorageNode());
 		}
 		
 		return parent::get($key);
@@ -165,7 +182,13 @@ class Host extends FOGController
 	
 	public function isValid()
 	{
-		return (($this->get('id') != '' || $this->get('name') != '') && $this->get('mac') != '' ? true : false);
+		return (($this->get('id') != '' || $this->get('name') != '') && $this->getMACAddress() != '' ? true : false);
+	}
+	
+	// Custom functions
+	public function getActiveTaskCount()
+	{
+		return $this->FOGCore->getClass('TaskManager')->count(array('state' => array(0, 1), 'hostID' => $this->get('id')));
 	}
 	
 	public function isValidToImage()
@@ -180,6 +203,361 @@ class Host extends FOGController
 		// TODO: Use this version when class caching has been finialized
 		//return ($this->getImage()->isValid() && $this->getImage()->getOS()->isValid() && $this->getImage()->getStorageGroup()->isValid() && $this->getImage()->getStorageGroup()->getStorageNode*(->isValid() ? true : false);
 	}
+	
+	public function getOptimalStorageNode()
+	{
+		return $this->get('optimalStorageNode');
+	}
+
+	// Should be called: createDeployTask
+	function createImagePackage($taskType, $taskName = '', $shutdown = false, $debug = false, $deploySnapins = true, $isGroupTask = false)
+	{
+		try
+		{
+			// Variables
+			$taskType = strtoupper($taskType);	// U = Upload, D = Download
+			$isUpload = ($taskType == 'U');
+		
+			// Error checking
+			if ($this->getActiveTaskCount())
+			{
+				throw new Exception('Host is already a member of a active task');
+			}
+			if (!$this->isValid())
+			{
+				throw new Exception('Host is not valid');
+			}
+			
+			// Image: Variables
+			$Image = $this->getImage();
+			
+			// Image: Error checking
+			if (!$Image->isValid())
+			{
+				throw new Exception('Image is not valid');
+			}
+			if (!$Image->getStorageGroup()->isValid())
+			{
+				throw new Exception('Storage Group is not valid');
+			}
+			
+			// Storage Node: Variables
+			// NOTE: Master storage node node for Uploads or, Optimal storage node for Deploy
+			$StorageNode = ($isUpload ? $Image->getStorageGroup()->getMasterStorageNode() : $this->getOptimalStorageNode());
+			
+			// Storage Node: Error Checking
+			if (!$StorageNode->isValid())
+			{
+				throw new Exception('Storage Node is not valid');
+			}
+			
+			// Variables
+			$mac = $this->getMACAddress()->getMACWithColon();
+			$localPXEFile = $this->FOGCore->makeTempFilePath();
+			$remotePXEFile = rtrim($this->FOGCore->getSetting('FOG_TFTP_PXE_CONFIG_DIR'), '/') . '/' . $this->getMACAddress()->getMACPXEPrefix();
+			
+			// Kernel Arguments: Define possible kernel arguments
+			// NOTE: slightly more manageable but needs more love
+			$kernelArgsArray = array(
+				// FOG
+				'initrd=' . $this->FOGCore->getSetting('FOG_PXE_BOOT_IMAGE'),
+				'root=/dev/ram0',
+				'rw',
+				'ramdisk_size=' . $this->FOGCore->getSetting('FOG_KERNEL_RAMDISK_SIZE'),
+				'ip=dhcp',
+				'dns=' . $this->FOGCore->getSetting('FOG_PXE_IMAGE_DNSADDRESS'),
+				'mac=' . $mac,
+				'ftp=' . $this->FOGCore->resolveHostname($this->FOGCore->getSetting('FOG_TFTP_HOST')),
+				'storage=' . $StorageNode->get('ip') . ':' . $StorageNode->get('path'),
+				'web=' . $this->FOGCore->resolveHostname($this->FOGCore->getSetting('FOG_WEB_HOST')) . '/' . ltrim($this->FOGCore->getSetting('FOG_WEB_ROOT'), '/'),
+				'osid=' . $this->get('osID'),
+				'loglevel=4',
+				'consoleblank=0',
+				'chkdsk=' . ($this->FOGCore->getSetting('FOG_DISABLE_CHKDSK') == '1' ? '0' : '1'),
+				'img=' . $Image->get('path'),
+				'imgType=' . $Image->getImageType()->get('type'),
+				
+			
+				// Dynamic kernel args - if 'active' is false, arg wont be used
+				array(	'value'		=> 'shutdown=' . $shutdown,
+					'active'	=> $shutdown
+				),
+				array(	'value'		=> 'mode=debug',
+					'active'	=> $debug
+				),
+				array(	'value'		=> 'keymap=' . $this->FOGCore->getSetting('FOG_KEYMAP'),
+					'active'	=> $this->FOGCore->getSetting('FOG_KEYMAP')
+				),
+				array(	'value'		=> 'fdrive=' . $this->get('kernelDevice'),
+					'active'	=> $this->get('kernelDevice')
+				),
+				array(	'value'		=> 'hostname=' . $this->get('name'),
+					'active'	=> $this->FOGCore->getSetting('FOG_CHANGE_HOSTNAME_EARLY')
+				),
+				
+				// Type
+				'type=' . ($isUpload ? 'up' : 'down'),
+				
+				// Upload
+				array(	'value'		=> 'pct=' . (is_numeric($GLOBALS['FOGCore']->getSetting('FOG_UPLOADRESIZEPCT')) && $GLOBALS['FOGCore']->getSetting('FOG_UPLOADRESIZEPCT') >= 5 && $GLOBALS['FOGCore']->getSetting('FOG_UPLOADRESIZEPCT') < 100 ? $this->FOGCore->getSetting('FOG_UPLOADRESIZEPCT') : '5'),
+					'active'	=> $isUpload
+				),
+				array(	'value'		=> 'ignorepg=' . ($GLOBALS['FOGCore']->getSetting( "FOG_UPLOADIGNOREPAGEHIBER" ) ? '1' : '0'),
+					'active'	=> $isUpload
+				),
+				array(	'value'		=> 'imgid=' . $Image->get('id'),
+					'active'	=> $isUpload
+				),
+				
+				
+				
+				// OLD DEPLOY
+				//append initrd=" . $GLOBALS['FOGCore']->getSetting( "FOG_PXE_BOOT_IMAGE" ) . "  root=/dev/ram0 rw ramdisk_size=" . $GLOBALS['FOGCore']->getSetting( "FOG_KERNEL_RAMDISK_SIZE" ) . " ip=dhcp dns=" . $GLOBALS['FOGCore']->getSetting( "FOG_PXE_IMAGE_DNSADDRESS" ) . " type=down img=" . $Image->get('path') . " mac=" . $member->getMACColon() . " ftp=" . sloppyNameLookup($GLOBALS['FOGCore']->getSetting( "FOG_TFTP_HOST" )) . " storage=" . $member->getNFSServer() . ":" . $member->getNFSRoot() . " web=" . sloppyNameLookup($GLOBALS['FOGCore']->getSetting( "FOG_WEB_HOST")) . $GLOBALS['FOGCore']->getSetting( "FOG_WEB_ROOT" ) . " osid=" . $member->getOSID() . " $mode $imgType $keymapapp shutdown=$shutdown loglevel=4 consoleblank=0 " . $GLOBALS['FOGCore']->getSetting( "FOG_KERNEL_ARGS" ) . " " . $member->getKernelArgs() . " " . $otherargs; 
+				// OLD UPLOAD
+				//append initrd=" . $GLOBALS['FOGCore']->getSetting( "FOG_PXE_BOOT_IMAGE" ) . "  root=/dev/ram0 rw ramdisk_size=" . $GLOBALS['FOGCore']->getSetting( "FOG_KERNEL_RAMDISK_SIZE" ) . " ip=dhcp dns=" . $GLOBALS['FOGCore']->getSetting( "FOG_PXE_IMAGE_DNSADDRESS" ) . " type=up img=$image imgid=$imageid mac=" . $member->getMACColon() . " storage=" . $nfsip . ":" . $nfsroot . " web=" . sloppyNameLookup($GLOBALS['FOGCore']->getSetting( "FOG_WEB_HOST")) . $GLOBALS['FOGCore']->getSetting( "FOG_WEB_ROOT" ) . " ignorepg=$ignorepg osid=" . $member->getOSID() . " $mode $pct $imgType $keymapapp shutdown=$shutdown loglevel=4 consoleblank=0 " . $GLOBALS['FOGCore']->getSetting( "FOG_KERNEL_ARGS" ) . " " . $member->getKernelArgs() . " " . $otherargs; 
+				
+				// User
+				$this->FOGCore->getSetting('FOG_KERNEL_ARGS'),
+				$this->get('kernelArgs'),
+			);
+			
+			// 
+			
+			// Kernel Arguments: Build kernelArgs array based on 'active' element
+			foreach ($kernelArgsArray AS $arg)
+			{
+				if (!is_array($arg) && !empty($arg) || (is_array($arg) && $arg['active'] && $arg = $arg['value'] && !empty($arg)))
+				{
+					$kernelArgs[] = $arg;
+				}
+			}
+			
+			// Kernel Arguements: Error checking
+			if (!count($kernelArgs))
+			{
+				throw new Exception('No Kernel Arguments! This should not happen!');
+			}
+			
+			// PXE: Build PXE File contents
+			$output[] = "# " . _("Created by FOG Imaging System");
+			$output[] = "DEFAULT fog";
+			$output[] = "LABEL fog";
+			$output[] = "KERNEL " . ($this->get('kernel') ? $this->get('kernel') : $this->FOGCore->getSetting('FOG_TFTP_PXE_KERNEL'));
+			$output[] = "APPEND " . implode(' ', (array)$kernelArgs);
+			
+			// PXE: Save PXE File to tmp file
+			if (!@file_put_contents($localPXEFile, implode("\n", $output)))
+			{
+				$error = error_get_last();
+				throw new Exception(sprintf('Failed to write TMP PXE File. File: %s, Error: %s', $localPXEFile, $error['message']));
+			}
+			
+			// FTP: Connect -> Upload new PXE file
+			
+			$this->FOGFTP	->set('host', 		$this->FOGCore->getSetting('FOG_TFTP_HOST'))
+					->set('username',	$this->FOGCore->getSetting('FOG_TFTP_FTP_USERNAME'))
+					->set('password',	$this->FOGCore->getSetting('FOG_TFTP_FTP_PASSWORD'))
+					->connect()
+					->put($remotePXEFile, $localPXEFile);
+			
+			
+			// PXE: Remove local PXE file
+			@unlink($localPXEFile);
+			
+			// Task: Create Task Object
+			$Task = new Task(array(
+				'name'		=> $taskName,
+				'createdBy'	=> $this->FOGUser->get('name'),
+				'hostID'	=> $this->get('id'),
+				'isForced'	=> 0,
+				'state'		=> 0,
+				'type'		=> $taskType
+			));
+			
+			// Task: Save to database
+			if (!$Task->save())
+			{
+				// Task save failed!
+				// FTP: Delete PXE file -> Disconnect
+				$this->FOGFTP->delete($remotePXEFile)->close(($isGroupTask ? false : true));
+				
+			
+				// Throw error
+				throw new Exception(_('Task creation failed'));
+			}
+			
+			// Success
+			// FTP: Disconnect
+			$this->FOGFTP->close(($isGroupTask ? false : true));
+		
+			// Snapins
+			// LEGACY
+			// TODO: Convert
+			if (!$isUpload && $deploySnapins)
+			{
+				// Remove any exists snapin tasks
+				cancelSnapinsForHost($conn, $this->get('id'));
+				
+				// now do a clean snapin deploy
+				deploySnapinsForHost($conn, $this->get('id'));
+			}
+			
+			// Wake Host
+			$this->wakeOnLAN();
+			
+			// Log History event
+			$this->FOGCore->logHistory(sprintf('Task Created: Task ID: %s, Task Name: %s, Host ID: %s, Host Name: %s, Host MAC: %s, Image ID: %s, Image Name: %s', $Task->get('id'), $Task->get('name'), $this->get('id'), $this->get('name'), $this->getMACAddress(), $this->getImage()->get('id'), $this->getImage()->get('name')));
+			
+			return $Task;
+		}
+		catch (Exception $e)
+		{
+			// Failure
+			//$this->debug('Failed to %s. Error: %s', array(__FUNCTION__, $e->getMessage()));
+			//throw new Exception(sprintf('Failed to %s. Error: %s', __FUNCTION__, $e->getMessage()));
+			throw new Exception($e->getMessage());
+		}
+	}
+	
+	function createSingleRunScheduledPackage($taskType, $taskName = '', $scheduledDeployTime, $enableShutdown = false, $enableSnapins = false, $isGroupTask = false, $arg2 = null)
+	{
+		try
+		{
+			// Varaibles
+			$taskType = strtoupper($taskType);
+			$isUpload = ($taskType == 'U');
+			
+			$findWhere = array(
+				'isActive' 	=> '1',
+				'isGroupTask' 	=> $isGroupTask,
+				'taskType' 	=> $taskType,
+				'type' 		=> 'S',		// S = Single Schedule Deployment, C = Cron-style Schedule Deployment
+				'hostID' 	=> $this->get('id'),
+				'scheduleTime'	=> $scheduledDeployTime
+			);
+
+			// Error checking
+			if ($scheduledDeployTime < time())
+			{
+				throw new Exception(sprintf('Scheduled date is in the past. Date: %s', date('Y/d/m H:i', $scheduledDeployTime)));
+			}
+			if ($this->FOGCore->getClass('ScheduledTaskManager')->count($findWhere))
+			{
+				throw new Exception('A task already exists for this Host at this scheduled date & time');
+			}
+			
+			// Task: Merge $findWhere array with other Task data -> Create ScheduledTask Object
+			$Task = new ScheduledTask(array_merge($findWhere, array(
+				'name'		=> 'Scheduled Task',
+				'shutdown'	=> ($enableShutdown ? '1' : '0'),
+				'other1'	=> ($isUpload && $enableSnapins ? '1' : '0'),
+				'other2'	=> $arg2
+			)));
+			
+			// Save
+			if (!$Task->save())
+			{
+				// Throw error
+				throw new Exception(_('Task creation failed'));
+			}
+			
+			// Log History event
+			$this->FOGCore->logHistory(sprintf('Scheduled Task Created: Task ID: %s, Task Name: %s, Host ID: %s, Host Name: %s, Host MAC: %s, Image ID: %s, Image Name: %s', $Task->get('id'), $Task->get('name'), $this->get('id'), $this->get('name'), $this->getMACAddress(), $this->getImage()->get('id'), $this->getImage()->get('name')));
+			
+			// Return
+			return $Task;
+		}
+		catch (Exception $e)
+		{
+			// Failure
+			throw new Exception($e->getMessage());
+		}
+	}
+	
+	function createCronScheduledPackage($taskType, $taskName = '', $minute = 1, $hour = 23, $dayOfMonth = '*', $month = '*', $dayOfWeek = '*', $enableShutdown = false, $enableSnapins = true, $isGroupTask = false, $arg2 = null)
+	{
+		try
+		{
+			// Varaibles
+			$taskType = strtoupper($taskType);
+			$isUpload = ($taskType == 'U');
+			
+			// Error checking
+			if ($minute != '*' && ($minute < 0 || $minute > 59))
+			{
+				throw new Exception('Minute value is not valid');
+			}
+			if ($hour != '*' && ($hour < 0 || $hour > 23))
+			{
+				throw new Exception('Hour value is not valid');
+			}
+			if ($dayOfMonth != '*' && ($dayOfMonth < 0 || $dayOfMonth > 31))
+			{
+				throw new Exception('Day of Month value is not valid');
+			}
+			if ($month != '*' && ($month < 0 || $month > 12))
+			{
+				throw new Exception('Month value is not valid');
+			}
+			if ($dayOfWeek != '*' && ($dayOfWeek < 0 || $dayOfWeek > 6))
+			{
+				throw new Exception('Day of Week value is not valid');
+			}
+			
+			// Variables
+			$findWhere = array(
+				'isActive' 	=> '1',
+				'isGroupTask' 	=> $isGroupTask,
+				'taskType' 	=> $taskType,
+				'type' 		=> 'C',		// S = Single Schedule Deployment, C = Cron-style Schedule Deployment
+				'hostID' 	=> $this->get('id'),
+				'minute' 	=> $minute,
+				'hour' 		=> $hour,
+				'dayOfMonth' 	=> $dayOfMonth,
+				'month' 	=> $month,
+				'dayOfWeek' 	=> $dayOfWeek
+			);
+			
+			// Error checking: Active Scheduled Task
+			if ($this->FOGCore->getClass('ScheduledTaskManager')->count($findWhere))
+			{
+				throw new Exception('A task already exists for this Host at this cron schedule');
+			}
+			
+			// Task: Merge $findWhere array with other Task data -> Create ScheduledTask Object
+			$Task = new ScheduledTask(array_merge($findWhere, array(
+				'name'		=> 'Scheduled Task',
+				'shutdown'	=> ($enableShutdown ? '1' : '0'),
+				'other1'	=> ($isUpload && $enableSnapins ? '1' : '0'),
+				'other2'	=> $arg2
+			)));
+			
+			// Task: Save
+			if (!$Task->save())
+			{
+				// Throw error
+				throw new Exception(_('Task creation failed'));
+			}
+			
+			// Log History event
+			$this->FOGCore->logHistory(sprintf('Cron Task Created: Task ID: %s, Task Name: %s, Host ID: %s, Host Name: %s, Host MAC: %s, Image ID: %s, Image Name: %s', $Task->get('id'), $Task->get('name'), $this->get('id'), $this->get('name'), $this->getMACAddress(), $this->getImage()->get('id'), $this->getImage()->get('name')));
+			
+			// Return
+			return $Task;
+		}
+		catch (Exception $e)
+		{
+			// Failure
+			throw new Exception($e->getMessage());
+		}
+	}
+
+	public function wakeOnLAN()
+	{
+		// HTTP request to WOL script
+		$this->FOGCore->wakeOnLAN($this->getMACAddress());
+	}
+	
 	
 	// Legacy
 	const PRINTER_MANAGEMENT_UNKNOWN = -1;
@@ -219,6 +597,7 @@ class Host extends FOGController
 	function getPassword()				{ return $this->get('ADPass'); }
 	function setDiskDevice( $hd )			{ return $this->set('kernelDevice', $hd); }
 	function getDiskDevice(  )			{ return $this->get('kernelDevice'); }
+	function getDevice(  )				{ return $this->get('kernelDevice'); }
 	function setID( $id )				{ return $this->set('id', $id); }
 	function getID()				{ return $this->get('id'); }
 	function getHostName()				{ return $this->get('name'); }
@@ -226,1049 +605,4 @@ class Host extends FOGController
 	function setDescription( $desc )		{ return $this->set('description', $desc); }
 	function getDescription( )			{ return $this->get('description'); }
 	function setOS( $os )				{ return $this->set('osID', $os); }
-	
-	// Replace with Task Class when completed
-	public function startTask($conn, $tasktype, $blShutdown, $args1=null, $args2=null, $args3=null, $args4=null, $args5=null, &$reason)
-	{
-		$reason = "";
-		if ( $conn != null  )
-		{
-			switch( strtoupper($tasktype) )
-			{
-				/*
-				 *    Unicast Send
-				 */
-				
-				
-				case strtoupper(FOGCore::TASK_UNICAST_SEND):
-					if ( $this->getImage() != null  )
-					{
-						if ( $this->getImage()->getPath() != null && strlen(trim($this->getImage()->getPath())) > 0 )
-						{
-							$storageGroup = $this->getImage()->getStorageGroup();
-							if ( $storageGroup != null )
-							{
-								if ( $storageGroup->getMembers() != null && count( $storageGroup->getMembers() ) > 0  )
-								{
-									$masterNode = $storageGroup->getMasterStorageNode();
-									if ( $masterNode != null )
-									{
-										$mac = $this->get('mac');							
-										if ( $mac != null )
-										{
-											if ( $mac->isValid( ) )
-											{
-												$imgType = "imgType=n";
-												if ( $this->getImage()->getImageType() == Image::IMAGE_TYPE_DD )
-													$imgType = "imgType=dd";
-												else if ( $this->getImage()->getImageType() == Image::IMAGE_TYPE_MULTIPARTITION_SINGLE_DISK )
-													$imgType = "imgType=mps";
-												else if ( $this->getImage()->getImageType() == Image::IMAGE_TYPE_MULTIPARTITION_MULTIDISK )
-													$imgType = "imgType=mpa";												
-												else
-												{
-													if ( $this->get('osID') == Host::OS_OTHER )
-													{
-														$reason = "Invalid OS type, unable to determine MBR.";
-														return false;
-													}
-
-													if ( strlen( trim($this->get('osID')) ) == 0 || $this->get('osID') == Host::OS_UNKNOWN )
-													{
-														$reason = "Invalid OS type, you must specify an OS Type to image.";
-														return false;
-													}
-
-													if ( trim($this->get('osID')) != Host::OS_WIN2000XP && trim($this->get('osID')) != Host::OS_WINVISTA && trim($this->get('osID')) != Host::OS_WIN7 )
-													{
-														$reason = "Unsupported OS detected in host!";
-														return false;
-													}				
-												}
-											
-												$keymapapp = "";
-												$keymap = $this->FOGCore->getSetting("FOG_KEYMAP");
-												if ( $keymap != null && $keymap != "" )
-													$keymapapp = "keymap=$keymap";																							
-
-												$strKern = $this->FOGCore->getSetting("FOG_TFTP_PXE_KERNEL" );
-												if ( $this->get('kernel') != "" && $this->get('kernel') != null )
-													$strKern = $this->get('kernel');		
-													
-												$output = "# Created by FOG Imaging System\n\n
-															  DEFAULT fog\n
-															  LABEL fog\n
-															  kernel " . $strKern . "\n
-															  append initrd=" . $this->FOGCore->getSetting("FOG_PXE_BOOT_IMAGE" ) . "  root=/dev/ram0 rw ramdisk_size=" . $this->FOGCore->getSetting("FOG_KERNEL_RAMDISK_SIZE" ) . " ip=dhcp dns=" . $this->FOGCore->getSetting("FOG_PXE_IMAGE_DNSADDRESS" ) . " type=down img=" . $this->getImage()->getPath() . " mac=" . $mac->getMACWithColon() . " ftp=" . sloppyNameLookup($this->FOGCore->getSetting("FOG_TFTP_HOST" )) . " storage=" . $masterNode->getHostIP() . ":" . $masterNode->getRoot() . " web=" . sloppyNameLookup($this->FOGCore->getSetting("FOG_WEB_HOST")) . $this->FOGCore->getSetting("FOG_WEB_ROOT" ) . " osid=" . $this->get('osID') . " $imgType $keymapapp shutdown=" . ( $blShutdown ? "on" : " " ) . " loglevel=4 "  . $this->FOGCore->getSetting("FOG_KERNEL_ARGS" ) . " " . $this->get('kernelArgs');
-
-												$tmp = createPXEFile( $output );
-												if( $tmp !== null )
-												{
-													// make sure there is no active task for this mac address
-													$num = $this->FOGCore->getClass('TaskManager')->getCountOfActiveTasksWithMAC($mac->getMACWithColon());
-				
-													if ( $num == 0 )
-													{
-														// attempt to ftp file
-										
-														$ftp = ftp_connect($this->FOGCore->getSetting("FOG_TFTP_HOST" )); 
-														$ftp_loginres = ftp_login($ftp, $this->FOGCore->getSetting("FOG_TFTP_FTP_USERNAME" ), $this->FOGCore->getSetting("FOG_TFTP_FTP_PASSWORD" )); 			
-														if ($ftp && $ftp_loginres ) 
-														{
-															if ( ftp_put( $ftp, $this->FOGCore->getSetting("FOG_TFTP_PXE_CONFIG_DIR" ) . $mac->getMACImageReady(), $tmp, FTP_ASCII ) )
-															{			
-																$uname = "FOGScheduler";
-											
-																$sql = "insert into 
-																		tasks(taskName, taskCreateTime, taskCheckIn, taskHostID, taskState, taskCreateBy, taskForce, taskType, taskNFSGroupID, taskNFSMemberID ) 
-																		values('" . mysql_real_escape_string("Sched: " . $this->get('name')) . "', NOW(), NOW(), '" . $this->get('id') . "', '0', '" . $uname . "', '0', 'D', '" . $storageGroup->get('id') . "', '" . $masterNode->get('id') . "' )";
-								
-																if ( mysql_query( $sql, $conn ) )
-																{
-																
-																	if ( trim($args1) == "1" )
-																	{
-																		// Remove any exists snapin tasks
-																		cancelSnapinsForHost( $conn, $this->get('id') );
-									
-																		// now do a clean snapin deploy
-																		deploySnapinsForHost( $conn, $this->get('id') );
-																	}
-								
-																	// lets try to wake the computer up!
-																	wakeUp( $mac->getMACWithColon() );																			
-																	@ftp_close($ftp); 					
-																	@unlink( $tmp );								
-																	return true;
-																}
-																else
-																{
-																	ftp_delete( $ftp, $this->FOGCore->getSetting("FOG_TFTP_PXE_CONFIG_DIR" ) . $mac->getMACImageReady() ); 									
-																	$reason = mysql_error($conn);
-																}
-															}  
-															else
-																$reason = "Unable to upload file."; 											
-														}	
-														else
-															$reason = "Unable to connect to tftp server."; 	
-						
-														@ftp_close($ftp); 					
-														@unlink( $tmp ); 							
-													}
-													else
-														$reason = "Host is already a member of a active task.";
-												}
-												else
-													$reason = "Failed to open tmp file.";	
-											}
-											else
-												$reason = "Primary MAC is invalid: " . $mac->getMACWithColon();
-										}
-										else
-											$reason = "No primary MAC address found.";
-									}
-									else
-										$reason = "Unable to locate master node in storage group.";
-								}
-								else
-									$reason = "Storage group has no members.";
-							}
-							else 
-								$reason = "Storage Group is null.";
-						}
-						else
-							$reason = "Image path is null.";
-					}
-					else
-						$reason = "Image is null.";				
-					break;
-				case strtoupper(FOGCore::TASK_UNICAST_UPLOAD):
-					/*
-				 	*    Unicast Upload
-				 	*/
-				 	if ( $this->getImage() != null  )
-					{
-						if ( $this->getImage()->getPath() != null && strlen(trim($this->getImage()->getPath())) > 0 )
-						{
-							$storageGroup = $this->getImage()->getStorageGroup();
-							if ( $storageGroup != null )
-							{
-								if ( $storageGroup->getMembers() != null && count( $storageGroup->getMembers() ) > 0  )
-								{
-									$masterNode = $storageGroup->getMasterStorageNode();
-									if ( $masterNode != null )
-									{
-										$mac = $this->get('mac');							
-										if ( $mac != null )
-										{
-											if ( $mac->isValid( ) )
-											{
-												$imgType = "imgType=n";
-												if ( $this->getImage()->getImageType() == Image::IMAGE_TYPE_DD )
-													$imgType = "imgType=dd";
-												else if ( $this->getImage()->getImageType() == Image::IMAGE_TYPE_MULTIPARTITION_SINGLE_DISK )
-													$imgType = "imgType=mps";
-												else if ( $this->getImage()->getImageType() == Image::IMAGE_TYPE_MULTIPARTITION_MULTIDISK )
-													$imgType = "imgType=mpa";												
-												else
-												{
-													if ( $this->get('osID') == Host::OS_OTHER )
-													{
-														$reason = "Invalid OS type, unable to determine MBR.";
-														return false;
-													}
-
-													if ( strlen( trim($this->get('osID')) ) == 0 || $this->get('osID') == Host::OS_UNKNOWN )
-													{
-														$reason = "Invalid OS type, you must specify an OS Type to image.";
-														return false;
-													}
-
-													if ( trim($this->get('osID')) != Host::OS_WIN2000XP && trim($this->get('osID')) != Host::OS_WINVISTA && trim($this->get('osID')) != Host::OS_WIN7 )
-													{
-														$reason = "Unsupported OS detected in host!";
-														return false;
-													}				
-												}
-												
-												$nfsroot = $masterNode->getRoot();
-												if ( $nfsroot != null )
-												{
-													if ( endsWith( $nfsroot, "/" )  )
-														$nfsroot .= "dev/";
-													else 
-														$nfsroot .= "/dev/";
-														
-													$pct = "pct=5";
-													if ( is_numeric($this->FOGCore->getSetting("FOG_UPLOADRESIZEPCT") ) && $this->FOGCore->getSetting("FOG_UPLOADRESIZEPCT") >= 5 && $this->FOGCore->getSetting("FOG_UPLOADRESIZEPCT") < 100 )
-														$pct = "pct=" . $this->FOGCore->getSetting("FOG_UPLOADRESIZEPCT");
-														
-													$ignorepg = "0";
-			
-													if ( $this->FOGCore->getSetting("FOG_UPLOADIGNOREPAGEHIBER" ) )
-														$ignorepg = "1";		
-														
-													$keymapapp = "";
-													$keymap = $this->FOGCore->getSetting("FOG_KEYMAP" );
-													if ( $keymap != null && $keymap != "" )
-														$keymapapp = "keymap=$keymap";	
-														
-													$strKern = $this->FOGCore->getSetting("FOG_TFTP_PXE_KERNEL" );
-													if ( $this->get('kernel') != "" && $this->get('kernel') != null )
-														$strKern = $this->get('kernel');	
-														
-													$output = "# Created by FOG Imaging System\n\n
-																  DEFAULT send\n
-																  LABEL send\n
-																  kernel " . $strKern . "\n
-																  append initrd=" . $this->FOGCore->getSetting("FOG_PXE_BOOT_IMAGE" ) . "  root=/dev/ram0 rw ramdisk_size=" . $this->FOGCore->getSetting("FOG_KERNEL_RAMDISK_SIZE" ) . " ip=dhcp dns=" . $this->FOGCore->getSetting("FOG_PXE_IMAGE_DNSADDRESS" ) . " type=up img=" .  $this->getImage()->getPath()  . " imgid=" . $this->getImage()->get('id') . " mac=" . $mac->getMACWithColon() . " storage=" . $masterNode->getHostIP() . ":" . $nfsroot . " web=" . sloppyNameLookup($this->FOGCore->getSetting("FOG_WEB_HOST")) . $this->FOGCore->getSetting("FOG_WEB_ROOT" ) . " ignorepg=$ignorepg osid=" . $this->get('osID') . " $pct $imgType $keymapapp shutdown=" . ( $blShutdown ? "on" : " " ) . " loglevel=4 "  . $this->FOGCore->getSetting("FOG_KERNEL_ARGS" ) . " " . $this->get('kernelArgs');																									
-			 										$tmp = createPXEFile( $output );
-													if( $tmp !== null )
-													{ 
-														$num = $this->FOGCore->getClass('TaskManager')->getCountOfActiveTasksWithMAC($mac->getMACWithColon());
-														if ( $num == 0 )
-														{
-															$ftp = ftp_connect($this->FOGCore->getSetting("FOG_TFTP_HOST" )); 
-															$ftp_loginres = ftp_login($ftp, $this->FOGCore->getSetting("FOG_TFTP_FTP_USERNAME" ), $this->FOGCore->getSetting("FOG_TFTP_FTP_PASSWORD" )); 			
-															if ($ftp && $ftp_loginres ) 
-															{
-																if ( ftp_put( $ftp, $this->FOGCore->getSetting("FOG_TFTP_PXE_CONFIG_DIR" ) . $mac->getMACImageReady(), $tmp, FTP_ASCII ) )
-																{			
-																	$uname = "FOGScheduler";
-																	$sql = "INSERT INTO 
-																			tasks(taskName, taskCreateTime, taskCheckIn, taskHostID, taskState, taskCreateBy, taskForce, taskType, taskNFSGroupID, taskNFSMemberID ) 
-																			VALUES('" . mysql_real_escape_string("Sched: " . $this->get('name')) . "', NOW(), NOW(), '" . $this->get('id') . "', '0', '" . mysql_real_escape_string( $uname ) . "', '0', 'U', '" . $storageGroup->get('id') . "', '" . $masterNode->get('id') . "' )";																																
-						
-																	if ( mysql_query( $sql, $conn ) )
-																	{																
-																		// lets try to wake the computer up!
-																		wakeUp( $mac->getMACWithColon() );																			
-																		@ftp_close($ftp); 					
-																		@unlink( $tmp );								
-																		return true;
-																	}
-																	else
-																	{
-																		ftp_delete( $ftp, $this->FOGCore->getSetting("FOG_TFTP_PXE_CONFIG_DIR" ) . $mac->getMACImageReady() ); 									
-																		$reason = mysql_error($conn);
-																																			
-																	}
-																}
-																else
-																	$reason = "Unable to upload file.";
-															}
-															else
-																$reason = "Unable to connect to tftp server."; 	
-						
-															@ftp_close($ftp); 					
-															@unlink( $tmp );															
-														}
-														else
-															$reason = "Host is already a member of a active task.";
-													}	
-													else
-														$reason = "Failed to open tmp file.";																  
-												}
-												else
-													$reason = "Invalid NFS Root: " . $nfsroot;
-											}
-											else
-												$reason = "Primary MAC is invalid: " . $mac->getMACWithColon();
-										}
-										else
-											$reason = "No primary MAC address found.";											
-									}
-									else
-										$reason = "Unable to locate master node in storage group.";									
-								}
-								else
-									$reason = "Storage group has no members.";
-							}
-							else 
-								$reason = "Storage Group is null.";
-						}
-						else
-							$reason = "Image path is null.";
-					}
-					else
-						$reason = "Image is null.";
-					break;
-				case strtoupper(FOGCore::TASK_WIPE):
-					if ( $this->getImage() != null  )
-					{
-						if ( $this->getImage()->getPath() != null && strlen(trim($this->getImage()->getPath())) > 0 )
-						{
-							$storageGroup = $this->getImage()->getStorageGroup();
-							if ( $storageGroup != null )
-							{
-								if ( $storageGroup->getMembers() != null && count( $storageGroup->getMembers() ) > 0  )
-								{
-									$masterNode = $storageGroup->getMasterStorageNode();
-									if ( $masterNode != null )
-									{
-										$mac = $this->get('mac');							
-										if ( $mac != null )
-										{
-											if ( $mac->isValid( ) )
-											{
-												if ( is_numeric($args2) )
-												{
-													$wipemode="wipemode=full";
-													if ( trim($args2) ==  WIPE_FAST )
-														$wipemode="wipemode=fast";
-													else if ( trim($args2) ==  WIPE_NORMAL )
-														$wipemode="wipemode=normal";
-													else if ( trim($args2) ==  WIPE_FULL )	
-														$wipemode="wipemode=full";
-												
-													$keymapapp = "";
-													$keymap = $this->FOGCore->getSetting("FOG_KEYMAP" );
-													if ( $keymap != null && $keymap != "" )
-														$keymapapp = "keymap=$keymap";	
-														
-													$strKern = $this->FOGCore->getSetting("FOG_TFTP_PXE_KERNEL" );
-													if ( $this->get('kernel') != "" && $this->get('kernel') != null )
-														$strKern = $this->get('kernel');													
-													
-													$output = "# Created by FOG Imaging System\n\n
-															  DEFAULT send\n
-															  LABEL send\n
-															  kernel " . $strKern . "\n
-															  append initrd=" . $this->FOGCore->getSetting("FOG_PXE_BOOT_IMAGE" ) . "  root=/dev/ram0 rw ramdisk_size=" . $this->FOGCore->getSetting("FOG_KERNEL_RAMDISK_SIZE" ) . " ip=dhcp dns=" . $this->FOGCore->getSetting("FOG_PXE_IMAGE_DNSADDRESS" ) . " mac=" . $mac->getMACWithColon() . " web=" . sloppyNameLookup( $this->FOGCore->getSetting("FOG_WEB_HOST") ) . $this->FOGCore->getSetting("FOG_WEB_ROOT" ) . " osid=" . $this->get('osID') . " $wipemode mode=wipe $keymapapp shutdown=" . ( $blShutdown ? "on" : " " ) . " loglevel=4 " . $this->FOGCore->getSetting("FOG_KERNEL_ARGS" ) . " " . $this->get('kernelArgs') ;												
-												
-													//cancelSnapinsForHost( $conn, $this->get('id') );
-													//deploySnapinsForHost( $conn, $this->get('id'), trim($args2) );
-												
-													$tmp = createPXEFile( $output );
-													if( $tmp !== null )
-													{ 
-														$num = $this->FOGCore->getClass('TaskManager')->getCountOfActiveTasksWithMAC($mac->getMACWithColon());
-														if ( $num == 0 )
-														{
-															$ftp = ftp_connect($this->FOGCore->getSetting("FOG_TFTP_HOST" )); 
-															$ftp_loginres = ftp_login($ftp, $this->FOGCore->getSetting("FOG_TFTP_FTP_USERNAME" ), $this->FOGCore->getSetting("FOG_TFTP_FTP_PASSWORD" )); 			
-															if ($ftp && $ftp_loginres ) 
-															{
-																if ( ftp_put( $ftp, $this->FOGCore->getSetting("FOG_TFTP_PXE_CONFIG_DIR" ) . $mac->getMACImageReady(), $tmp, FTP_ASCII ) )
-																{			
-																	$uname = "FOGScheduler";
-																	$sql = "INSERT INTO 
-																			tasks(taskName, taskCreateTime, taskCheckIn, taskHostID, taskState, taskCreateBy, taskForce, taskType ) 
-																			VALUES('" . mysql_real_escape_string("Sched: " . $this->get('name')) . "', NOW(), NOW(), '" . $this->get('id') . "', '0', '" . mysql_real_escape_string( $uname ) . "', '0', 'W')";																																
-						
-																	if ( mysql_query( $sql, $conn ) )
-																	{																
-																		// lets try to wake the computer up!
-																		wakeUp( $mac->getMACWithColon() );																			
-																		@ftp_close($ftp); 					
-																		@unlink( $tmp );								
-																		return true;
-																	}
-																	else
-																	{
-																		ftp_delete( $ftp, $this->FOGCore->getSetting("FOG_TFTP_PXE_CONFIG_DIR" ) . $mac->getMACImageReady() ); 									
-																		$reason = mysql_error($conn);
-																																			
-																	}
-																}
-																else
-																	$reason = "Unable to upload file.";
-															}
-															else
-																$reason = "Unable to connect to tftp server."; 	
-						
-															@ftp_close($ftp); 					
-															@unlink( $tmp );															
-														}
-														else
-															$reason = "Host is already a member of a active task.";
-													}	
-													else
-														$reason = "Failed to open tmp file.";												
-												
-													wakeUp( $mac->getMACWithColon() );
-													return true;
-												}
-												else
-													$reason = "Invalid snapin ID";
-											}		
-											else
-												$reason = "Primary MAC is invalid: " . $mac->getMACWithColon();
-										}
-										else
-											$reason = "No primary MAC address found.";											
-									}
-									else
-										$reason = "Unable to locate master node in storage group.";									
-								}
-								else
-									$reason = "Storage group has no members.";
-							}
-							else 
-								$reason = "Storage Group is null.";
-						}
-						else
-							$reason = "Image path is null.";
-					}
-					else
-						$reason = "Image is null.";							
-					break;
-				case strtoupper(FOGCore::TASK_DEBUG):
-					break;	
-				case strtoupper(FOGCore::TASK_MEMTEST):
-					break;	
-				case strtoupper(FOGCore::TASK_TESTDISK):
-					if ( $this->getImage() != null  )
-					{
-						if ( $this->getImage()->getPath() != null && strlen(trim($this->getImage()->getPath())) > 0 )
-						{
-							$storageGroup = $this->getImage()->getStorageGroup();
-							if ( $storageGroup != null )
-							{
-								if ( $storageGroup->getMembers() != null && count( $storageGroup->getMembers() ) > 0  )
-								{
-									$masterNode = $storageGroup->getMasterStorageNode();
-									if ( $masterNode != null )
-									{
-										$mac = $this->get('mac');							
-										if ( $mac != null )
-										{
-											if ( $mac->isValid( ) )
-											{
-												$keymapapp = "";
-												$keymap = $this->FOGCore->getSetting("FOG_KEYMAP" );
-												if ( $keymap != null && $keymap != "" )
-													$keymapapp = "keymap=$keymap";	
-													
-												$strKern = $this->FOGCore->getSetting("FOG_TFTP_PXE_KERNEL" );
-												if ( $this->get('kernel') != "" && $this->get('kernel') != null )
-													$strKern = $this->get('kernel');													
-												
-												$output = "# Created by FOG Imaging System\n\n
-														  DEFAULT send\n
-														  LABEL send\n
-														  kernel " . $strKern . "\n
-														  append initrd=" . $this->FOGCore->getSetting("FOG_PXE_BOOT_IMAGE" ) . "  root=/dev/ram0 rw ramdisk_size=" . $this->FOGCore->getSetting("FOG_KERNEL_RAMDISK_SIZE" ) . " ip=dhcp dns=" . $this->FOGCore->getSetting("FOG_PXE_IMAGE_DNSADDRESS" ) . " mac=" . $mac->getMACWithColon() . " web=" . sloppyNameLookup($this->FOGCore->getSetting("FOG_WEB_HOST")) . $this->FOGCore->getSetting("FOG_WEB_ROOT" ) . " mode=badblocks $keymapapp shutdown=" . ( $blShutdown ? "on" : " " ) . " loglevel=4 " . $this->FOGCore->getSetting("FOG_KERNEL_ARGS" ) . " " . $this->get('kernelArgs');
-
-												$tmp = createPXEFile( $output );
-												if( $tmp !== null )
-												{ 
-													$num = $this->FOGCore->getClass('TaskManager')->getCountOfActiveTasksWithMAC($mac->getMACWithColon());
-													if ( $num == 0 )
-													{
-														$ftp = ftp_connect($this->FOGCore->getSetting("FOG_TFTP_HOST" )); 
-														$ftp_loginres = ftp_login($ftp, $this->FOGCore->getSetting("FOG_TFTP_FTP_USERNAME" ), $this->FOGCore->getSetting("FOG_TFTP_FTP_PASSWORD" )); 			
-														if ($ftp && $ftp_loginres ) 
-														{
-															if ( ftp_put( $ftp, $this->FOGCore->getSetting("FOG_TFTP_PXE_CONFIG_DIR" ) . $mac->getMACImageReady(), $tmp, FTP_ASCII ) )
-															{			
-																$uname = "FOGScheduler";
-																$sql = "INSERT INTO 
-																		tasks(taskName, taskCreateTime, taskCheckIn, taskHostID, taskState, taskCreateBy, taskForce, taskType ) 
-																		VALUES('" . mysql_real_escape_string("Sched: " . $this->get('name')) . "', NOW(), NOW(), '" . $this->get('id') . "', '0', '" . mysql_real_escape_string( $uname ) . "', '0', 'T')";																																
-					
-																if ( mysql_query( $sql, $conn ) )
-																{																
-																	// lets try to wake the computer up!
-																	wakeUp( $mac->getMACWithColon() );																			
-																	@ftp_close($ftp); 					
-																	@unlink( $tmp );								
-																	return true;
-																}
-																else
-																{
-																	ftp_delete( $ftp, $this->FOGCore->getSetting("FOG_TFTP_PXE_CONFIG_DIR" ) . $mac->getMACImageReady() ); 									
-																	$reason = mysql_error($conn);
-																																		
-																}
-															}
-															else
-																$reason = "Unable to upload file.";
-														}
-														else
-															$reason = "Unable to connect to tftp server."; 	
-					
-														@ftp_close($ftp); 					
-														@unlink( $tmp );															
-													}
-													else
-														$reason = "Host is already a member of a active task.";
-												}	
-												else
-													$reason = "Failed to open tmp file.";												
-											
-												wakeUp( $mac->getMACWithColon() );
-												return true;
-												
-											}		
-											else
-												$reason = "Primary MAC is invalid: " . $mac->getMACWithColon();
-										}
-										else
-											$reason = "No primary MAC address found.";											
-									}
-									else
-										$reason = "Unable to locate master node in storage group.";									
-								}
-								else
-									$reason = "Storage group has no members.";
-							}
-							else 
-								$reason = "Storage Group is null.";
-						}
-						else
-							$reason = "Image path is null.";
-					}
-					else
-						$reason = "Image is null.";				
-					break;
-				case strtoupper(FOGCore::TASK_PHOTOREC):
-					break;
-				case strtoupper(FOGCore::TASK_MULTICAST):
-					if ( $this->getImage() != null  )
-					{
-						if ( $this->getImage()->getPath() != null && strlen(trim($this->getImage()->getPath())) > 0 )
-						{
-							$storageGroup = $this->getImage()->getStorageGroup();
-							if ( $storageGroup != null )
-							{
-								if ( $storageGroup->getMembers() != null && count( $storageGroup->getMembers() ) > 0  )
-								{
-									$masterNode = $storageGroup->getMasterStorageNode();
-									if ( $masterNode != null )
-									{
-										$mac = $this->get('mac');							
-										if ( $mac != null )
-										{
-											if ( $mac->isValid( ) )
-											{
-												$port = trim($args1);
-												$mcID = trim($args2);
-												if ( is_numeric( $port ) && is_numeric( $mcID ) && $port > 0 && $mcID >= 0 )
-												{
-													$nfsroot = $masterNode->getRoot();
-													if ( $nfsroot != null )
-													{
-														if ( ! endsWith( $nfsroot, "/" )  )
-															$nfsroot .= "/";
-															
-														$imgType = "imgType=n";
-														if ( $this->getImage()->getImageType() == Image::IMAGE_TYPE_DD )
-															$imgType = "imgType=dd";
-														else if ( $this->getImage()->getImageType() == Image::IMAGE_TYPE_MULTIPARTITION_SINGLE_DISK )
-															$imgType = "imgType=mps";
-														else if ( $this->getImage()->getImageType() == Image::IMAGE_TYPE_MULTIPARTITION_MULTIDISK )
-															$imgType = "imgType=mpa";												
-														else
-														{
-															if ( $this->get('osID') == Host::OS_OTHER )
-															{
-																$reason = "Invalid OS type, unable to determine MBR.";
-																return false;
-															}
-
-															if ( strlen( trim($this->get('osID')) ) == 0 || $this->get('osID') == Host::OS_UNKNOWN )
-															{
-																$reason = "Invalid OS type, you must specify an OS Type to image.";
-																return false;
-															}
-
-															if ( trim($this->get('osID')) != Host::OS_WIN2000XP && trim($this->get('osID')) != Host::OS_WINVISTA && trim($this->get('osID')) != Host::OS_WIN7 )
-															{
-																$reason = "Unsupported OS detected in host!";
-																return false;
-															}				
-														}
-													
-														$keymapapp = "";
-														$keymap = $this->FOGCore->getSetting("FOG_KEYMAP" );
-														if ( $keymap != null && $keymap != "" )
-															$keymapapp = "keymap=$keymap";	
-														
-														$strKern = $this->FOGCore->getSetting("FOG_TFTP_PXE_KERNEL" );
-														if ( $this->get('kernel') != "" && $this->get('kernel') != null )
-															$strKern = $this->get('kernel');	
-														
-													
-														
-														$output = "# Created by FOG Imaging System\n\n
-																	  DEFAULT send\n
-																	  LABEL send\n
-																	  kernel " . $strKern . "\n
-																	  append initrd=" . $this->FOGCore->getSetting("FOG_PXE_BOOT_IMAGE" ) . " root=/dev/ram0 rw ramdisk_size=" . $this->FOGCore->getSetting("FOG_KERNEL_RAMDISK_SIZE" ) . " ip=dhcp dns=" . $this->FOGCore->getSetting("FOG_PXE_IMAGE_DNSADDRESS" ) . " type=down img=" .  $this->getImage()->getPath()  . " mc=yes port=" . $port . " storageip=" . $masterNode->getHostIP() . " storage=" . $masterNode->getHostIP() . ":" . $nfsroot . " mac=" . $mac->getMACWithColon() . " ftp=" . sloppyNameLookup($this->FOGCore->getSetting("FOG_TFTP_HOST" )) . " web=" . sloppyNameLookup($this->FOGCore->getSetting("FOG_WEB_HOST")) . $this->FOGCore->getSetting("FOG_WEB_ROOT" ) . " osid=" . $this->get('osID') . " $mode $imgType $keymapapp shutdown=" . ( $blShutdown ? "on" : " " ) . " loglevel=4 " . $this->FOGCore->getSetting("FOG_KERNEL_ARGS" ) . " " . $this->get('kernelArgs');
-																						
-				 										$tmp = createPXEFile( $output );
-														if( $tmp !== null )
-														{ 
-															// make sure there is no active task for this mac address
-															$num = $this->FOGCore->getClass('TaskManager')->getCountOfActiveTasksWithMAC($mac->getMACWithColon());
-				
-															if ( $num == 0 )
-															{
-																// attempt to ftp file
-										
-																$ftp = ftp_connect($this->FOGCore->getSetting("FOG_TFTP_HOST" )); 
-																$ftp_loginres = ftp_login($ftp, $this->FOGCore->getSetting("FOG_TFTP_FTP_USERNAME" ), $this->FOGCore->getSetting("FOG_TFTP_FTP_PASSWORD" )); 			
-																if ($ftp && $ftp_loginres ) 
-																{
-																	if ( ftp_put( $ftp, $this->FOGCore->getSetting("FOG_TFTP_PXE_CONFIG_DIR" ) . $mac->getMACImageReady(), $tmp, FTP_ASCII ) )
-																	{			
-																		$uname = "FOGScheduler";
-											
-																		$sql = "insert into 
-																				tasks(taskName, taskCreateTime, taskCheckIn, taskHostID, taskState, taskCreateBy, taskForce, taskType, taskNFSGroupID, taskNFSMemberID ) 
-																				values('" . mysql_real_escape_string("Sched: " . $this->get('name')) . "', NOW(), NOW(), '" . $this->get('id') . "', '0', '" . $uname . "', '0', 'D', '" . $storageGroup->get('id') . "', '" . $masterNode->get('id') . "' )";
-								
-																		if ( mysql_query( $sql, $conn ) )
-																		{
-																			$insertId = mysql_insert_id( $conn );
-																			if ( $insertId !== null && $insertId >= 0 )
-																			{
-																				if ( linkTaskToMultitaskJob( $conn, $insertId, $mcID ) )
-																				{
-
-																					// Remove any exists snapin tasks
-																					cancelSnapinsForHost( $conn, $this->get('id') );
-								
-																					// now do a clean snapin deploy
-																					deploySnapinsForHost( $conn, $this->get('id') );
-
-																					// lets try to wake the computer up!
-																					wakeUp( $mac->getMACWithColon() );																			
-																					@ftp_close($ftp); 					
-																					@unlink( $tmp );
-																					$reason = "OK";								
-																					return true;
-																				}
-																				else
-																					$reason = "Unable to link host task to multicast job!";
-																			}
-																			else
-																				$reason = "Unable to obtain auto ID";
-																		}
-																		else
-																		{
-																			ftp_delete( $ftp, $this->FOGCore->getSetting("FOG_TFTP_PXE_CONFIG_DIR" ) . $mac->getMACImageReady() ); 									
-																			$reason = mysql_error($conn);
-																		}
-																	}  
-																	else
-																		$reason = "Unable to upload file."; 											
-																}	
-																else
-																	$reason = "Unable to connect to tftp server."; 	
-						
-																@ftp_close($ftp); 					
-																@unlink( $tmp ); 							
-															}
-															else
-																$reason = "Host is already a member of a active task.";
-														}
-														else
-															$reason = "Failed to open tmp file.";														
-													}
-													else
-														$reason = "Unable to determine NFS root";
-												}
-												else
-													$reason = "Invalid port or multicast ID number";
-											}		
-											else
-												$reason = "Primary MAC is invalid: " . $mac->getMACWithColon();																	
-										}
-										else
-											$reason = "No primary MAC address found.";
-									}
-									else
-										$reason = "Unable to locate master node in storage group.";
-								}
-								else
-									$reason = "Storage group has no members.";
-							}
-							else 
-								$reason = "Storage Group is null.";
-						}
-						else
-							$reason = "Image path is null.";						
-					}
-					else
-						$reason = "Image is null.";					
-					break;
-				case strtoupper(FOGCore::TASK_VIRUSSCAN):
-					if ( $this->getImage() != null  )
-					{
-						if ( $this->getImage()->getPath() != null && strlen(trim($this->getImage()->getPath())) > 0 )
-						{
-							$storageGroup = $this->getImage()->getStorageGroup();
-							if ( $storageGroup != null )
-							{
-								if ( $storageGroup->getMembers() != null && count( $storageGroup->getMembers() ) > 0  )
-								{
-									$masterNode = $storageGroup->getMasterStorageNode();
-									if ( $masterNode != null )
-									{
-										$mac = $this->get('mac');							
-										if ( $mac != null )
-										{
-											if ( $mac->isValid( ) )
-											{
-												$scanmode="avmode=s";
-												if ( trim($args2) == FOG_AV_SCANQUARANTINE )
-													$scanmode="avmode=q";
-											
-												$keymapapp = "";
-												$keymap = $this->FOGCore->getSetting("FOG_KEYMAP" );
-												if ( $keymap != null && $keymap != "" )
-													$keymapapp = "keymap=$keymap";	
-													
-												$strKern = $this->FOGCore->getSetting("FOG_TFTP_PXE_KERNEL" );
-												if ( $this->get('kernel') != "" && $this->get('kernel') != null )
-													$strKern = $this->get('kernel');													
-												
-												$output = "# Created by FOG Imaging System\n\n
-														  DEFAULT send\n
-														  LABEL send\n
-														  kernel " . $strKern . "\n
-														  append initrd=" . $this->FOGCore->getSetting("FOG_PXE_BOOT_IMAGE" ) . "  root=/dev/ram0 rw ramdisk_size=" . $this->FOGCore->getSetting("FOG_KERNEL_RAMDISK_SIZE" ) . " ip=dhcp dns=" . $this->FOGCore->getSetting("FOG_PXE_IMAGE_DNSADDRESS" ) . " mac=" . $mac->getMACWithColon() . " web=" . sloppyNameLookup($this->FOGCore->getSetting("FOG_WEB_HOST")) . $this->FOGCore->getSetting("FOG_WEB_ROOT" ) . " osid=" . $this->get('osID') . " $scanmode mode=clamav $keymapapp shutdown=" . ( $blShutdown ? "on" : " " ) . " loglevel=4 " . $this->FOGCore->getSetting("FOG_KERNEL_ARGS" ) . " " . $this->get('kernelArgs');												
-											
-												$tmp = createPXEFile( $output );
-												if( $tmp !== null )
-												{ 
-													$num = $this->FOGCore->getClass('TaskManager')->getCountOfActiveTasksWithMAC($mac->getMACWithColon());
-													if ( $num == 0 )
-													{
-														$ftp = ftp_connect($this->FOGCore->getSetting("FOG_TFTP_HOST" )); 
-														$ftp_loginres = ftp_login($ftp, $this->FOGCore->getSetting("FOG_TFTP_FTP_USERNAME" ), $this->FOGCore->getSetting("FOG_TFTP_FTP_PASSWORD" )); 			
-														if ($ftp && $ftp_loginres ) 
-														{
-															if ( ftp_put( $ftp, $this->FOGCore->getSetting("FOG_TFTP_PXE_CONFIG_DIR" ) . $mac->getMACImageReady(), $tmp, FTP_ASCII ) )
-															{			
-																$uname = "FOGScheduler";
-																$sql = "INSERT INTO 
-																		tasks(taskName, taskCreateTime, taskCheckIn, taskHostID, taskState, taskCreateBy, taskForce, taskType ) 
-																		VALUES('" . mysql_real_escape_string("Sched: " . $this->get('name')) . "', NOW(), NOW(), '" . $this->get('id') . "', '0', '" . mysql_real_escape_string( $uname ) . "', '0', 'V')";																																
-					
-																if ( mysql_query( $sql, $conn ) )
-																{																
-																	// lets try to wake the computer up!
-																	wakeUp( $mac->getMACWithColon() );																			
-																	@ftp_close($ftp); 					
-																	@unlink( $tmp );								
-																	return true;
-																}
-																else
-																{
-																	ftp_delete( $ftp, $this->FOGCore->getSetting("FOG_TFTP_PXE_CONFIG_DIR" ) . $mac->getMACImageReady() ); 									
-																	$reason = mysql_error($conn);
-																																		
-																}
-															}
-															else
-																$reason = "Unable to upload file.";
-														}
-														else
-															$reason = "Unable to connect to tftp server."; 	
-					
-														@ftp_close($ftp); 					
-														@unlink( $tmp );															
-													}
-													else
-														$reason = "Host is already a member of a active task.";
-												}	
-												else
-													$reason = "Failed to open tmp file.";												
-											
-												wakeUp( $mac->getMACWithColon() );
-												return true;
-												
-											}		
-											else
-												$reason = "Primary MAC is invalid: " . $mac->getMACWithColon();
-										}
-										else
-											$reason = "No primary MAC address found.";											
-									}
-									else
-										$reason = "Unable to locate master node in storage group.";									
-								}
-								else
-									$reason = "Storage group has no members.";
-							}
-							else 
-								$reason = "Storage Group is null.";
-						}
-						else
-							$reason = "Image path is null.";
-					}
-					else
-						$reason = "Image is null.";				
-					break;	
-				case strtoupper(FOGCore::TASK_INVENTORY):
-					if ( $this->getImage() != null  )
-					{
-						if ( $this->getImage()->getPath() != null && strlen(trim($this->getImage()->getPath())) > 0 )
-						{
-							$storageGroup = $this->getImage()->getStorageGroup();
-							if ( $storageGroup != null )
-							{
-								if ( $storageGroup->getMembers() != null && count( $storageGroup->getMembers() ) > 0  )
-								{
-									$masterNode = $storageGroup->getMasterStorageNode();
-									if ( $masterNode != null )
-									{
-										$mac = $this->get('mac');							
-										if ( $mac != null )
-										{
-											if ( $mac->isValid( ) )
-											{
-												$keymapapp = "";
-												$keymap = $this->FOGCore->getSetting("FOG_KEYMAP" );
-												if ( $keymap != null && $keymap != "" )
-													$keymapapp = "keymap=$keymap";	
-													
-												$strKern = $this->FOGCore->getSetting("FOG_TFTP_PXE_KERNEL" );
-												if ( $this->get('kernel') != "" && $this->get('kernel') != null )
-													$strKern = $this->get('kernel');													
-												
-												$output = "# Created by FOG Imaging System\n\n
-														  DEFAULT send\n
-														  LABEL send\n
-														  kernel " . $strKern . "\n
-														  append initrd=" . $this->FOGCore->getSetting("FOG_PXE_BOOT_IMAGE" ) . "  root=/dev/ram0 rw ramdisk_size=" . $this->FOGCore->getSetting("FOG_KERNEL_RAMDISK_SIZE" ) . " ip=dhcp dns=" . $this->FOGCore->getSetting("FOG_PXE_IMAGE_DNSADDRESS" ) . " mac_deployed=" . $mac->getMACWithColon() . " web=" . sloppyNameLookup($this->FOGCore->getSetting("FOG_WEB_HOST")) . $this->FOGCore->getSetting("FOG_WEB_ROOT" ) . " mode=autoreg deployed=1 $keymapapp shutdown=" . ( $blShutdown ? "on" : " " ) . " loglevel=4 " . $this->FOGCore->getSetting("FOG_KERNEL_ARGS" ) . " " . $this->get('kernelArgs');											
-											
-												$tmp = createPXEFile( $output );
-												if( $tmp !== null )
-												{ 
-													$num = $this->FOGCore->getClass('TaskManager')->getCountOfActiveTasksWithMAC($mac->getMACWithColon());
-													if ( $num == 0 )
-													{
-														$ftp = ftp_connect($this->FOGCore->getSetting("FOG_TFTP_HOST" )); 
-														$ftp_loginres = ftp_login($ftp, $this->FOGCore->getSetting("FOG_TFTP_FTP_USERNAME" ), $this->FOGCore->getSetting("FOG_TFTP_FTP_PASSWORD" )); 			
-														if ($ftp && $ftp_loginres ) 
-														{
-															if ( ftp_put( $ftp, $this->FOGCore->getSetting("FOG_TFTP_PXE_CONFIG_DIR" ) . $mac->getMACImageReady(), $tmp, FTP_ASCII ) )
-															{			
-																$uname = "FOGScheduler";
-																$sql = "INSERT INTO 
-																		tasks(taskName, taskCreateTime, taskCheckIn, taskHostID, taskState, taskCreateBy, taskForce, taskType ) 
-																		VALUES('" . mysql_real_escape_string("Sched: " . $this->get('name')) . "', NOW(), NOW(), '" . $this->get('id') . "', '0', '" . mysql_real_escape_string( $uname ) . "', '0', 'I')";																																
-					
-																if ( mysql_query( $sql, $conn ) )
-																{																
-																	// lets try to wake the computer up!
-																	wakeUp( $mac->getMACWithColon() );																			
-																	@ftp_close($ftp); 					
-																	@unlink( $tmp );								
-																	return true;
-																}
-																else
-																{
-																	ftp_delete( $ftp, $this->FOGCore->getSetting("FOG_TFTP_PXE_CONFIG_DIR" ) . $mac->getMACImageReady() ); 									
-																	$reason = mysql_error($conn);
-																																		
-																}
-															}
-															else
-																$reason = "Unable to upload file.";
-														}
-														else
-															$reason = "Unable to connect to tftp server."; 	
-					
-														@ftp_close($ftp); 					
-														@unlink( $tmp );															
-													}
-													else
-														$reason = "Host is already a member of a active task.";
-												}	
-												else
-													$reason = "Failed to open tmp file.";												
-											
-												wakeUp( $mac->getMACWithColon() );
-												return true;
-												
-											}		
-											else
-												$reason = "Primary MAC is invalid: " . $mac->getMACWithColon();
-										}
-										else
-											$reason = "No primary MAC address found.";											
-									}
-									else
-										$reason = "Unable to locate master node in storage group.";									
-								}
-								else
-									$reason = "Storage group has no members.";
-							}
-							else 
-								$reason = "Storage Group is null.";
-						}
-						else
-							$reason = "Image path is null.";
-					}
-					else
-						$reason = "Image is null.";					
-					break;
-				case strtoupper(FOGCore::TASK_PASSWORD_RESET):
-					break;
-				case strtoupper(FOGCore::TASK_ALL_SNAPINS):
-					if ( $this->getImage() != null  )
-					{
-						if ( $this->getImage()->getPath() != null && strlen(trim($this->getImage()->getPath())) > 0 )
-						{
-							$storageGroup = $this->getImage()->getStorageGroup();
-							if ( $storageGroup != null )
-							{
-								if ( $storageGroup->getMembers() != null && count( $storageGroup->getMembers() ) > 0  )
-								{
-									$masterNode = $storageGroup->getMasterStorageNode();
-									if ( $masterNode != null )
-									{
-										$mac = $this->get('mac');							
-										if ( $mac != null )
-										{
-											if ( $mac->isValid( ) )
-											{
-												cancelSnapinsForHost( $conn, $this->get('id') );
-												deploySnapinsForHost( $conn, $this->get('id') );
-												
-												wakeUp( $mac->getMACWithColon() );
-												return true;
-											}		
-											else
-												$reason = "Primary MAC is invalid: " . $mac->getMACWithColon();
-										}
-										else
-											$reason = "No primary MAC address found.";											
-									}
-									else
-										$reason = "Unable to locate master node in storage group.";									
-								}
-								else
-									$reason = "Storage group has no members.";
-							}
-							else 
-								$reason = "Storage Group is null.";
-						}
-						else
-							$reason = "Image path is null.";
-					}
-					else
-						$reason = "Image is null.";											
-					break;
-				case strtoupper(FOGCore::TASK_SINGLE_SNAPIN):
-					if ( $this->getImage() != null  )
-					{
-						if ( $this->getImage()->getPath() != null && strlen(trim($this->getImage()->getPath())) > 0 )
-						{
-							$storageGroup = $this->getImage()->getStorageGroup();
-							if ( $storageGroup != null )
-							{
-								if ( $storageGroup->getMembers() != null && count( $storageGroup->getMembers() ) > 0  )
-								{
-									$masterNode = $storageGroup->getMasterStorageNode();
-									if ( $masterNode != null )
-									{
-										$mac = $this->get('mac');							
-										if ( $mac != null )
-										{
-											if ( $mac->isValid( ) )
-											{
-												if ( is_numeric($args2) )
-												{
-													//cancelSnapinsForHost( $conn, $this->get('id') );
-													deploySnapinsForHost( $conn, $this->get('id'), trim($args2) );
-												
-													wakeUp( $mac->getMACWithColon() );
-													return true;
-												}
-												else
-													$reason = "Invalid snapin ID";
-											}		
-											else
-												$reason = "Primary MAC is invalid: " . $mac->getMACWithColon();
-										}
-										else
-											$reason = "No primary MAC address found.";											
-									}
-									else
-										$reason = "Unable to locate master node in storage group.";									
-								}
-								else
-									$reason = "Storage group has no members.";
-							}
-							else 
-								$reason = "Storage Group is null.";
-						}
-						else
-							$reason = "Image path is null.";
-					}
-					else
-						$reason = "Image is null.";				
-				
-				
-					break;
-				case strtoupper(FOGCore::TASK_WAKE_ON_LAN):
-					$mac = $this->get('mac');							
-					if ( $mac != null )
-					{
-						if ( $mac->isValid( ) )
-						{
-							wakeUp( $mac->getMACWithColon() );
-							return true;
-						}
-						else
-							$reason = "MAC Address is not valid.";
-					}
-					else
-						$reason = "MAC address is null";
-					break;				
-				default:
-					$reason = "Unknown task type: " . $tasktype;
-			}
-		}
-		else
-			$reason = "Database connection was null.";
-		return false;
-	}
 }

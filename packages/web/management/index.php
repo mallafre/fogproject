@@ -69,6 +69,12 @@ $sectionTitle = $FOGPageManager->getFOGPageName();
 // Page Title - should be set after page has been rendered
 $pageTitle = $FOGPageManager->getFOGPageTitle();
 
+if ($FOGCore->isAJAXRequest())
+{
+	print $content;
+	exit;
+}
+
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -157,9 +163,21 @@ $FOGCore->getMessages();
 <script type="text/javascript" src="js/jquery.progressbar.js"></script>
 <script type="text/javascript" src="js/jquery.tmpl.js"></script>
 <script type="text/javascript" src="js/jquery.organicTabs.js"></script>
+<script type="text/javascript" src="js/jquery.placeholder.js"></script>
+<script type="text/javascript" src="js/jquery.disableSelection.js"></script>
 <script type="text/javascript" src="js/fog.js"></script>
 <script type="text/javascript" src="js/fog.main.js"></script>
 <?php
+// Auto find javascript based on $node and/or $sub
+foreach (array("js/fog.{$node}.js", "js/fog.{$node}.{$sub}.js") AS $jsFilepath)
+{
+	if (file_exists($jsFilepath))
+	{
+		printf('<script type="text/javascript" src="%s"></script>', $jsFilepath);
+	}
+}
+
+
 // TODO: Move to array
 if ($node == 'tasks' && $sub == 'active')
 {

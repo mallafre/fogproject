@@ -56,7 +56,7 @@ class Group extends FOGController
 		return $this;
 	}
 	
-	public function get($key)
+	public function get($key = '')
 	{
 		if ($this->key($key) == 'hosts' && !$this->hostsLoaded)
 		{
@@ -113,7 +113,7 @@ class Group extends FOGController
 		return $this;
 	}
 	
-	// Remove these
+	// LEGACY
 	function getID()
 	{
 		return $this->get('id');
@@ -144,7 +144,6 @@ class Group extends FOGController
 		return $this->set('description', $description);
 	}
 	
-	// Rewrite this
 	function doMembersHaveUniformImages()
 	{
 		$members = $this->getHosts();	
@@ -204,128 +203,4 @@ class Group extends FOGController
 		}
 		return false;
 	}
-	
-	public function startTask($conn, $tasktype, $blShutdown, $args1=null, $args2=null, $args3=null, $args4=null, $args5=null, &$reason)
-	{
-		$reason = '';
-		
-		try
-		{
-			if ($conn == null)
-			{
-				throw new Exception('Database connection was null');
-			}
-			
-			switch (strtoupper($tasktype))
-			{
-				case strtoupper(FOGCore::TASK_MULTICAST):
-					if ($this->getHostCount() == 0)
-					{
-						throw new Exception('No hosts present in group');
-					}
-					
-					if (!$this->doMembersHaveUniformOS())
-					{
-						throw new Exception('Not all hosts have the same operating system association');
-					}
-					
-					if (!$this->doMembersHaveUniformImages())
-					{
-						throw new Exception('Not all hosts have the same Image');
-					}
-					
-					$t = $this->getHosts();
-					$templateHost = $t[0];
-					
-					if ($templateHost == null)
-					{
-						throw new Exception('Template host is null');
-					}
-					
-					$templateImage = $templateHost->getImage();
-					
-					if ($templateImage == null)
-					{
-						throw new Exception('Template image is null');
-					}
-					
-					$templateSG = $templateImage->getStorageGroup();
-					
-					if ($templateSG == null)
-					{
-						throw new Exception('Template storage group is null');
-					}
-					
-					// get port base
-					$port = getMulticastPort( $conn );
-					
-					if ($port === -1)
-					{
-						throw new Exception('Unable to determine port base for multicast');
-					}
-					
-					$mcId = createMulticastJob( $conn, "Scheduled Task: " . $this->getName(), $port, $templateImage->getPath(), null, $templateImage->getImageType(), $templateSG->getID() );
-					
-					if (!is_numeric($mcId) || $mcId != 0)
-					{
-						throw new Exception('Unable to create a multicast job entry');
-					}
-					
-					$hosts = $this->getHosts();
-					$suc = 0;
-					$fail = 0;
-					$hostoutput = "";
-					for( $i = 0; $i < count( $hosts ); $i++ )
-					{
-						$host = $hosts[$i];
-						if ( $host != null )
-						{
-							// arg1 = port
-							// arg2 = job id
-							$ireason;
-							if ( $host->startTask($conn, $tasktype, $blShutdown, $port, $mcId, null, null, null, &$ireason) )
-							{
-								$suc++;
-								$hostoutput .= $host->getHostName() . ": " . $ireason . "\n";
-							}
-							else
-							{
-								$fail++;
-								$hostoutput .= $host->getHostName() . ": " . $ireason . "\n";
-							}
-						}
-					}
-					
-					if ($suc <= 0)
-					{
-						throw new Exception($hostoutput . "\nNo hosts were added to multicast task!");
-					}
-					
-					if ( activateMulticastJob( $conn, $mcId ) )
-					{
-						$this->lastError = $hostoutput . "\n" . "=============================================" . "\nResult: " . $suc . " of " . ($suc + $fail) . " clients were added to the task.";
-						
-						return true;
-					}
-					else
-					{
-						throw new Exception('Failed to active task!');
-					}
-					
-					
-					break;
-				default:
-				
-					throw new Exception('Unsupported task at group level');
-					break;
-			}
-		}
-		catch (Exception $e)
-		{
-			$this->lastError = $e->getMessage();
-		}
-		
-		return false;		
-	}
-	// END Rewrite this
 }

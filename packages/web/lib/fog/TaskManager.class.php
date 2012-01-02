@@ -22,23 +22,17 @@ class TaskManager extends FOGManagerController
 		return (array)$this->find(array('state' => array('0', '1')));
 	}
 	
-	// Move this to $Host->getTasks()
+	// LEGACY
+	// NOTE: Dont use this, use $Host->getActiveTaskCount() instead
 	public function getCountOfActiveTasksForHost($host)
 	{
-		return count(
-			$this->find(
-				array(
-					'state'		=> array('0', '1'),
-					'hostID'	=> ($host instanceof Host ? $host->get('id') : $host)
-				)
-			)
-		);
-		
-		/*
-			$sql = "SELECT count(*) as cnt FROM tasks WHERE taskHostID = '" . $this->DB->sanitize( $host->getID() ) . "' and tasks.taskState in (0,1)";	
-		*/
+		return $this->count(array(	'state'		=> array('0', '1'),
+						'hostID'	=> ($host instanceof Host ? $host->get('id') : $host)
+					)
+				);
 	}
 	
+	// NOTE: Dont use this, use $Host->getActiveTaskCount() instead
 	function getCountOfActiveTasksWithMAC($mac)
 	{
 		$count = $this->DB->query("SELECT

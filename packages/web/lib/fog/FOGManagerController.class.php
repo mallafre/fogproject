@@ -92,7 +92,7 @@ abstract class FOGManagerController extends FOGBase
 					}
 					else
 					{
-						$whereArray[] = sprintf("`%s`='%s'", $this->key($field), $value);
+						$whereArray[] = sprintf("`%s` %s '%s'", $this->key($field), (preg_match('#%#', $value) ? 'LIKE' : '='), $value);
 					}
 				}
 			}
@@ -113,6 +113,49 @@ abstract class FOGManagerController extends FOGBase
 			
 			// Return
 			return (array)$data;
+		}
+		catch (Exception $e)
+		{
+			$this->debug('Find all failed! Class: %s, Error: %s', array(get_class($this), $e->getMessage()));
+		}
+		
+		return false;
+	}
+
+	public function count($where = array(), $whereOperator = 'AND')
+	{
+		try
+		{
+			// Error checking
+			if (empty($this->databaseTable))
+			{
+				throw new Exception('No database table defined');
+			}
+			
+			if (count($where))
+			{
+				foreach ($where AS $field => $value)
+				{
+					if (is_array($value))
+					{
+						$whereArray[] = sprintf("`%s` IN ('%s')", $this->key($field), implode("', '", $value));
+					}
+					else
+					{
+						$whereArray[] = sprintf("`%s` %s '%s'", $this->key($field), (preg_match('#%#', $value) ? 'LIKE' : '='), $value);
+					}
+				}
+			}
+
+			// Count result rows
+			$this->DB->query("SELECT COUNT(%s) AS total FROM `%s`%s LIMIT 1", array(
+				$this->databaseFields['id'],
+				$this->databaseTable,
+				(count($whereArray) ? ' WHERE ' . implode(' ' . $whereOperator . ' ', $whereArray) : '')
+			));
+			
+			// Return
+			return $this->DB->fetch()->get('total');
 		}
 		catch (Exception $e)
 		{

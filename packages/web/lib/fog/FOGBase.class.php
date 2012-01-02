@@ -28,6 +28,7 @@ abstract class FOGBase
 		$this->DB = $this->FOGCore->DB;
 		$this->HookManager = $GLOBALS['HookManager'];
 		$this->FOGUser = $GLOBALS['currentUser'];
+		$this->FOGFTP = $GLOBALS['FOGFTP'];
 		
 		// LEGACY
 		$this->db = $this->FOGCore->DB;
@@ -43,7 +44,10 @@ abstract class FOGBase
 		if (!preg_match('#/service/#', $_SERVER['PHP_SELF']))
 		{
 			printf('<div class="debug-error">FOG ERROR: %s: %s</div>%s', get_clasS($this), (count($data) ? vsprintf($txt, $data) : $txt), "\n");
-			exit;
+			//exit;
+			
+			flush();
+			ob_flush();
 		}
 		
 		// TODO: Log to Database
@@ -55,6 +59,9 @@ abstract class FOGBase
 		if ((!isset($this) || (isset($this->debug) && $this->debug === true)) && !FOGCore::isAJAXRequest() && !preg_match('#/service/#', $_SERVER['PHP_SELF']))
 		{
 			printf('<div class="debug-error">FOG DEBUG: %s: %s</div>%s', get_clasS($this), (count($data) ? vsprintf($txt, $data) : $txt), "\n");
+			
+			flush();
+			ob_flush();
 		}
 		
 		// TODO: Log to Database
@@ -67,8 +74,13 @@ abstract class FOGBase
 		
 		// !isset gets used when a call is made without a class context. i.e. FOGCore::info('foo bah');
 		if ((!isset($this) || (isset($this->info) && $this->info === true)) && !FOGCore::isAJAXRequest() && !preg_match('#/service/#', $_SERVER['PHP_SELF']))
+		//if ($this->info === true && !FOGCore::isAJAXRequest() && !preg_match('#/service/#', $_SERVER['PHP_SELF']))
+		//if ($this->info === true)
 		{
 			printf('<div class="debug-info">FOG INFO: %s: %s</div>%s', get_clasS($this), (count($data) ? vsprintf($txt, $data) : $txt), "\n");
+			
+			flush();
+			ob_flush();
 		}
 		
 		// TODO: Log to Database

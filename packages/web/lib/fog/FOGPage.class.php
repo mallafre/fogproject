@@ -61,18 +61,22 @@ abstract class FOGPage extends FOGBase
 		}
 		
 		// Make these key's accessible in $this->request
+		/*
 		foreach (array('node', 'sub', 'tab', 'confirm') AS $x)
 		{
 			$this->request[$x] = (isset($_REQUEST[$x]) && !empty($_REQUEST[$x]) ? $_REQUEST[$x] : false);
 		}
-		$this->request['id'] = $this->request[$this->id] = (isset($_REQUEST[$this->id]) && !empty($_REQUEST[$this->id]) ? $_REQUEST[$this->id] : false);
+		*/
+		$this->request = $this->REQUEST = $this->DB->sanitize($_REQUEST);
+		$this->request['id'] = $this->REQUEST['id'] = $this->request[$this->id] = $this->REQUEST[$this->id] = $this->DB->sanitize(isset($_REQUEST[$this->id]) && !empty($_REQUEST[$this->id]) ? $_REQUEST[$this->id] : false);
 		
 		// Methods
 		$this->post = $this->FOGCore->isPOSTRequest();
 		$this->ajax = $this->FOGCore->isAJAXRequest();
 		
 		// Default form target
-		$this->formAction = sprintf('%s?node=%s&sub=%s%s', $_SERVER['PHP_SELF'], $this->request['node'], $this->request['sub'], ($this->request['id'] ? sprintf('&%s=%s', $this->id, $this->request['id']) : ''));
+		//$this->formAction = sprintf('%s?node=%s&sub=%s%s', $_SERVER['PHP_SELF'], $this->request['node'], $this->request['sub'], ($this->request['id'] ? sprintf('&%s=%s', $this->id, $this->request['id']) : ''));
+		$this->formAction = sprintf('%s?%s', $_SERVER['PHP_SELF'], $_SERVER['QUERY_STRING']);
 		
 		// DEBUG
 		//printf('node: %s, sub: %s, id: %s, id value: %s, post: %s', $this->node, $this->sub, $this->id, $this->request['id'], ($this->post === false ? 'false' : $this->post));
@@ -134,7 +138,7 @@ abstract class FOGPage extends FOGBase
 				// HTML output
 				if ($this->searchFormURL)
 				{
-					$result = sprintf('%s<form method="GET" action="%s" id="search-wrapper"><input id="%s-search" class="search-input placeholder" type="text" value="" placeholder="%s" autocomplete="off" /> <input id="%s-search-submit" class="search-submit" type="button" value="" /></form>',
+					$result = sprintf('%s<form method="POST" action="%s" id="search-wrapper"><input id="%s-search" class="search-input placeholder" type="text" value="" placeholder="%s" autocomplete="off" /> <input id="%s-search-submit" class="search-submit" type="button" value="" /></form>',
 						"\n\t\t\t",
 						$this->searchFormURL,
 						(substr($this->node, -1) == 's' ? substr($this->node, 0, -1) : $this->node),	// TODO: Store this in class as variable
@@ -276,7 +280,7 @@ abstract class FOGPage extends FOGBase
 								$this->wrapper);
 			
 			// Reset
-			unset($dataFind, $dataReplace);
+			unset($attributes, $dataFind, $dataReplace);
 		}
 		
 		// Return result

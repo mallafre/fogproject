@@ -3,6 +3,10 @@
 // Blackout - 8:44 PM 23/09/2011
 class StorageGroup extends FOGController
 {
+	// Debug & Info
+	public $debug = true;
+	public $info = false;
+	
 	// Table
 	public $databaseTable = 'nfsGroups';
 	
@@ -33,13 +37,10 @@ class StorageGroup extends FOGController
 		// Variables
 		$this->data['storageNodes'] = array();
 		
-		// Query
-		$this->DB->query("SELECT * FROM nfsGroupMembers WHERE ngmGroupID='%s' AND ngmIsEnabled='1'", array($this->get('id')));
-		
 		// Loop all Storage Nodes -> Push into data array
-		while ($storageNode = $this->DB->fetch()->get())
+		foreach ((array)$this->FOGCore->getClass('StorageNodeManager')->find(array('isEnabled' => '1', 'storageGroupID' => $this->get('id'))) AS $StorageNode)
 		{
-			$this->add('storageNodes', new StorageNode($storageNode));
+			$this->add('storageNodes', $StorageNode);
 		}
 	}
 	
@@ -57,15 +58,17 @@ class StorageGroup extends FOGController
 	
 	function getMasterStorageNode()
 	{
-		foreach ($this->getStorageNodes() AS $storageNode)
+		// Return master
+		foreach ($this->get('storageNodes') AS $StorageNode)
 		{
-			if ($storageNode->isMaster())
+			if ($StorageNode->get('isMaster'))
 			{
-				return $storageNode;
+				return $StorageNode;
 			}
-		}		
+		}
 		
-		return ($storageNode ? $storageNode : false);
+		// Failed to find Master - return first Storage Node if there is one, otherwise false
+		return (count($this->get('storageNodes')) ? current($this->get('storageNodes')) : false);
 	}
 	
 	function getOptimalStorageNode()

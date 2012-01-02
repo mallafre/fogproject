@@ -126,7 +126,7 @@ else
 				->set('path', 		$_POST['file'])
 				->set('storageGroupID', $_POST['storagegroup'])
 				->set('osID', 		$_POST['os'])
-				->set('type', 		($_POST['imagetype'] ? $_POST['imagetype'] : 0));
+				->set('imageTypeID', 	($_POST['imagetype'] ? $_POST['imagetype'] : 0));
 			
 			// Save to database
 			if ($image->save())
@@ -177,7 +177,7 @@ else
 				$masterStorageNode = $image->getStorageGroup()->getMasterStorageNode();
 				
 				echo ( "<tr><td>"._("Image File").":</td><td>" . ($masterStorageNode ? $masterStorageNode->get('path') : '') . "<input type=\"text\" name=\"file\" value=\"" . $image->get('path') . "\" /></td></tr>" );
-				echo ( "<tr><td>"._("Image Type").":</td><td>" .  $FOGCore->getClass('ImageTypeManager')->buildSelectBox($image->get('type')) . " <a href=\"javascript:popUpWindow('static/imagetypehelp.html');\"><img class=\"noBorder\" src=\"./images/help.png\" /></a></td></tr>" );
+				echo ( "<tr><td>"._("Image Type").":</td><td>" .  $FOGCore->getClass('ImageTypeManager')->buildSelectBox($image->get('imageTypeID')) . " <a href=\"javascript:popUpWindow('static/imagetypehelp.html');\"><img class=\"noBorder\" src=\"./images/help.png\" /></a></td></tr>" );
 				echo ( "<tr><td colspan=2><center><input type=\"hidden\" name=\"update\" value=\"1\" /><input type=\"hidden\" name=\"imgid\" value=\"" . $image->get('id') . "\" /><input type=\"submit\" value=\""._("Update")."\" /></center></td></tr>" );				
 			echo ( "</table>" );
 			echo ( "</form>" );

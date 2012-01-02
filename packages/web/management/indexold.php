@@ -195,6 +195,8 @@ $FOGCore->getMessages();
 <script type="text/javascript" src="js/jquery.progressbar.js"></script>
 <script type="text/javascript" src="js/jquery.tmpl.js"></script>
 <script type="text/javascript" src="js/jquery.organicTabs.js"></script>
+<script type="text/javascript" src="js/jquery.placeholder.js"></script>
+<script type="text/javascript" src="js/jquery.disableSelection.js"></script>
 <script type="text/javascript" src="js/fog.js"></script>
 <script type="text/javascript" src="js/fog.main.js"></script>
 <?php
