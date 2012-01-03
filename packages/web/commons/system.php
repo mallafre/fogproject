@@ -15,7 +15,16 @@ define('FOG_VERSION', '0.33B');
 define('FOG_SCHEMA', 31);
 define('FOG_SVN_REVISION', '$Revision$');
 define('FOG_SVN_LAST_UPDATE', '$LastChangedDate$');
+define('PHP_VERSION_REQUIRED', '5.2.1');
+define('PHP_COMPATIBLE', version_compare(PHP_VERSION, PHP_VERSION_REQUIRED, '>='));
 define('BASEPATH', DetermineBasePath());
+
+// PHP: Version check
+if (PHP_COMPATIBLE === false)
+{
+	die(sprintf(_('Your systems PHP version is not sufficient. You have version %s, version %s is required.'), PHP_VERSION, PHP_VERSION_REQUIRED));
+	exit;
+}
 
 // LEGACY - Database
 if (defined('MYSQL_HOST') && !defined('DATABASE_HOST'))
