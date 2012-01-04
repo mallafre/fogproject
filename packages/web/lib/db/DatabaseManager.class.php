@@ -22,10 +22,10 @@ class DatabaseManager
 			{
 				throw new Exception('User not set');
 			}
-			if (!$pass)
-			{
-				throw new Exception('Pass not set');
-			}
+			//if (!$pass)
+			//{
+			//	throw new Exception('Pass not set');
+			//}
 			if (!$database)
 			{
 				throw new Exception('Database not set');
