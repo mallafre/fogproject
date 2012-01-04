@@ -112,7 +112,6 @@ class DatabaseManager
 				throw new Exception('Database not connected');
 			}
 			
-			echo "test  | " . $this->DB->query('SELECT vValue FROM schemaVersion LIMIT 1')->fetch()->get('vValue');
 			return $this->DB->query('SELECT vValue FROM schemaVersion LIMIT 1')->fetch()->get('vValue');
 		}
 		catch (Exception $e)
