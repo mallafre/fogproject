@@ -1148,15 +1148,27 @@ $dbSchema[227] = "UPDATE `" . DATABASE_NAME . "`.`schemaVersion` set vValue = '3
 					if ($DatabaseManager && $DB)
 					{
 						$currentSchema = $DatabaseManager->getVersion();
+						
+						// chuck syperski - Jan 4, 2012
+						// new installs break becase $currentSchema is false so $currentSchema++ doesn't work
+						if ( $currentSchema === FALSE )
+							$currentSchema = 0;
+							
 						if ( $FOG_SCHEMA != $currentSchema )
 						{
-							while( $currentSchema != $FOG_SCHEMA )
+							// chuck syperski - Jan 4, 2012
+							// without the errorFlag 
+							// I kept getting stuck in an infinite loop
+							// on new installs that would not fail until 
+							// allowed memory was exhausted
+							$errorFlag = false;
+							while( $currentSchema != $FOG_SCHEMA && ! $errorFlag )
 							{
 								$queryArray = $installPath[$currentSchema];
 								for( $i = 0; $i < count( $queryArray ); $i++ )
 								{
 									$sql = $dbSchema[$queryArray[$i]];
-									
+								
 									if (is_callable($sql))
 									{
 										$result = $sql();
@@ -1164,23 +1176,33 @@ $dbSchema[227] = "UPDATE `" . DATABASE_NAME . "`.`schemaVersion` set vValue = '3
 										if (is_string($result))
 										{
 											$errors[] = sprintf('<p><b>Update ID:</b> %s</p><p><b>Function Error:</b> <pre>%s</pre></p><p><b>Function:</b> <pre>%s</pre></p>', "$currentSchema - $i", $result, print_r($sql, 1));
+											$errorFlag = true;
+											break;
 										}
 									}
-									else if (!$DB->query($sql)->queryResult())
-									{
+									else if (! $DB->query($sql)->queryResult())
+									{		
 										$errors[] = sprintf('<p><b>Update ID:</b> %s</p><p><b>Database Error:</b> <pre>%s</pre></p><p><b>Database SQL:</b> <pre>%s</pre></p>', "$currentSchema - $i", $DB->error(), $sql);
+										$errorFlag = true;
+										break;
 									}
 								}
-								$currentSchema++;
+							 	! $errorFlag && $currentSchema++;
 							}
 
-							if ( $FOG_SCHEMA == $DatabaseManager->getVersion() )
+							// Chuck Syperski - Jan 4, 2012
+							// if you don't call connect here the DatabaseManager may
+							// have an invalid reference to a db object (null)
+							// thus get version will always return false.
+							$DatabaseManager->connect(); 
+							if ( $FOG_SCHEMA == $DatabaseManager->getVersion() && ! $errorFlag )
 							{
 								echo "<p>"._("Update/Install Successful!")."</p>";
 								echo ( "<p>"._("Click")." <a href=\"../../management\">"._("here")."</a> "._("to login.")."</p>" );
 							}
 							else
 							{
+								echo $FOG_SCHEMA . " | " . $DatabaseManager->getVersion();
 								echo(  "<p>"._("Update/Install Failed!")."</p>" );
 							}
 							
