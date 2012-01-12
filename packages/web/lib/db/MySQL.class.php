@@ -175,17 +175,20 @@ class MySQL
 	{
 		try
 		{
+			// Result finished
 			if ($this->result === false)
 			{
-				// result finished
 				return false;
 			}
-			if ($field && !array_key_exists($field, $this->result))
+			
+			// Query failed
+			if ($this->queryResult === false)
 			{
-				throw new Exception(sprintf('No field found in results: Field: %s', $field));
+				return false;
 			}
 			
-			return ($field ? $this->result[$field] : $this->result);
+			// Return: 'field' if requested and field exists in results, otherwise the raw result
+			return ($field && array_key_exists($field, $this->result) ? $this->result[$field] : $this->result);
 		}
 		catch (Exception $e)
 		{

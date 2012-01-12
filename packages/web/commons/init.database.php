@@ -14,7 +14,7 @@ require_once(BASEPATH . '/commons/init.php');
 $DatabaseManager = new DatabaseManager(DATABASE_TYPE, DATABASE_HOST, DATABASE_USERNAME, DATABASE_PASSWORD, DATABASE_NAME);
 
 // Update FOGCore with new database connection
-$DB = $FOGCore->DB = $DatabaseManager->connect();
+$DB = $FOGCore->DB = $DatabaseManager->connect()->DB;
 
 // FOG Locales
 if (!isset($_SESSION['locale']))

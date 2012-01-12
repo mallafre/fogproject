@@ -4,6 +4,7 @@
 class DatabaseManager
 {
 	public $type, $host, $user, $pass, $database;
+	public $DB;
 	private $valid = false;
 
 	function __construct($type, $host, $user, $pass, $database) 
@@ -80,18 +81,27 @@ class DatabaseManager
 			}
 			
 			// Database Schema version check
-			if ($this->getVersion() < FOG_SCHEMA && $_GET['redir'] != '1')
+			if ($this->getVersion() < FOG_SCHEMA && !preg_match('#schemaupdater#i', $_SERVER['PHP_SELF']))
 			{
 				FOGCore::redirect('../commons/schemaupdater/index.php?redir=1');
 			}
-			
-			// Return database connection
-			return $this->DB;
 		}
 		catch (Exception $e)
 		{
 			FOGCore::error('Failed: %s->%s(): Error: %s', array(get_class($this), __FUNCTION__, $e->getMessage()));
 		}
+		
+		return $this;
+	}
+	
+	public function close()
+	{
+		if ($this->DB)
+		{
+			$this->DB->close();
+		}
+		
+		return $this;
 	}
  
 	function getVersion()
