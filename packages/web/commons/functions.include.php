@@ -69,7 +69,7 @@ function createCronScheduledPackage( $conn, $blGroup, $groupHostID, $taskType, $
 			WHERE 
 				stActive = '1' and 
 				stIsGroup = '" . ($blGroup ? "1" : "0") . "' and 
-				stTaskType = '" . mysql_real_escape_string( $taskType ) . "' and 
+				stTaskTypeID = '" . mysql_real_escape_string( $taskTypeID ) . "' and 
 				stType = 'C' and 
 				stGroupHostID = '$groupHostID' and 
 				stMinute = '$m' and 
@@ -88,9 +88,9 @@ function createCronScheduledPackage( $conn, $blGroup, $groupHostID, $taskType, $
 		{	
 			$sql = "INSERT INTO
 					scheduledTasks 
-						(stName, stDesc, stType, stTaskType, stMinute, stHour, stDOM, stMonth, stDOW, stIsGroup, stGroupHostID, stShutDown, stOther1, stOther2, stActive)
+						(stName, stDesc, stType, stTaskTypeID, stMinute, stHour, stDOM, stMonth, stDOW, stIsGroup, stGroupHostID, stShutDown, stOther1, stOther2, stActive)
 					VALUES
-						( 'Scheduled Task', '', 'C', '" . mysql_real_escape_string( $taskType ) . "', '" . mysql_real_escape_string( $m ) . "', '" . mysql_real_escape_string( $h ) . "', '" . mysql_real_escape_string( $dom ) . "', '" . mysql_real_escape_string( $mon ) . "', '" . mysql_real_escape_string( $dow ) . "', '" . ($blGroup ? "1" : "0") . "', '$groupHostID', '" . ($blShutdown ? "1" : "0" ) . "', '" . ( $blPushSnapins ? "1" : "0" ) . "', '" . mysql_real_escape_string( $arg2 ) . "','1' ) ";
+						( 'Scheduled Task', '', 'C', '" . mysql_real_escape_string( $taskTypeID ) . "', '" . mysql_real_escape_string( $m ) . "', '" . mysql_real_escape_string( $h ) . "', '" . mysql_real_escape_string( $dom ) . "', '" . mysql_real_escape_string( $mon ) . "', '" . mysql_real_escape_string( $dow ) . "', '" . ($blGroup ? "1" : "0") . "', '$groupHostID', '" . ($blShutdown ? "1" : "0" ) . "', '" . ( $blPushSnapins ? "1" : "0" ) . "', '" . mysql_real_escape_string( $arg2 ) . "','1' ) ";
 			if ( mysql_query( $sql, $conn ) )
 				return true;
 			else
@@ -119,7 +119,7 @@ function createSingleRunScheduledPackage( $conn, $blGroup, $groupHostID, $taskTy
 			WHERE 
 				stActive = '1' and 
 				stIsGroup = '" . ($blGroup ? "1" : "0") . "' and 
-				stTaskType = '" . mysql_real_escape_string( $taskType ) . "' and 
+				stTaskTypeID = '" . mysql_real_escape_string( $taskTypeID ) . "' and 
 				stType = 'S' and 
 				stGroupHostID = '$groupHostID' and 
 				stDateTime = '$lngTime'";
@@ -134,9 +134,9 @@ function createSingleRunScheduledPackage( $conn, $blGroup, $groupHostID, $taskTy
 		{
 			$sql = "INSERT INTO
 					scheduledTasks 
-						(stName, stDesc, stType, stTaskType, stIsGroup, stGroupHostID, stDateTime, stShutDown, stOther1, stOther2, stActive)
+						(stName, stDesc, stType, stTaskTypeID, stIsGroup, stGroupHostID, stDateTime, stShutDown, stOther1, stOther2, stActive)
 					VALUES
-						( 'Scheduled Task', '', 'S', '" . mysql_real_escape_string( $taskType ) . "', '" . ($blGroup ? "1" : "0") . "', '$groupHostID', '$lngTime', '" . ($blShutdown ? "1" : "0" ) . "', '" . ( $blPushSnapins ? "1" : "0" ) . "', '" . mysql_real_escape_string( $arg2 ) . "','1' ) ";
+						( 'Scheduled Task', '', 'S', '" . mysql_real_escape_string( $taskTypeID ) . "', '" . ($blGroup ? "1" : "0") . "', '$groupHostID', '$lngTime', '" . ($blShutdown ? "1" : "0" ) . "', '" . ( $blPushSnapins ? "1" : "0" ) . "', '" . mysql_real_escape_string( $arg2 ) . "','1' ) ";
 			if ( mysql_query( $sql, $conn ) )
 				return true;
 			else
@@ -1120,7 +1120,7 @@ function getNumberOfTasks($conn, $intState )
 		$sql = "select 
 				count(*) as cnt 
 			from 
-				(select * from tasks where taskState = '" . mysql_real_escape_string( $intState ) . "' and taskType in ('U', 'D') ) tasks 
+				(select * from tasks where taskStateID = '" . mysql_real_escape_string( $intState ) . "' and taskTypeID in ('" . Task::TYPE_UPLOAD . "', '" . Task::TYPE_DOWNLOAD . "') ) tasks 
 				inner join hosts on ( tasks.taskHostID = hosts.hostID )";
 		$res = mysql_query( $sql, $conn ) or criticalError( mysql_error(), _("FOG :: Database error!") );
 		if ( $ar = mysql_fetch_array( $res ) )
@@ -1386,7 +1386,7 @@ function createInventoryPackage( $conn, $member, &$reason, $shutdown="", $kernel
 						if ( ftp_put( $ftp, $GLOBALS['FOGCore']->getSetting( "FOG_TFTP_PXE_CONFIG_DIR" ) . $mac, $tmp, FTP_ASCII ) )
 						{		
 							$sql = "insert into 
-									tasks(taskName, taskCreateTime, taskCheckIn, taskHostID, taskState, taskCreateBy, taskForce, taskType ) 
+									tasks(taskName, taskCreateTime, taskCheckIn, taskHostID, taskStateID, taskCreateBy, taskForce, taskTypeID ) 
 									values('" . mysql_real_escape_string($member->getHostName() . " Inventory") . "', NOW(), NOW(), '" . $member->getID() . "', '0', '" . mysql_real_escape_string( $currentUser->get('name') ) . "', '0', 'I' )";
 							if ( mysql_query( $sql, $conn ) )
 							{
@@ -1466,7 +1466,7 @@ function createDiskSufaceTestPackage( $conn, $member, &$reason, $shutdown="", $k
 						if ( ftp_put( $ftp, $GLOBALS['FOGCore']->getSetting( "FOG_TFTP_PXE_CONFIG_DIR" ) . $mac, $tmp, FTP_ASCII ) )
 						{		
 							$sql = "insert into 
-									tasks(taskName, taskCreateTime, taskCheckIn, taskHostID, taskState, taskCreateBy, taskForce, taskType ) 
+									tasks(taskName, taskCreateTime, taskCheckIn, taskHostID, taskStateID, taskCreateBy, taskForce, taskTypeID ) 
 									values('" . mysql_real_escape_string($member->getHostName() . " Testdisk") . "', NOW(), NOW(), '" . $member->getID() . "', '0', '" . mysql_real_escape_string( $currentUser->get('name') ) . "', '0', 'T' )";
 							if ( mysql_query( $sql, $conn ) )
 							{
@@ -1545,7 +1545,7 @@ function createPassResetPackage( $conn, $member, &$reason, $shutdown="", $kernel
 						if ( ftp_put( $ftp, $GLOBALS['FOGCore']->getSetting( "FOG_TFTP_PXE_CONFIG_DIR" ) . $mac, $tmp, FTP_ASCII ) )
 						{		
 							$sql = "insert into 
-									tasks(taskName, taskCreateTime, taskCheckIn, taskHostID, taskState, taskCreateBy, taskForce, taskType ) 
+									tasks(taskName, taskCreateTime, taskCheckIn, taskHostID, taskStateID, taskCreateBy, taskForce, taskTypeID ) 
 									values('" . mysql_real_escape_string($member->getHostName() . " pass reset") . "', NOW(), NOW(), '" . $member->getID() . "', '0', '" . mysql_real_escape_string( $currentUser->get('name') ) . "', '0', 'J' )";
 							if ( mysql_query( $sql, $conn ) )
 							{
@@ -1625,7 +1625,7 @@ function createPhotoRecPackage( $conn, $member, &$reason, $shutdown="", $kernel=
 						if ( ftp_put( $ftp, $GLOBALS['FOGCore']->getSetting( "FOG_TFTP_PXE_CONFIG_DIR" ) . $mac, $tmp, FTP_ASCII ) )
 						{		
 							$sql = "insert into 
-									tasks(taskName, taskCreateTime, taskCheckIn, taskHostID, taskState, taskCreateBy, taskForce, taskType ) 
+									tasks(taskName, taskCreateTime, taskCheckIn, taskHostID, taskStateID, taskCreateBy, taskForce, taskTypeID ) 
 									values('" . mysql_real_escape_string($member->getHostName() . " photorec") . "', NOW(), NOW(), '" . $member->getID() . "', '0', '" . mysql_real_escape_string( $currentUser->get('name') ) . "', '0', 'R' )";
 							if ( mysql_query( $sql, $conn ) )
 							{
@@ -1705,7 +1705,7 @@ function createTestDiskPackage( $conn, $member, &$reason, $shutdown="", $kernel=
 						if ( ftp_put( $ftp, $GLOBALS['FOGCore']->getSetting( "FOG_TFTP_PXE_CONFIG_DIR" ) . $mac, $tmp, FTP_ASCII ) )
 						{		
 							$sql = "insert into 
-									tasks(taskName, taskCreateTime, taskCheckIn, taskHostID, taskState, taskCreateBy, taskForce, taskType ) 
+									tasks(taskName, taskCreateTime, taskCheckIn, taskHostID, taskStateID, taskCreateBy, taskForce, taskTypeID ) 
 									values('" . mysql_real_escape_string($member->getHostName() . " Testdisk") . "', NOW(), NOW(), '" . $member->getID() . "', '0', '" . mysql_real_escape_string( $currentUser->get('name') ) . "', '0', 'T' )";
 							if ( mysql_query( $sql, $conn ) )
 							{
@@ -1792,7 +1792,7 @@ function createWipePackage( $conn, $member, &$reason, $mode=WIPE_NORMAL, $shutdo
 						if ( ftp_put( $ftp, $GLOBALS['FOGCore']->getSetting( "FOG_TFTP_PXE_CONFIG_DIR" ) . $mac, $tmp, FTP_ASCII ) )
 						{		
 							$sql = "insert into 
-									tasks(taskName, taskCreateTime, taskCheckIn, taskHostID, taskState, taskCreateBy, taskForce, taskType ) 
+									tasks(taskName, taskCreateTime, taskCheckIn, taskHostID, taskStateID, taskCreateBy, taskForce, taskTypeID ) 
 									values('" . mysql_real_escape_string($member->getHostName() . " Wipe") . "', NOW(), NOW(), '" . $member->getID() . "', '0', '" . mysql_real_escape_string( $currentUser->get('name') ) . "', '0', 'W' )";
 							if ( mysql_query( $sql, $conn ) )
 							{
@@ -1915,7 +1915,7 @@ function createAVPackage( $conn, $member, &$reason, $mode=FOG_AV_SCANONLY, $shut
 						if ( ftp_put( $ftp, $GLOBALS['FOGCore']->getSetting( "FOG_TFTP_PXE_CONFIG_DIR" ) . $mac, $tmp, FTP_ASCII ) )
 						{		
 							$sql = "insert into 
-									tasks(taskName, taskCreateTime, taskCheckIn, taskHostID, taskState, taskCreateBy, taskForce, taskType ) 
+									tasks(taskName, taskCreateTime, taskCheckIn, taskHostID, taskStateID, taskCreateBy, taskForce, taskTypeID ) 
 									values('" . mysql_real_escape_string($member->getHostName() . " ClamScan") . "', NOW(), NOW(), '" . $member->getID() . "', '0', '" . mysql_real_escape_string( $currentUser->get('name') ) . "', '0', 'v' )";
 							if ( mysql_query( $sql, $conn ) )
 							{
@@ -2056,7 +2056,7 @@ function createUploadImagePackage( $conn, $member, &$reason, $debug=false, $shut
 										if ( ftp_put( $ftp, $GLOBALS['FOGCore']->getSetting( "FOG_TFTP_PXE_CONFIG_DIR" ) . $mac, $tmp, FTP_ASCII ) )
 										{		
 											$sql = "insert into 
-													tasks(taskName, taskCreateTime, taskCheckIn, taskHostID, taskState, taskCreateBy, taskForce, taskType, taskNFSGroupID, taskNFSMemberID ) 
+													tasks(taskName, taskCreateTime, taskCheckIn, taskHostID, taskStateID, taskCreateBy, taskForce, taskType, taskNFSGroupID, taskNFSMemberID ) 
 													values('" . mysql_real_escape_string($taskName) . "', NOW(), NOW(), '" . $member->getID() . "', '0', '" . mysql_real_escape_string( $currentUser->get('name') ) . "', '0', 'U', '$groupid', '$nodeid' )";
 											if ( mysql_query( $sql, $conn ) )
 											{
@@ -2146,7 +2146,7 @@ function createMemTestPackage($conn, $member, &$reason)
 						if ( ftp_put( $ftp, $GLOBALS['FOGCore']->getSetting( "FOG_TFTP_PXE_CONFIG_DIR" ) . $mac, $tmp, FTP_ASCII ) )
 						{						
 							$sql = "insert into 
-									tasks(taskName, taskCreateTime, taskCheckIn, taskHostID, taskState, taskCreateBy, taskForce, taskType ) 
+									tasks(taskName, taskCreateTime, taskCheckIn, taskHostID, taskStateID, taskCreateBy, taskForce, taskTypeID ) 
 									values('" . mysql_real_escape_string('MEMTEST') . "', NOW(), NOW(), '" . $member->getID() . "', '0', '" . mysql_real_escape_string( $currentUser->get('name') ) . "', '0', 'M' )";
 							if ( mysql_query( $sql, $conn ) )
 							{
@@ -2235,7 +2235,7 @@ function createDebugPackage($conn, $member, &$reason, $kernel="", $otherargs="")
 						if ( ftp_put( $ftp, $GLOBALS['FOGCore']->getSetting( "FOG_TFTP_PXE_CONFIG_DIR" ) . $mac, $tmp, FTP_ASCII ) )
 						{						
 							$sql = "insert into 
-									tasks(taskName, taskCreateTime, taskCheckIn, taskHostID, taskState, taskCreateBy, taskForce, taskType ) 
+									tasks(taskName, taskCreateTime, taskCheckIn, taskHostID, taskStateID, taskCreateBy, taskForce, taskTypeID ) 
 									values('" . mysql_real_escape_string('DEBUG') . "', NOW(), NOW(), '" . $member->getID() . "', '0', '" . mysql_real_escape_string( $currentUser->get('name') ) . "', '0', 'X' )";
 							if ( mysql_query( $sql, $conn ) )
 							{
@@ -2511,7 +2511,7 @@ function createImagePackageMulticast($conn, $member, $taskName, $port, &$reason,
 									if ( ftp_put( $ftp, $GLOBALS['FOGCore']->getSetting( "FOG_TFTP_PXE_CONFIG_DIR" ) . $mac, $tmp, FTP_ASCII ) )
 									{						
 										$sql = "insert into 
-												tasks(taskName, taskCreateTime, taskCheckIn, taskHostID, taskState, taskCreateBy, taskForce, taskType ) 
+												tasks(taskName, taskCreateTime, taskCheckIn, taskHostID, taskStateID, taskCreateBy, taskForce, taskTypeID ) 
 												values('" . mysql_real_escape_string($taskName) . "', NOW(), NOW(), '" . $member->getID() . "', '0', '" . mysql_real_escape_string( $currentUser->get('name') ) . "', '0', 'C' )";
 										if ( mysql_query( $sql, $conn ) )
 										{
@@ -2744,7 +2744,7 @@ function cleanIncompleteTasks( $conn, $hostid )
 {
 	if ( $conn != null && $hostid != null )
 	{
-		$sql = "update tasks set taskState = '0' where taskHostID = '" . mysql_real_escape_string($hostid) . "' and taskState = '1'";	
+		$sql = "update tasks set taskStateID = '0' where taskHostID = '" . mysql_real_escape_string($hostid) . "' and taskStateID = '1'";	
 		mysql_query( $sql, $conn ) or criticalError( mysql_error(), _("FOG :: Database error!") );
 	}
 }
@@ -2765,7 +2765,7 @@ function getTaskIDByMac( $conn, $mac, $state=0 )
 		$sql = "select 
 				* 
 				from hosts 
-				inner join tasks on ( hosts.hostID = tasks.taskHostID ) where hostMAC = '" . mysql_real_escape_string($mac) . "' and taskState = '$state'";
+				inner join tasks on ( hosts.hostID = tasks.taskHostID ) where hostMAC = '" . mysql_real_escape_string($mac) . "' and taskStateID = '$state'";
 
 		$res = mysql_query( $sql, $conn ) or criticalError( mysql_error(), _("FOG :: Database error!") );
 		while( $ar = mysql_fetch_array( $res ) )
@@ -2781,7 +2781,7 @@ function getNumberInQueue( $conn, $state )
 {
 	if ( $conn != null && $state != null )
 	{
-		$sql = "select count(*) as cnt from tasks where taskState = '" . mysql_real_escape_string($state) . "' and taskType in ('U', 'D')";
+		$sql = "select count(*) as cnt from tasks where taskStateID = '" . mysql_real_escape_string($state) . "' and taskTypeID in ('" . Task::TYPE_UPLOAD . "', '" . Task::TYPE_DOWNLOAD . "')";
 		$res = mysql_query( $sql, $conn ) or criticalError( mysql_error(), _("FOG :: Database error!") );
 		
 		if ( $ar = mysql_fetch_array( $res ) )
@@ -2806,8 +2806,8 @@ function getNumberInQueueByNFSServer( $conn, $state, $nodeid )
 			FROM
 				tasks
 			WHERE 
-				taskState = '" . mysql_real_escape_string( $state ) . "' and
-				taskType in ( 'U', 'D' ) and
+				taskStateID = '" . mysql_real_escape_string( $state ) . "' and
+				taskTypeID in ( 'U', 'D' ) and
 				taskNFSMemberID = '" . mysql_real_escape_string( $nodeid ) . "'";
 		$res = mysql_query( $sql, $conn ) or criticalError( mysql_error(), _("FOG :: Database error!") );
 		
@@ -2856,8 +2856,8 @@ function getNumberInQueueByNFSGroup( $conn, $state, $groupid )
 			FROM
 				tasks
 			WHERE 
-				taskState = '" . mysql_real_escape_string( $state ) . "' and
-				taskType in ( 'U', 'D' ) and
+				taskStateID = '" . mysql_real_escape_string( $state ) . "' and
+				taskTypeID in ( 'U', 'D' ) and
 				taskNFSGroupID = '" . mysql_real_escape_string( $groupid ) . "'";
 		$res = mysql_query( $sql, $conn ) or criticalError( mysql_error(), _("FOG :: Database error!") );
 		
@@ -3088,7 +3088,7 @@ function doImage( $conn, $jobid, $blUpdateNFS=false, $nodeid=null )
 		{
 			$set = "taskNFSMemberID = '" . mysql_real_escape_string( $nodeid ) . "', ";
 		}
-		$sql = "update tasks set $set taskState = '1' where taskID = '" . mysql_real_escape_string($jobid) . "'";
+		$sql = "update tasks set $set taskStateID = '1' where taskID = '" . mysql_real_escape_string($jobid) . "'";
 		if ( mysql_query( $sql, $conn ) )
 			return true;
 		else
@@ -3131,7 +3131,7 @@ function getNumberInFrontOfMe( $conn, $jobid, $groupid=-1 )
 		{ 
 			$where = " taskNFSGroupID = '" . mysql_real_escape_string( $groupid ) . "' and ";
 		}
-		$sql = "select count(*) as c from tasks where $where taskState = '0' and taskID < " . mysql_real_escape_string($jobid) . " and (UNIX_TIMESTAMP() - UNIX_TIMESTAMP(taskCheckIn)) < " . $GLOBALS['FOGCore']->getSetting( "FOG_CHECKIN_TIMEOUT" );
+		$sql = "select count(*) as c from tasks where $where taskStateID = '0' and taskID < " . mysql_real_escape_string($jobid) . " and (UNIX_TIMESTAMP() - UNIX_TIMESTAMP(taskCheckIn)) < " . $GLOBALS['FOGCore']->getSetting( "FOG_CHECKIN_TIMEOUT" );
 		$res = mysql_query( $sql, $conn ) or criticalError( mysql_error(), _("FOG :: Database error!") );
 		if ( $ar = mysql_fetch_array( $res ) )
 			return $ar["c"];
@@ -3157,7 +3157,7 @@ function checkOut( $conn, $jobid )
 {
 	if ( $conn != null && $jobid != null )
 	{
-		$sql = "update tasks set taskState = '2' where taskID = '" . mysql_real_escape_string($jobid). "'";
+		$sql = "update tasks set taskStateID = '2' where taskID = '" . mysql_real_escape_string($jobid). "'";
 		if ( mysql_query( $sql, $conn ) )
 			return true;
 	}

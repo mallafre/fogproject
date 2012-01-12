@@ -40,7 +40,7 @@ foreach ($allTasks as $task)
 	$taskData = array();
 	
 	// Determine state
-	$state = ($task->getState() == Task::STATE_QUEUED && $FOGCore->getClass('TaskManager')->hasActiveTaskCheckedIn($task->get('id')) ? 'In Line' : $task->getStateText());
+	$state = ($task->getState() == Task::STATE_QUEUED && $FOGCore->getClass('TaskManager')->hasActiveTaskCheckedIn($task->get('id')) ? 'In Line' : $task->getTaskStateText());
 	
 	// Push static variables into local array
 	$Host = $task->getHost();
@@ -49,10 +49,10 @@ foreach ($allTasks as $task)
 		'state'		=> $state,
 		'hostname'	=> $Host->getHostname(),
 		'force'		=> $task->get('isForced') ? '1' : '0',
-		'type'		=> $task->getTaskType(),
-		'typeName'	=> $task->getTaskTypeString(),
-		'mac'		=> (string)$Host->get('mac'),
-		'createTime'	=> $task->getCreateTime()->getLong()
+		'type'		=> $task->get('typeID'),
+		'typeName'	=> $task->getTaskTypeText(),
+		'mac'		=> (string)$Host->getMACAddress(),
+		'createTime'	=> (string)$task->getCreateTime()
 	);
 
 	if ($task->getName() != null)
@@ -68,33 +68,6 @@ foreach ($allTasks as $task)
 		$taskData['timeRemaining'] = trim($task->getTimeRemaining());
 		$taskData['dataCopied'] = trim($task->getDataCopied());
 		$taskData['dataTotal'] = trim($task->getTaskDataTotal());
-	}
-
-	// Format variables
-	$time = $taskData['createTime'];
-	if ($time)
-	{
-		// Today
-		if (date('d-m-Y', $time) == date('d-m-Y'))
-		{
-			//$taskData['createTime'] = 'Today, ' . date('g:i a', $time);
-			$taskData['createTime'] = date('g:ia', $time);
-		}
-		// Yesterday
-		elseif (date('d-m-Y', $time) == date("d-m-Y", strtotime("-1 day")))
-		{
-			$taskData['createTime'] = 'Yesterday, ' . date('g:i a', $time);
-		}
-		// Short date
-		elseif (date('m-Y', $time) == date('m-Y'))
-		{
-			$taskData['createTime'] = date('dS, g:ia', $time);
-		}
-		// Long date
-		else
-		{
-			$taskData['createTime'] = date('m-d-Y g:ia', $time);
-		}
 	}
 	
 	if ($taskData['BPM'])
@@ -140,7 +113,7 @@ foreach ($allTasks as $task)
 	$taskData['stateIconName'] = strtolower(str_replace(' ', '', $taskData['state']));
 	$taskData['typeIconName'] = strtolower(str_replace(' ', '', $taskData['typeName']));
 	$taskData['taskDetails'] = ($taskData['name'] ? '<div class="task-name" title="Task: ' . $taskData['name'] . '">' . $taskData['name'] . '</div>' : '');
-	$taskData['forceDetails'] = ($taskData['force'] == '1' ? '<span class="icon icon-forced" title="' . _('Task forced to start') . '"></span>' : (strtolower($taskData['type']) == 'u' || strtolower($taskData['type']) == 'd' ? '<a href="?node=tasks&sub=active&forcetask=%id%&mac=%mac%"><span class="icon icon-force" title="' . _('Force task to start') . '"></span></a>' : '&nbsp;'));
+	$taskData['forceDetails'] = ($taskData['force'] == '1' ? '<span class="icon icon-forced" title="' . _('Task forced to start') . '"></span>' : (strtolower($taskData['type']) == Task::TYPE_UPLOAD || strtolower($taskData['type']) == Task::TYPE_DOWNLOAD ? '<a href="?node=tasks&sub=active&forcetask=%id%&mac=%mac%"><span class="icon icon-force" title="' . _('Force task to start') . '"></span></a>' : '&nbsp;'));
 	
 	// Push into our final data array
 	$data[] = $taskData;

@@ -22,14 +22,6 @@ class DatabaseManager
 			{
 				throw new Exception('User not set');
 			}
-			
-			// We should allow for a blank password since root@localhost is 
-			// default.  I don't see a security issue with this that is any 
-			// worse than some of the others we have. 
-			//if (!$pass)
-			//{
-			//	throw new Exception('Pass not set');
-			//}
 			if (!$database)
 			{
 				throw new Exception('Database not set');
@@ -112,7 +104,11 @@ class DatabaseManager
 				throw new Exception('Database not connected');
 			}
 			
-			return $this->DB->query('SELECT vValue FROM schemaVersion LIMIT 1')->fetch()->get('vValue');
+			// Get version
+			$version = $this->DB->query('SELECT vValue FROM schemaVersion LIMIT 1')->fetch()->get('vValue');
+			
+			// Return version OR 0 (for new install) if query failed
+			return ($version ? $version : 0);
 		}
 		catch (Exception $e)
 		{

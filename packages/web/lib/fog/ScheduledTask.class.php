@@ -12,7 +12,7 @@ class ScheduledTask extends FOGController
 		'name'		=> 'stName',
 		'description'	=> 'stDesc',
 		'type'		=> 'stType',
-		'taskType'	=> 'stTaskType',
+		'stTaskTypeID'	=> 'stTaskTypeID',
 		'minute'	=> 'stMinute',
 		'hour'		=> 'stHour',
 		'dayOfMonth'	=> 'stDOM',
@@ -37,6 +37,17 @@ class ScheduledTask extends FOGController
 	// Database field to Class relationships
 	public $databaseFieldClassRelationships = array(
 	);
+	
+	// Custom Functions
+	public function getHost()
+	{
+		return new Host($this->get('hostID'));
+	}
+	
+	public function getImage()
+	{
+		return $this->getHost()->getImage();
+	}
 	
 	// LEGACY
 	const TASK_TYPE_SINGLE 	= "S";

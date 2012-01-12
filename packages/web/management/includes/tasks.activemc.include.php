@@ -69,7 +69,7 @@ $OutputManager = new OutputManager('task', $data, $templates, $attributes);
 			FROM 
 				(select * from multicastSessions where msState in (0,1)) multicastSessions  
 				inner join multicastSessionsAssoc on ( multicastSessionsAssoc.msID = multicastSessions.msID )
-				inner join ( select * from tasks where taskState in (0,1) ) tasks on ( multicastSessionsAssoc.tID = tasks.taskID )
+				inner join ( select * from tasks where taskStateID in (1, 2) ) tasks on ( multicastSessionsAssoc.tID = tasks.taskID )
 				inner join hosts on (taskHostID = hostID)
 			GROUP BY
 				multicastSessions.msID";	

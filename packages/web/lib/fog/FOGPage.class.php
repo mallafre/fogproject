@@ -61,14 +61,9 @@ abstract class FOGPage extends FOGBase
 		}
 		
 		// Make these key's accessible in $this->request
-		/*
-		foreach (array('node', 'sub', 'tab', 'confirm') AS $x)
-		{
-			$this->request[$x] = (isset($_REQUEST[$x]) && !empty($_REQUEST[$x]) ? $_REQUEST[$x] : false);
-		}
-		*/
 		$this->request = $this->REQUEST = $this->DB->sanitize($_REQUEST);
-		$this->request['id'] = $this->REQUEST['id'] = $this->request[$this->id] = $this->REQUEST[$this->id] = $this->DB->sanitize(isset($_REQUEST[$this->id]) && !empty($_REQUEST[$this->id]) ? $_REQUEST[$this->id] : false);
+		$this->REQUEST['id'] = $_REQUEST[$this->id];
+		$this->request['id'] = $_REQUEST[$this->id];
 		
 		// Methods
 		$this->post = $this->FOGCore->isPOSTRequest();

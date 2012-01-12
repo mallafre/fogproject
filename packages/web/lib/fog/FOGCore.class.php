@@ -117,7 +117,7 @@ class FOGCore extends FOGBase
 						{
 							if ( ($host->isValid() || $blIgnoreNonImageReady) && ( $groupid == "%" || $host->getImage()->getStorageGroup()->getID() == $groupid  ) )
 							{
-								$task = new ScheduledTask( $host, $group, $timer, $ar["stTaskType"], $ar["stID"] );
+								$task = new ScheduledTask( $host, $group, $timer, $ar["stTaskTypeID"], $ar["stID"] );
 								$task->setShutdownAfterTask( $ar["stShutDown"] == 1 );
 								$task->setOther1( $ar["stOther1"] );
 								$task->setOther2( $ar["stOther2"] );
@@ -152,7 +152,7 @@ class FOGCore extends FOGBase
 								}
 								//echo ( "After: " . $group->getHostCount() );
 								
-								$task = new ScheduledTask( $host, $group, $timer, $ar["stTaskType"], $ar["stID"] );
+								$task = new ScheduledTask( $host, $group, $timer, $ar["stTaskTypeID"], $ar["stID"] );
 								$task->setShutdownAfterTask( $ar["stShutDown"] == 1 );
 								$task->setOther1( $ar["stOther1"] );
 								$task->setOther2( $ar["stOther2"] );
@@ -471,5 +471,39 @@ class FOGCore extends FOGBase
 		
 		// HTTP request to WOL script
 		$this->fetchURL(sprintf('http://%s%s?wakeonlan=%s', $this->getSetting('FOG_WOL_HOST'), $this->getSetting('FOG_WOL_PATH'), ($mac instanceof MACAddress ? $mac->getMACWithColon() : $mac)));
+	}
+	
+	public function formatTime($time, $format = '')
+	{
+		// Convert to unix date if not already
+		if (!is_numeric($time))
+		{
+			$time = strtotime($time);
+		}
+		
+		// Forced format
+		if ($format)
+		{
+			return date($format, $time);
+		}
+		
+		// Today
+		if (date('d-m-Y', $time) == date('d-m-Y'))
+		{
+			return 'Today, ' . date('g:ia', $time);
+		}
+		// Yesterday
+		elseif (date('d-m-Y', $time) == date('d-m-Y', strtotime('-1 day')))
+		{
+			return 'Yesterday, ' . date('g:i a', $time);
+		}
+		// Short date
+		elseif (date('m-Y', $time) == date('m-Y'))
+		{
+			return date('jS, g:ia', $time);
+		}
+		
+		// Long date
+		return date('m-d-Y g:ia', $time);
 	}
 }

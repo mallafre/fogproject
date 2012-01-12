@@ -25,7 +25,7 @@ class Image extends FOGController
 		'createdBy'	=> 'imageCreateBy',
 		'building'	=> 'imageBuilding',
 		'size'		=> 'imageSize',
-		'imageTypeID'	=> 'imageDD',
+		'imageTypeID'	=> 'imageTypeID',
 		'storageGroupID'=> 'imageNFSGroupID',
 		'osID'		=> 'imageOSID',
 		// TODO: Add 'size' for Image Size

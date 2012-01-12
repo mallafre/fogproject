@@ -89,7 +89,7 @@ if ( $mac != null  )
 							
 						if ( $blUpdate )
 						{
-							$sql = "UPDATE tasks set taskState = '0' WHERE taskID = '$jobid'";
+							$sql = "UPDATE tasks set taskStateID = '0' WHERE taskID = '$jobid'";
 							if ( mysql_query( $sql, $conn ) )
 								echo "##";
 							else 	

@@ -39,7 +39,7 @@ class HostManagementPage extends FOGPage
 			'<a href="?node=host&sub=edit&id=${id}" title="Edit">${name}</a>',
 			'${mac}',
 			'${ip}',
-			'<a href="?node=host&sub=edit&id=${id}"><span class="icon icon-download" title="Deploy"></span></a> <a href="?node=host&sub=edit&id=${id}"><span class="icon icon-multicast" title="Multi-cast Deploy"></span></a> <a href="?node=host&sub=edit&id=${id}"><span class="icon icon-edit" title="Edit"></span></a>'
+			'<a href="?node=host&sub=deploy&id=${id}"><span class="icon icon-download" title="Deploy"></span></a> <a href="?node=host&sub=deploy&type=8&id=${id}"><span class="icon icon-multicast" title="Multi-cast Deploy"></span></a> <a href="?node=host&sub=edit&id=${id}"><span class="icon icon-edit" title="Edit"></span></a>'
 		);
 		
 		// Row attributes
@@ -273,96 +273,65 @@ class HostManagementPage extends FOGPage
 				
 				<!-- Basic Tasks -->
 				<div id="host-tasks" class="organic-tabs-hidden">
-					<form method="POST" action="<?php print $this->formAction; ?>&tab=host-tasks">
-						<input type="hidden" name="id" value="<?php print $this->REQUEST['id']; ?>" />
-						<h2><?php print _("Host Tasks"); ?></h2>
-						<table cellpadding="0" cellspacing="0" border="0" width="100%">
-							<tr>
-								<td class="task-action"><a href="?node=host&sub=deploy&id=<?php echo $Host->get('id'); ?>"><img src="./images/senddebug.png" /><p><?php echo(_("Deploy")); ?></p></a></td>
-								<td><p><?php print _("Deploy action will send an image saved on the FOG server to the client computer with all included snapins."); ?></p></td></tr>
-							<tr>
-								<td class="task-action"><a href="?node=host&sub=upload&id=<?php echo $Host->get('id'); ?>"><img src="./images/restoredebug.png" /><p><?php echo(_("Upload")); ?></p></a></td>
-								<td><p><?php print _("Upload will pull an image from a client computer that will be saved on the server."); ?></p></td></tr>
-							<tr>
-								<td class="task-action"><a href="<?php print $this->formAction; ?>#host-tasks" class="advanced-tasks-link"><img src="./images/host-advanced.png" /><p><?php echo(_("Advanced")); ?></p></a></td>
-								<td><p><?php print _("View advanced tasks for this host."); ?></p></td>
-							</tr>
-						</table>
+					<h2><?php print _('Host Tasks'); ?></h2>
+					<table cellpadding="0" cellspacing="0" border="0" width="100%">
+						<?php
 						
-						<div id="advanced-tasks" class="hidden">
-							<h2><?php print _('Advanced Actions'); ?></h2>
-							<table cellpadding="0" cellspacing="0" border="0" width="100%">
-								<tr>
-									<td class="task-action"><a href="?node=host&sub=debug&id=<?php print $Host->get('id'); ?>"><img src="./images/debug.png" /><p><?php print _('Debug'); ?></p></a></td>
-									<td><p><?php print _('Debug mode will load the boot image and load a prompt so you can run any commands you wish.  When you are done, you must remember to remove the PXE file, by clicking on "Active Tasks" and clicking on the "Kill Task" button.'); ?></p></td>
-								</tr>	
-								<tr>
-									<td class="task-action"><a href="?node=host&sub=deploy&debug=true&id=<?php print $Host->get('id'); ?>"><img src="./images/senddebug.png" /><p><?php print _('Deploy-Debug'); ?></p></a></td>
-									<td><p><?php print _('Deploy-Debug mode allows FOG to setup the environment to allow you send a specific image to a computer, but instead of sending the image, FOG will leave you at a prompt right before sending.  If you actually wish to send the image all you need to do is type "fog" and hit enter.'); ?></p></td>
-								</tr>		
-								<tr>
-									<td class="task-action"><a href="?node=host&sub=upload&debug=true&id=<?php print $Host->get('id'); ?>"><img src="./images/restoredebug.png" /><p><?php print _('Upload-Debug'); ?></p></a></td>
-									<td><p><?php print _('Upload-Debug mode allows FOG to setup the environment to allow you Upload a specific image to a computer, but instead of Upload the image, FOG will leave you at a prompt right before restoring.  If you actually wish to Upload the image all you need to do is type "fog" and hit enter.'); ?></p></td>
-								</tr>			
-								<tr>
-									<td class="task-action"><a href="?node=host&sub=deploy&snapins=false&id=<?php print $Host->get('id'); ?>"><img src="./images/sendnosnapin.png" /><p><?php print _('Deploy without Snapins'); ?></p></a></td>
-									<td><p><?php print _('Deploy without snapins allows FOG to image the workstation, but after the task is complete any snapins linked to the host or group will NOT be sent.'); ?></p></td>
-								</tr>		
-								<tr>
-									<td class="task-action"><a href="?node=host&sub=snapins&id=<?php print $Host->get('id'); ?>"><img src="./images/snap.png" /><p><?php print _('Deploy Snapins'); ?></p></a></td>
-									<td><p><?php print _('This option allows you to send all the snapins to host without imaging the computer.  (Requires FOG Service to be installed on client)'); ?></p></td>
-								</tr>		
-								<tr>
-									<td class="task-action"><a href="?node=host&sub=snapin-single&id=<?php print $Host->get('id'); ?>"><img src="./images/snap.png" /><p><?php print _('Deploy Single Snapin'); ?></p></a></td>
-									<td><p><?php print _('This option allows you to send a single snapin to a host.  (Requires FOG Service to be installed on client)'); ?></p></td>
-								</tr>			
-								<tr>
-									<td class="task-action"><a href="?node=host&sub=memtest&id=<?php print $Host->get('id'); ?>"><img src="./images/memtest.png" /><p><?php print _('Memtest86+'); ?></p></a></td>
-									<td><p><?php print _('Memtest86+ loads Memtest86+ on the client computer and will have it continue to run until stopped.  When you are done, you must remember to remove the PXE file, by clicking on "Active Tasks" and clicking on the "Kill Task" button.'); ?></p></td>
-								</tr>		
-								<tr>
-									<td class="task-action"><a href="?node=host&sub=wakeup&id=<?php print $Host->get('id'); ?>"><img src="./images/wake.png" /><p><?php print _('Wake Up'); ?></p></a></td>
-									<td><p><?php print _('Wake Up will attempt to send the Wake-On-LAN packet to the computer to turn the computer on.  In switched environments, you typically need to configure your hardware to allow for this (iphelper).'); ?></p></td>
-								</tr>			
-								<tr>
-									<td class="task-action"><a href="?node=host&sub=wipe-fast&id=<?php print $Host->get('id'); ?>"><img src="./images/veryfastwipe.png" /><p><?php print _('Fast Wipe'); ?></p></a></td>
-									<td><p><?php print _("Fast Wipe will boot the client computer and perform a quick and lazy disk wipe.  This method writes zero's to the start of the hard disk, destroying the MBR, but NOT overwritting everything on the disk."); ?></p></td>
-								</tr>					
-								<tr>
-									<td class="task-action"><a href="?node=host&sub=wipe-normal&id=<?php print $Host->get('id'); ?>"><img src="./images/quickwipe.png" /><p><?php print _('Normal Wipe'); ?></p></a></td>
-									<td><p><?php print _("Normal Wipe will boot the client computer and perform a simple disk wipe.  This method writes one pass of zero's to the hard disk."); ?></p></td>
-								</tr>				
-								<tr>
-									<td class="task-action"><a href="?node=host&sub=wipe-full&id=<?php print $Host->get('id'); ?>"><img src="./images/fullwipe.png" /><p><?php print _('Full Wipe'); ?></p></a></td>
-									<td><p><?php print _('Full Wipe will boot the client computer and perform a full disk wipe.  This method writes a few passes of random data to the hard disk.'); ?></p></td>
-								</tr>					
-								<tr>
-									<td class="task-action"><a href="?node=host&sub=surface-test&id=<?php print $Host->get('id'); ?>"><img src="./images/surfacetest.png" /><p><?php print _('Disk Surface Test'); ?></p></a></td>
-									<td><p><?php print _("Disk Surface Test checks the hard drive's surface sector by sector for any errors and reports back if errors are present."); ?></p></td>
-								</tr>							
-								<tr>
-									<td class="task-action"><a href="?node=host&sub=test-disk&id=<?php print $Host->get('id'); ?>"><img src="./images/testdisk.png" /><p><?php print _('Test Disk'); ?></p></a></td>
-									<td><p><?php print _('Test Disk loads the testdisk utility that can be used to check a hard disk and recover lost partitions.'); ?></p></td>
-								</tr>					
-								<tr>
-									<td class="task-action"><a href="?node=host&sub=recover&id=<?php print $Host->get('id'); ?>"><img src="./images/recover.png" /><p><?php print _('Recover'); ?></p></a></td>
-									<td><p><?php print _('Recover loads the photorec utility that can be used to recover lost files from a hard drisk.  When recovering files, make sure you save them to your NFS volume (ie: /images).'); ?></p></td>
-								</tr>								
-								<tr>
-									<td class="task-action"><a href="?node=host&sub=antivirus&id=<?php print $Host->get('id'); ?>"><img src="./images/clam.png" /><p><?php print _('Anti-Virus'); ?></p></a></td>
-									<td><p><?php print _('Anti-Virus loads Clam AV on the client boot image, updates the scanner and then scans the Windows partition.'); ?></p></td>
-								</tr>									
-								<tr>
-									<td class="task-action"><a href="?node=host&sub=inventory&id=<?php print $Host->get('id'); ?>"><img src="./images/inventory.png" /><p><?php print _('Hardware Inventory'); ?></p></a></td>
-									<td><p><?php print _('The hardware inventory task will boot the client computer and pull basic hardware informtation from it and report it back to the FOG server.'); ?></p></td>
-								</tr>									
-								<tr>
-									<td class="task-action"><a href="?node=host&sub=windows-password-reset&id=<?php print $Host->get('id'); ?>"><img src="./images/winpass.png" /><p><?php print _('Password Reset'); ?></p></a></td>
-									<td><p><?php print _('Password reset will blank out a Windows user password that may have been lost or forgotten.'); ?></p></td>
-								</tr>	
-							</table>
-						</div>
-					</form>
+						// Find TaskTypes
+						$TaskTypes = $this->FOGCore->getClass('TaskTypeManager')->find(array('access' => array('both', 'host'), 'isAdvanced' => '0'), 'AND', 'id');
+						
+						// Iterate -> Print
+						foreach ((array)$TaskTypes AS $TaskType)
+						{
+							printf('<tr>
+									<td class="task-action"><a href="?node=%s&sub=deploy&type=%s&%s=%s"><img src="./images/%s" /><p>%s</p></a></td>
+									<td><p>%s</p></td>
+								</tr>',
+									$this->node,
+									$TaskType->get('id'),
+									$this->id,
+									$Host->get('id'),
+									$TaskType->get('icon'),
+									_($TaskType->get('name')),
+									_($TaskType->get('description'))
+							);
+						}
+						
+						?>
+						<tr>
+							<td class="task-action"><a href="<?php print $this->formAction; ?>#host-tasks" class="advanced-tasks-link"><img src="./images/host-advanced.png" /><p><?php echo(_("Advanced")); ?></p></a></td>
+							<td><p><?php print _("View advanced tasks for this host."); ?></p></td>
+						</tr>
+					</table>
+					
+					<div id="advanced-tasks" class="hidden">
+						<h2><?php print _('Advanced Actions'); ?></h2>
+						<table cellpadding="0" cellspacing="0" border="0" width="100%">
+							<?php
+							
+							// Find TaskTypes
+							$TaskTypes = $this->FOGCore->getClass('TaskTypeManager')->find(array('access' => array('both', 'host'), 'isAdvanced' => '1'), 'AND', 'id');
+							
+							// Iterate -> Print
+							foreach ((array)$TaskTypes AS $TaskType)
+							{
+								printf('<tr>
+										<td class="task-action"><a href="?node=%s&sub=deploy&type=%s&%s=%s"><img src="./images/%s" /><p>%s</p></a></td>
+										<td><p>%s</p></td>
+									</tr>',
+										$this->node,
+										$TaskType->get('id'),
+										$this->id,
+										$Host->get('id'),
+										$TaskType->get('icon'),
+										_($TaskType->get('name')),
+										_($TaskType->get('description'))
+								);
+							}
+							
+							?>
+						</table>
+					</div>
 				</div>
 				
 				<!-- Active Directory -->
@@ -1389,9 +1358,10 @@ class HostManagementPage extends FOGPage
 	{
 		// Find
 		$Host = new Host($this->REQUEST['id']);
+		$TaskType = new TaskType(($this->REQUEST['type'] ? $this->REQUEST['type'] : '1'));
 		
 		// Title
-		$this->title = "Deploy Image to Host";
+		$this->title = sprintf('%s: %s', _('Deploy Task'), $TaskType->get('name'));
 		
 		// Deploy
 		?>
@@ -1402,7 +1372,7 @@ class HostManagementPage extends FOGPage
 					<h2><?php print _("Advanced Settings"); ?></h2>
 					<p><input type="checkbox" name="shutdown" id="shutdown" value="1" autocomplete="off"> <label for="shutdown"><?php print _("Schedule <u>Shutdown</u> after task completion"); ?></label></p>
 					<?php
-					if ($_GET['debug'] != 'true')
+					if (!preg_match('#mode=debug#i', $TaskType->get('kernelTemplate')))
 					{
 						?>
 						<p><input type="radio" name="scheduleType" id="scheduleInstant" value="instant" autocomplete="off" checked="checked" /> <label for="scheduleInstant"><?php print _("Schedule <u>Instant Deployment</u>"); ?></label></p>
@@ -1433,7 +1403,7 @@ class HostManagementPage extends FOGPage
 				</tbody>
 			</table>
 			
-			<p class="c"><input type="submit" value="<?php print _("Deploy to") . ' ' . $Host->get('name'); ?>" /></p>
+			<p class="c"><input type="submit" value="<?php print _('Deploy to') . ' ' . $Host->get('name'); ?>" /></p>
 		</form>
 		<?php
 	}
@@ -1450,6 +1420,8 @@ class HostManagementPage extends FOGPage
 		$enableShutdown = ($this->REQUEST['shutdown'] == 1 ? true : false);
 		$enableSnapins = ($this->REQUEST['deploySnapins'] == 'true' ? true : false);
 		$enableDebug = ($this->REQUEST['debug'] == 'true' ? true : false);
+		$scheduledDeployTime = strtotime($this->REQUEST['scheduleSingleTime']);
+		$taskTypeID = $this->REQUEST['type'];
 		
 		$taskName = '';
 		
@@ -1459,10 +1431,8 @@ class HostManagementPage extends FOGPage
 			if ($this->REQUEST['scheduleType'] == 'single')
 			{
 				// Scheduled Deployment
-				$scheduledDeployTime = strtotime($this->REQUEST['scheduleSingleTime']);
-				
 				// NOTE: Function will throw an exception if it fails
-				$Host->createSingleRunScheduledPackage('D', $taskName, $scheduledDeployTime, $enableShutdown, $enableSnapins);
+				$Host->createSingleRunScheduledPackage($taskTypeID, $taskName, $scheduledDeployTime, $enableShutdown, $enableSnapins);
 				
 				// Success
 				printf('<div class="task-start-ok"><p>%s</p><p>%s</p></div>', sprintf(_('Successfully created task for deployment of <u>%s</u> to <u>%s</u>'), $Host->getImage()->get('name'), $Host->get('name')), _('Scheduled to start at:') . ' ' . $this->REQUEST['scheduleSingleTime']);
@@ -1472,7 +1442,7 @@ class HostManagementPage extends FOGPage
 			{
 				// Cron Deployment
 				// NOTE: Function will throw an exception if it fails
-				$Host->createCronScheduledPackage('D', $taskName, $this->REQUEST['scheduleCronMin'], $this->REQUEST['scheduleCronHour'], $this->REQUEST['scheduleCronDOM'], $this->REQUEST['scheduleCronMonth'], $this->REQUEST['scheduleCronDOW'], $enableShutdown, $enableSnapins);
+				$Host->createCronScheduledPackage($taskTypeID, $taskName, $this->REQUEST['scheduleCronMin'], $this->REQUEST['scheduleCronHour'], $this->REQUEST['scheduleCronDOM'], $this->REQUEST['scheduleCronMonth'], $this->REQUEST['scheduleCronDOW'], $enableShutdown, $enableSnapins);
 				
 				// Success
 				printf('<div class="task-start-ok"><p>%s</p><p>%s</p></div>', sprintf(_('Successfully created task for deployment of <u>%s</u> to <u>%s</u>'), $Host->getImage()->get('name'), $Host->get('name')), _('Cron Schedule:') . ' ' . implode(' ', array($this->REQUEST['scheduleCronMin'], $this->REQUEST['scheduleCronHour'], $this->REQUEST['scheduleCronDOM'], $this->REQUEST['scheduleCronMonth'], $this->REQUEST['scheduleCronDOW'])));
@@ -1481,7 +1451,7 @@ class HostManagementPage extends FOGPage
 			{
 				// Instant Deployment
 				// NOTE: Function will throw an exception if it fails
-				$Host->createImagePackage('D', $taskName, $enableShutdown, $enableDebug, $enableSnapins);
+				$Host->createImagePackage($taskTypeID, $taskName, $enableShutdown, $enableDebug, $enableSnapins);
 				
 				// Success
 				printf('<div class="task-start-ok"><p>%s</p></div>', sprintf(_('Successfully created task for deployment of <u>%s</u> to <u>%s</u>'), $Host->getImage()->get('name'), $Host->get('name')));
@@ -1491,114 +1461,6 @@ class HostManagementPage extends FOGPage
 		{
 			// Failure
 			printf('<div class="task-start-failed"><p>%s</p><p>%s</p></div>', _('Failed to create deploy task'), $e->getMessage());
-		}
-	}
-	
-	public function upload()
-	{
-		// Find
-		$Host = new Host($this->REQUEST['id']);
-		
-		// Title
-		$this->title = "Upload Image from Host";
-		
-		// Deploy
-		?>
-		<p class="c"><b><?php print _("Are you sure you wish to deploy these machines?"); ?></b></p>
-		<form method="POST" action="<?php print $this->formAction; ?>" id="deploy-container">
-			<div class="confirm-message">
-				<div class="advanced-settings">
-					<h2><?php print _("Advanced Settings"); ?></h2>
-					<p><input type="checkbox" name="shutdown" id="shutdown" value="1" autocomplete="off"> <label for="shutdown"><?php print _("Schedule <u>Shutdown</u> after task completion"); ?></label></p>
-					<?php
-					if ($_GET['debug'] != 'true')
-					{
-						?>
-						<p><input type="radio" name="scheduleType" id="scheduleInstant" value="instant" autocomplete="off" checked="checked" /> <label for="scheduleInstant"><?php print _("Schedule <u>Instant Deployment</u>"); ?></label></p>
-						<p><input type="radio" name="scheduleType" id="scheduleSingle" value="single" autocomplete="off" /> <label for="scheduleSingle"><?php print _("Schedule <u>Delayed Deployment</u>"); ?></label></p>
-						<p class="hidden" id="singleOptions"><input type="text" name="scheduleSingleTime" id="scheduleSingleTime" autocomplete="off" /></p>
-						<p><input type="radio" name="scheduleType" id="scheduleCron" value="cron" autocomplete="off"> <label for="scheduleCron"><?php print _("Schedule <u>Cron-style Deployment</u>"); ?></label></p>
-						<p class="hidden" id="cronOptions">
-							<input type="text" name="scheduleCronMin" id="scheduleCronMin" placeholder="min" autocomplete="off" />
-							<input type="text" name="scheduleCronHour" id="scheduleCronHour" placeholder="hour" autocomplete="off" />
-							<input type="text" name="scheduleCronDOM" id="scheduleCronDOM" placeholder="dom" autocomplete="off" />
-							<input type="text" name="scheduleCronMonth" id="scheduleCronMonth" placeholder="month" autocomplete="off" />
-							<input type="text" name="scheduleCronDOW" id="scheduleCronDOW" placeholder="dow" autocomplete="off" />
-						</p>
-						<?php
-					}
-					?>
-				</div>
-			</div>
-			
-			<h2><?php print _('Hosts in Task'); ?></h2>
-			<table width="100%" cellspacing="0" cellpadding="0" border="0">
-				<tbody>
-					<tr>
-						<td><?php print $Host->get('name'); ?></td>
-						<td><?php print $Host->get('mac') . ($Host->get('ip') ? sprintf('(%s)', $Host->get('ip')) : ''); ?></td>
-						<td><?php print $Host->getImage()->get('name'); ?></td>
-					</tr>
-				</tbody>
-			</table>
-			
-			<p class="c"><input type="submit" value="<?php print _("Upload from") . ' ' . $Host->get('name'); ?>" /></p>
-		</form>
-		<?php
-	}
-	
-	public function upload_post()
-	{
-		// Find
-		$Host = new Host($this->REQUEST['id']);
-		
-		// Title
-		$this->title = "Upload Image from Host";
-		
-		// Variables
-		$enableShutdown = ($this->REQUEST['shutdown'] == 1 ? true : false);
-		$enableSnapins = ($this->REQUEST['deploySnapins'] == 'true' ? true : false);
-		$enableDebug = ($this->REQUEST['debug'] == 'true' ? true : false);
-		
-		$taskName = '';
-		
-		// Deploy
-		try
-		{
-			if ($this->REQUEST['scheduleType'] == 'single')
-			{
-				// Scheduled Deployment
-				$scheduledDeployTime = strtotime($this->request['scheduleSingleTime']);
-				// NOTE: Function will throw an exception if it fails
-				$Host->createSingleRunScheduledPackage('U', $taskName, $scheduledDeployTime, $enableShutdown, $enableSnapins);
-				
-				// Success
-				printf('<div class="task-start-ok"><p>%s</p><p>%s</p></div>', sprintf(_('Successfully created task for upload of <u>%s</u> to <u>%s</u>'), $Host->get('name'), $Host->getImage()->get('name')), _('Scheduled to start at:') . ' ' . $this->request['scheduleSingleTime']);
-			
-			}
-			else if ($this->REQUEST['scheduleType'] == 'cron')
-			{
-				// Cron Deployment
-				// NOTE: Function will throw an exception if it fails
-				$Host->createCronScheduledPackage('U', $taskName, $this->REQUEST['scheduleCronMin'], $this->REQUEST['scheduleCronHour'], $this->REQUEST['scheduleCronDOM'], $this->REQUEST['scheduleCronMonth'], $this->REQUEST['scheduleCronDOW'], $enableShutdown, $enableSnapins);
-				
-				// Success
-				printf('<div class="task-start-ok"><p>%s</p><p>%s</p></div>', sprintf(_('Successfully created task for upload of <u>%s</u> to <u>%s</u>'), $Host->get('name'), $Host->getImage()->get('name')), _('Cron Schedule:') . ' ' . implode(' ', array($this->REQUEST['scheduleCronMin'], $this->REQUEST['scheduleCronHour'], $this->REQUEST['scheduleCronDOM'], $this->REQUEST['scheduleCronMonth'], $this->REQUEST['scheduleCronDOW'])));
-			}
-			else
-			{
-				// Instant Deployment
-				// NOTE: Function will throw an exception if it fails
-				$Host->createImagePackage('U', $taskName, $enableShutdown, $enableDebug, $enableSnapins);
-				
-				// Success
-				printf('<div class="task-start-ok"><p>%s</p></div>', sprintf(_('Successfully created task for upload of <u>%s</u> to <u>%s</u>'), $Host->get('name'), $Host->getImage()->get('name')));
-			}
-		}
-		catch (Exception $e)
-		{
-			// Failure
-			printf('<div class="task-start-failed"><p>%s</p><p>%s</p></div>', _('Failed to create upload task'), $e->getMessage());
 		}
 	}
 }

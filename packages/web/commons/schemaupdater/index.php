@@ -61,8 +61,9 @@ $installPath[25] = array( 195, 196, 197, 198 );
 $installPath[26] = array( 199, 200, 201, 202, 203, 204, 205, 206, 207, 208, 209, 210, 211, 212, 213 );
 $installPath[27] = array( 214, 215, 216 );
 $installPath[28] = array( 217, 218 );
-$installPath[29] = array( 219, 220, 221, 222, 223, 224, 225 );
-$installPath[30] = array( 226, 227 );
+$installPath[29] = array( 219, 220, 221, 222, 223, 224, 225, 226, 227, 228, 229 );
+$installPath[30] = array( 230, 231 );
+$installPath[31] = array( 232, 233, 234, 235, 236, 237, 238, 239, 240, 241, 242, 243, 244, 245, 246, 247, 248, 249, 250, 251, 252, 253, 254, 255, 256, 257, 258, 259, 260, 261, 262, 263, 264, 265, 266, 267 );
 
 $dbSchema[0] = "CREATE DATABASE " . DATABASE_NAME ;
 
@@ -1097,17 +1098,101 @@ $dbSchema[218] = "UPDATE `" . DATABASE_NAME . "`.`schemaVersion` set vValue = '2
 // Add default data for `imageTypeValue`
 // Update 'imageDD' (imageType) values to 'imageDD'+1 for new imageType IDs
 $dbSchema[219] = "ALTER TABLE `" . DATABASE_NAME . "`.`imageTypes` ADD `imageTypeValue` VARCHAR( 10 ) NOT NULL";
-$dbSchema[220] = "UPDATE `" . DATABASE_NAME . "`.`imageTypes` SET `imageTypeValue` = 'n' WHERE `imageTypes`.`imageTypeID` =1";
-$dbSchema[221] = "UPDATE `" . DATABASE_NAME . "`.`imageTypes` SET `imageTypeValue` = 'mps' WHERE `imageTypes`.`imageTypeID` =2";
-$dbSchema[222] = "UPDATE `" . DATABASE_NAME . "`.`imageTypes` SET `imageTypeValue` = 'mpa' WHERE `imageTypes`.`imageTypeID` =3";
-$dbSchema[223] = "UPDATE `" . DATABASE_NAME . "`.`imageTypes` SET `imageTypeValue` = 'dd' WHERE `imageTypes`.`imageTypeID` =4";
-$dbSchema[224] = "UPDATE `" . DATABASE_NAME . "`.`images` SET `imageDD` = `imageDD` + 1";	// If this is ran more than one there will be problems :\
-$dbSchema[225] = "UPDATE `" . DATABASE_NAME . "`.`schemaVersion` set vValue = '30'";
+$dbSchema[220] = "UPDATE `" . DATABASE_NAME . "`.`imageTypes` SET `imageTypeValue` = 'n' WHERE `imageTypes`.`imageTypeID` = 1";
+$dbSchema[221] = "UPDATE `" . DATABASE_NAME . "`.`imageTypes` SET `imageTypeValue` = 'mps' WHERE `imageTypes`.`imageTypeID` = 2";
+$dbSchema[222] = "UPDATE `" . DATABASE_NAME . "`.`imageTypes` SET `imageTypeValue` = 'mpa' WHERE `imageTypes`.`imageTypeID` = 3";
+$dbSchema[223] = "UPDATE `" . DATABASE_NAME . "`.`imageTypes` SET `imageTypeValue` = 'dd' WHERE `imageTypes`.`imageTypeID` = 4";
+$dbSchema[224] = "UPDATE `" . DATABASE_NAME . "`.`images` SET `imageDD` = '4' WHERE `imageDD` = '3'";
+$dbSchema[225] = "UPDATE `" . DATABASE_NAME . "`.`images` SET `imageDD` = '3' WHERE `imageDD` = '2'";
+$dbSchema[226] = "UPDATE `" . DATABASE_NAME . "`.`images` SET `imageDD` = '2' WHERE `imageDD` = '1'";
+$dbSchema[227] = "UPDATE `" . DATABASE_NAME . "`.`images` SET `imageDD` = '1' WHERE `imageDD` = '0'";
+$dbSchema[228] = "ALTER TABLE `" . DATABASE_NAME . "`.`images` CHANGE `imageDD` `imageTypeID` MEDIUMINT NOT NULL";
+$dbSchema[229] = "UPDATE `" . DATABASE_NAME . "`.`schemaVersion` set vValue = '30'";
 
 // 31 - Blackout - 10:56 AM 28/12/2011
 // scheduledTasks.stIsGroup now has a default of 0
-$dbSchema[226] = "ALTER TABLE `" . DATABASE_NAME . "`.`scheduledTasks` CHANGE `stIsGroup` `stIsGroup` VARCHAR( 2 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL DEFAULT '0'";
-$dbSchema[227] = "UPDATE `" . DATABASE_NAME . "`.`schemaVersion` set vValue = '31'";
+$dbSchema[230] = "ALTER TABLE `" . DATABASE_NAME . "`.`scheduledTasks` CHANGE `stIsGroup` `stIsGroup` VARCHAR( 2 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL DEFAULT '0'";
+$dbSchema[231] = "UPDATE `" . DATABASE_NAME . "`.`schemaVersion` set vValue = '31'";
+
+// 32 - Blackout - 11:26 AM 8/01/2012
+// Add 'taskStates' table and data
+// Update taskType values -> rename taskType to taskTypeID
+// Add 'taskTypes' table and data
+$dbSchema[232] = "CREATE TABLE IF NOT EXISTS `" . DATABASE_NAME . "`.`taskStates` (
+  `tsID` int(11) NOT NULL,
+  `tsName` int(11) NOT NULL,
+  `tsDescription` text NOT NULL,
+  `tsOrder` tinyint(4) NOT NULL DEFAULT '0'
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;";
+$dbSchema[233] = "INSERT INTO `" . DATABASE_NAME . "`.`taskStates` (`tsID`, `tsName`, `tsDescription`) VALUES
+(1, 'Queued', 'Task has been created and FOG is waiting for the Host to check-in.'),
+(2, 'In-Progress', 'Host is currently Imaging.'),
+(3, 'Complete', 'Imaging has been completed.');";
+$dbSchema[234] = "ALTER TABLE `" . DATABASE_NAME . "`.`tasks` CHANGE `taskState` `taskStateID` INT( 11 ) NOT NULL";
+$dbSchema[235] = "UPDATE `" . DATABASE_NAME . "`.`tasks` SET `taskType` = '1' WHERE `taskType`='d'";
+$dbSchema[236] = "UPDATE `" . DATABASE_NAME . "`.`tasks` SET `taskType` = '2' WHERE `taskType`='u'";
+$dbSchema[237] = "UPDATE `" . DATABASE_NAME . "`.`tasks` SET `taskType` = '3' WHERE `taskType`='x'";
+$dbSchema[238] = "UPDATE `" . DATABASE_NAME . "`.`tasks` SET `taskType` = '4' WHERE `taskType`='w'";
+$dbSchema[239] = "UPDATE `" . DATABASE_NAME . "`.`tasks` SET `taskType` = '5' WHERE `taskType`='m'";
+$dbSchema[240] = "UPDATE `" . DATABASE_NAME . "`.`tasks` SET `taskType` = '6' WHERE `taskType`='t'";
+$dbSchema[241] = "UPDATE `" . DATABASE_NAME . "`.`tasks` SET `taskType` = '7' WHERE `taskType`='r'";
+$dbSchema[242] = "UPDATE `" . DATABASE_NAME . "`.`tasks` SET `taskType` = '8' WHERE `taskType`='c'";
+$dbSchema[243] = "UPDATE `" . DATABASE_NAME . "`.`tasks` SET `taskType` = '9' WHERE `taskType`='v'";
+$dbSchema[244] = "UPDATE `" . DATABASE_NAME . "`.`tasks` SET `taskType` = '10' WHERE `taskType`='i'";
+$dbSchema[245] = "UPDATE `" . DATABASE_NAME . "`.`tasks` SET `taskType` = '11' WHERE `taskType`='j'";
+$dbSchema[246] = "UPDATE `" . DATABASE_NAME . "`.`tasks` SET `taskType` = '12' WHERE `taskType`='s'";
+$dbSchema[247] = "UPDATE `" . DATABASE_NAME . "`.`tasks` SET `taskType` = '13' WHERE `taskType`='l'";
+$dbSchema[248] = "UPDATE `" . DATABASE_NAME . "`.`tasks` SET `taskType` = '14' WHERE `taskType`='o'";
+$dbSchema[249] = "ALTER TABLE `" . DATABASE_NAME . "`.`tasks` CHANGE `taskType` `taskTypeID` MEDIUMINT NOT NULL ";
+$dbSchema[250] = "CREATE TABLE IF NOT EXISTS `" . DATABASE_NAME . "`.`taskTypes` (
+  `ttID` mediumint(9) NOT NULL AUTO_INCREMENT,
+  `ttName` varchar(30) NOT NULL,
+  `ttDescription` text NOT NULL,
+  `ttIcon` varchar(30) NOT NULL,
+  `ttKernelTemplate` text NOT NULL,
+  `ttType` enum('fog','user') NOT NULL DEFAULT 'user',
+  `ttIsAdvanced` enum('0','1') NOT NULL DEFAULT '0',
+  `ttIsAccess` enum('both','host','group') NOT NULL DEFAULT 'both',
+  PRIMARY KEY (`ttID`)
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=20 ;";
+$dbSchema[251] = "INSERT INTO `" . DATABASE_NAME . "`.`taskTypes` (`ttID`, `ttName`, `ttDescription`, `ttIcon`, `ttKernelTemplate`, `ttType`, `ttIsAdvanced`, `ttIsAccess`) VALUES
+(1, 'Download', 'Deploy action will send an image saved on the FOG server to the client computer with all included snapins.', 'senddebug.png', 'type=down', 'fog', '0', 'both'),
+(2, 'Upload', 'Upload will pull an image from a client computer that will be saved on the server.', 'restoredebug.png', 'type=up', 'fog', '0', 'host'),
+(3, 'Debug', 'Debug mode will load the boot image and load a prompt so you can run any commands you wish. When you are done, you must remember to remove the PXE file, by clicking on \"Active Tasks\" and clicking on the \"Kill Task\" button.', 'debug.png', 'type=down mode=debug', 'fog', '1', 'host'),
+(5, 'Memtest86+', 'Memtest86+ loads Memtest86+ on the client computer and will have it continue to run until stopped. When you are done, you must remember to remove the PXE file, by clicking on \"Active Tasks\" and clicking on the \"Kill Task\" button.', 'memtest.png', '', 'fog', '1', 'both'),
+(6, 'Disk Surface Test', 'Disk Surface Test checks the hard drive''s surface sector by sector for any errors and reports back if errors are present.', 'surfacetest.png', '', 'fog', '1', 'both'),
+(7, 'Recover', 'Recover loads the photorec utility that can be used to recover lost files from a hard drisk. When recovering files, make sure you save them to your NFS volume (ie: /images).', 'recover.png', '', 'fog', '1', 'both'),
+(8, 'Multi-Cast', 'Deploy action will send an image saved on the FOG server to the client computer with all included snapins.', 'senddebug.png', '', 'fog', '0', 'group'),
+(9, 'Virus Scan', 'Anti-Virus loads Clam AV on the client boot image, updates the scanner and then scans the Windows partition.', 'clam.png', '', 'fog', '1', 'both'),
+(10, 'Hardware Inventory', 'The hardware inventory task will boot the client computer and pull basic hardware informtation from it and report it back to the FOG server.', 'inventory.png', '', 'fog', '1', 'both'),
+(11, 'Password Reset', 'Password reset will blank out a Windows user password that may have been lost or forgotten.', 'winpass.png', '', 'fog', '1', 'both'),
+(12, 'All Snapins', 'This option allows you to send all the snapins to host without imaging the computer. (Requires FOG Service to be installed on client)', 'snap.png', '', 'fog', '1', 'both'),
+(13, 'Single Snapin', 'This option allows you to send a single snapin to a host. (Requires FOG Service to be installed on client)', 'snap.png', '', 'fog', '1', 'both'),
+(14, 'Wake-Up', 'Wake Up will attempt to send the Wake-On-LAN packet to the computer to turn the computer on. In switched environments, you typically need to configure your hardware to allow for this (iphelper).', 'wake.png', '', 'fog', '1', 'both'),
+(15, 'Download - Debug', 'Download - Debug mode allows FOG to setup the environment to allow you send a specific image to a computer, but instead of sending the image, FOG will leave you at a prompt right before sending. If you actually wish to send the image all you need to do is type \"fog\" and hit enter.', 'senddebug.png', 'type=down mode=debug', 'fog', '1', 'host'),
+(16, 'Upload - Debug', 'mode allows FOG to setup the environment to allow you Upload a specific image to a computer, but instead of Upload the image, FOG will leave you at a prompt right before restoring. If you actually wish to Upload the image all you need to do is type \"fog\" and hit enter.', 'restoredebug.png', 'type=up mode=debug', 'fog', '1', 'host'),
+(17, 'Download without Snapins', 'Deploy without snapins allows FOG to image the workstation, but after the task is complete any snapins linked to the host or group will NOT be sent.', 'sendnosnapin.png', '', 'fog', '1', 'both'),
+(18, 'Fast Wipe', 'Full Wipe will boot the client computer and perform a full disk wipe. This method writes a few passes of random data to the hard disk.', 'veryfastwipe.png', '', 'fog', '1', 'both'),
+(19, 'Normal Wipe', 'Normal Wipe will boot the client computer and perform a simple disk wipe. This method writes one pass of zero''s to the hard disk.', 'quickwipe.png', '', 'fog', '1', 'both'),
+(20, 'Full Wipe', 'Full Wipe will boot the client computer and perform a full disk wipe. This method writes a few passes of random data to the hard disk.', 'fullwipe.png', '', 'fog', '1', 'both');";
+$dbSchema[252] = "UPDATE `" . DATABASE_NAME . "`.`scheduledtasks` SET `taskType` = '1' WHERE `taskType`='d'";
+$dbSchema[253] = "UPDATE `" . DATABASE_NAME . "`.`scheduledtasks` SET `taskType` = '2' WHERE `taskType`='u'";
+$dbSchema[254] = "UPDATE `" . DATABASE_NAME . "`.`scheduledtasks` SET `taskType` = '3' WHERE `taskType`='x'";
+$dbSchema[255] = "UPDATE `" . DATABASE_NAME . "`.`scheduledtasks` SET `taskType` = '4' WHERE `taskType`='w'";
+$dbSchema[256] = "UPDATE `" . DATABASE_NAME . "`.`scheduledtasks` SET `taskType` = '5' WHERE `taskType`='m'";
+$dbSchema[257] = "UPDATE `" . DATABASE_NAME . "`.`scheduledtasks` SET `taskType` = '6' WHERE `taskType`='t'";
+$dbSchema[258] = "UPDATE `" . DATABASE_NAME . "`.`scheduledtasks` SET `taskType` = '7' WHERE `taskType`='r'";
+$dbSchema[259] = "UPDATE `" . DATABASE_NAME . "`.`scheduledtasks` SET `taskType` = '8' WHERE `taskType`='c'";
+$dbSchema[260] = "UPDATE `" . DATABASE_NAME . "`.`scheduledtasks` SET `taskType` = '9' WHERE `taskType`='v'";
+$dbSchema[261] = "UPDATE `" . DATABASE_NAME . "`.`scheduledtasks` SET `taskType` = '10' WHERE `taskType`='i'";
+$dbSchema[262] = "UPDATE `" . DATABASE_NAME . "`.`scheduledtasks` SET `taskType` = '11' WHERE `taskType`='j'";
+$dbSchema[263] = "UPDATE `" . DATABASE_NAME . "`.`scheduledtasks` SET `taskType` = '12' WHERE `taskType`='s'";
+$dbSchema[264] = "UPDATE `" . DATABASE_NAME . "`.`scheduledtasks` SET `taskType` = '13' WHERE `taskType`='l'";
+$dbSchema[265] = "UPDATE `" . DATABASE_NAME . "`.`scheduledtasks` SET `taskType` = '14' WHERE `taskType`='o'";
+$dbSchema[266] = "ALTER TABLE `" . DATABASE_NAME . "`.`scheduledtasks` CHANGE `stTaskType` `stTaskTypeID` MEDIUMINT NOT NULL ";
+$dbSchema[267] = "UPDATE `" . DATABASE_NAME . "`.`schemaVersion` set vValue = '32'";
+
+
 
 
 ?>
@@ -1148,12 +1233,7 @@ $dbSchema[227] = "UPDATE `" . DATABASE_NAME . "`.`schemaVersion` set vValue = '3
 					if ($DatabaseManager && $DB)
 					{
 						$currentSchema = $DatabaseManager->getVersion();
-						
-						// chuck syperski - Jan 4, 2012
-						// new installs break becase $currentSchema is false so $currentSchema++ doesn't work
-						if ( $currentSchema === FALSE )
-							$currentSchema = 0;
-							
+
 						if ( $FOG_SCHEMA != $currentSchema )
 						{
 							// chuck syperski - Jan 4, 2012

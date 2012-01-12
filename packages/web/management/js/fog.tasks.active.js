@@ -49,7 +49,7 @@ function ActiveTasksUpdate()
 	
 	ActiveTasksAJAX = $.ajax({
 		'type':		'GET',
-		'url':		'ajax/tasks.active.php',
+		'url':		'?node=tasks',
 		'cache':	false,
 		'dataType':	'json',
 		'beforeSend':	function()

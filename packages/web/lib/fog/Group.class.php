@@ -113,6 +113,16 @@ class Group extends FOGController
 		return $this;
 	}
 	
+	function doMembersHaveUniformImages()
+	{
+		foreach ($this->getHosts() AS $Host)
+		{
+			$images[$Host->get('imageID')] = $Host->get('imageID');
+		}
+		
+		return (count($images) == 1 ? true : false);
+	}
+	
 	// LEGACY
 	function getID()
 	{
@@ -142,65 +152,5 @@ class Group extends FOGController
 	function setDescription($description)
 	{
 		return $this->set('description', $description);
-	}
-	
-	function doMembersHaveUniformImages()
-	{
-		$members = $this->getHosts();	
-		if ( $members != null && count( $members ) > 0 )
-		{
-			$imgid = -99999999;
-			for ( $i = 0; $i < count( $members ); $i++ )
-			{
-				$member = $members[$i];
-				if ( $member != null )
-				{
-					$image = $member->getImage();
-					if ( $image != null )
-					{
-						if ( $i == 0 )
-						{
-							$imgid = $image->get('id');
-							if ( $imgid < 0 ) return false;
-							if ( ! is_numeric($imgid ) ) return false;
-						}
-						else 
-						{
-							if ( $imgid != $image->get('id') )
-								return false;
-						}
-					}
-					else
-						return false;
-				}
-			}
-			return true;
-		}
-		return false;
-	}
-	
-	function doMembersHaveUniformOS()
-	{
-		$members = $this->getHosts();
-		if ( $members != null && count( $members ) > 0 )
-		{
-			$osid = -99999999;
-			for ( $i = 0; $i < count( $members ); $i++ )
-			{
-				$member = $members[$i];
-				if ( $member != null )
-				{
-					if ( $i == 0 )
-						$osid = $member->getOSID();
-					else 
-					{
-						if ( $osid != $member->getOSID() )
-							return false;
-					}
-				}
-			}
-			return true;
-		}
-		return false;
 	}
 }

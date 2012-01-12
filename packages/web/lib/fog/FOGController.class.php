@@ -63,7 +63,7 @@ abstract class FOGController extends FOGBase
 				// Iterate data -> Set data
 				foreach ($data AS $key => $value)
 				{
-					$this->set($key, $value);
+					$this->set($this->key($key), $value);
 				}
 			}
 			// If incoming data is an INT -> Set as ID -> Load from database
@@ -204,7 +204,6 @@ abstract class FOGController extends FOGBase
 			// Variables
 			$fieldData = array();
 			$fieldsToUpdate = $this->databaseFields;
-			$fieldToName = array_flip($this->databaseFields);
 			
 			// Remove unwanted fields for update query
 			foreach ($this->databaseFields AS $name => $fieldName)
@@ -281,9 +280,6 @@ abstract class FOGController extends FOGBase
 				throw new Exception(sprintf('Operation field not set: %s', strtoupper($field)));
 			}
 			
-			// Variables
-			$fieldToName = array_flip($this->databaseFields);
-			
 			// Build query
 			if (is_array($this->get($field)))
 			{
@@ -317,7 +313,7 @@ abstract class FOGController extends FOGBase
 			// Loop returned rows -> Set new data
 			foreach ($queryData AS $key => $value)
 			{
-				$this->set($fieldToName[$key], (string)$value);
+				$this->set($this->key($key), (string)$value);
 			}
 			
 			// Success
@@ -346,9 +342,6 @@ abstract class FOGController extends FOGBase
 			{
 				throw new Exception(sprintf('Operation field not set: %s', strtoupper($field)));
 			}
-			
-			// Variables
-			$fieldToName = array_flip($this->databaseFields);
 			
 			// Query row data
 			$query = sprintf("DELETE FROM `%s` WHERE `%s`='%s'",

@@ -18,30 +18,41 @@
  *
  *
  */
- 
-class Date
-{
-	private $lngTS;
 
+// Blackout - 11:05 AM 8/01/2012
+class Date extends FOGBase
+{
+	private $time;
+
+	// Overrides
 	function __construct( $longUnixTime ) 
 	{
-		$this->lngTS = $longUnixTime;
+		// FOGBase Constructor
+		parent::__construct();
+		
+		// Set time
+		$this->time = $longUnixTime;
 	}
-
-	public function getLong()
-	{
-		return $this->lngTS;
-	}
-	
-	function toString( $format="M j, y" )
-	{
-		return date($format, $this->lngTS );
-	}
-	
+		
 	function __toString()
 	{
-		return $this->toString();
+		return (string)$this->toFormatted();
+	}
+	
+	// Custom
+	function toTimestamp()
+	{
+		return $this->time;
+	}
+	
+	function toFormatted()
+	{
+		return (string)$this->FOGCore->formatTime($this->time);
+	}
+
+	// LEGACY
+	public function getLong()
+	{
+		return $this->time;
 	}
 }
- 
-?>

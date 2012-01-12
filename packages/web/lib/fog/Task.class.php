@@ -12,12 +12,12 @@ class Task extends FOGController
 		'name'			=> 'taskName',
 		'checkInTime'		=> 'taskCheckIn',
 		'hostID'		=> 'taskHostID',
-		'state'			=> 'taskState',
+		'stateID'		=> 'taskStateID',
 		'createdTime'		=> 'taskCreateTime',
 		'createdBy'		=> 'taskCreateBy',
 		'isForced'		=> 'taskForce',
 		'scheduledStartTime'	=> 'taskScheduledStartTime',
-		'type'			=> 'taskType',
+		'typeID'		=> 'taskTypeID',
 		'pct'			=> 'taskPCT',
 		'bpm'			=> 'taskBPM',
 		'timeElapsed'		=> 'taskTimeElapsed',
@@ -34,7 +34,7 @@ class Task extends FOGController
 	// Required database fields
 	public $databaseFieldsRequired = array(
 		'id',
-		'type',
+		'typeID',
 		'hostID',
 		'NFSGroupID',
 		'NFSMemberID'
@@ -58,18 +58,16 @@ class Task extends FOGController
 	
 	public function getImage()
 	{
-		$Host = new Host($this->get('hostID'));
-		
-		return $Host->getImage();
+		return $this->getHost()->getImage();
 	}
 	
 	// Overrides
 	public function destroy()
 	{
 		// FTP: Create FTP object
-		$ftp = new FTP(array(	'host'		=> $this->FOGCore->getSetting('FOG_TFTP_HOST'),
-					'username'	=> $this->FOGCore->getSetting('FOG_TFTP_FTP_USERNAME'),
-					'password' 	=> $this->FOGCore->getSetting('FOG_TFTP_FTP_PASSWORD')
+		$ftp = new FOGFTP(array(	'host'		=> $this->FOGCore->getSetting('FOG_TFTP_HOST'),
+						'username'	=> $this->FOGCore->getSetting('FOG_TFTP_FTP_USERNAME'),
+						'password' 	=> $this->FOGCore->getSetting('FOG_TFTP_FTP_PASSWORD')
 				));
 		// FTP: Connect -> Upload new PXE file -> Disconnect
 		$ftp->connect()->delete(rtrim($this->FOGCore->getSetting('FOG_TFTP_PXE_CONFIG_DIR'), '/') . '/' . $this->getHost()->getMACAddress()->getMACPXEPrefix())->close();
@@ -81,34 +79,27 @@ class Task extends FOGController
 		// FOGController destroy
 		return parent::destroy();
 	}
-	
-	public function isValid()
-	{
-		$Host = $this->getHost();
-		$mac = $Host->get('mac');
-		
-		return ($Host->isValid() && $mac->isValid());
-	}
-	
-	// Legacy
-	const UPLOAD = 'u';
-	const DOWNLOAD = 'd';
-	const WIPE = 'w';
-	const DEBUG = 'x';
-	const MEMTEST = 'm';
-	const TESTDISK = 't';
-	const PHOTOREC = 'r';
-	const MULTICAST = 'c';
-	const VIRUS_SCAN = 'v';
-	const INVENTORY = 'i';
-	const PASSWORD_RESET = 'j';
-	const ALL_SNAPINS = 's';
-	const SINGLE_SNAPIN = 'l';
-	const WAKEUP = 'o';
 
-	const STATE_QUEUED = 0;
-	const STATE_INPROGRESS = 1;
-	const STATE_COMPLETE = 2;
+	// Task State ID Constants - required for now
+	const STATE_QUEUED = 1;
+	const STATE_INPROGRESS = 2;
+	const STATE_COMPLETE = 3;
+	
+	// Task Type ID Constants - required for now
+	const TYPE_DOWNLOAD = 1;		// Old: d
+	const TYPE_UPLOAD = 2;			// Old: u
+	const TYPE_DEBUG = 3;			// Old: x
+	const TYPE_WIPE = 4;			// Old: w
+	const TYPE_MEMTEST = 5;			// Old: m
+	const TYPE_TESTDISK = 6;		// Old: t
+	const TYPE_PHOTOREC = 7;		// Old: r
+	const TYPE_MULTICAST = 8;		// Old: c
+	const TYPE_VIRUS_SCAN = 9;		// Old: v
+	const TYPE_INVENTORY = 10;		// Old: i
+	const TYPE_PASSWORD_RESET = 11;		// Old: j
+	const TYPE_ALL_SNAPINS = 12;		// Old: s
+	const TYPE_SINGLE_SNAPIN = 13;		// Old: l
+	const TYPE_WAKEUP = 14;			// Old: o
 	
 	// Legacy: From ImageMember.class.php
 	public function  getNFSRoot() 	{ return $this->getStorageNode()->get('path'); }
@@ -134,8 +125,8 @@ class Task extends FOGController
 	public function setId($id)				{ return $this->set('id', $id);	}
 	public function getHostId()				{ return $this->get('hostID');	}
 	public function setHostId($hostId)			{ return $this->set('hostID', $id);	}
-	public function getState()				{ return $this->get('state');	}
-	public function setState($state)			{ return $this->set('state', $state);	}
+	public function getState()				{ return $this->get('stateID');	}
+	public function setState($state)			{ return $this->set('stateID', $state);	}
 	public function getNfsGroupId()			{ return $this->get('NFSGroupID');	}
 	public function setNfsGroupId($nfsGroupId)		{ return $this->set('NFSGroupID', $nfsGroupId);	}
 	public function getNfsMemberId()			{ return $this->get('NFSMemberID');	}
@@ -146,8 +137,8 @@ class Task extends FOGController
 	public function setNfsLastMemberId($nfsLastMemberId)	{ return $this->set('NFSLastMemberID', $nfsLastMemberId);	}
 	public function getName()				{ return $this->get('name');	}
 	public function setName($name)			{ return $this->set('name', $name);	}
-	public function setTaskType($taskType)		{ return $this->set('type', $taskType);	}
-	public function getCreateTime()			{ return new Date(strtotime($this->get('createdTime')));	}
+	public function setTaskType($taskType)		{ return $this->set('typeID', $taskType);	}
+	public function getCreateTime()			{ return new Date($this->get('createdTime'));	}
 	public function setCreateTime($createTime)		{ return $this->set('createdTime', $createTime);	}
 	public function getCheckinTime()			{ return $this->get('checkInTime');	}
 	public function setCheckinTime($checkinTime)		{ return $this->set('checkInTime', $checkinTime);	}
@@ -200,63 +191,21 @@ class Task extends FOGController
 	
 	public function getTaskType()
 	{
-		if ($this->get('type'))
-		{
-			return strtolower($this->get('type'));
-		}
-		
-		return $this->get('type');
+		return new TaskType($this->get('typeID'));
 	}
 	
-	public function getStateText()
+	public function getTaskTypeText()
 	{
-		switch ($this->get('state'))
-		{
-			case Task::STATE_QUEUED:
-				return 'Queued';
-			case Task::STATE_INPROGRESS:
-				return 'In progress';
-			case Task::STATE_COMPLETE:
-				return 'Complete';
-			default:
-				return 'unknown';
-		}
+		return (string)($this->getTaskType()->get('name') ? $this->getTaskType()->get('name') : _('Unknown'));
 	}
 	
-	public function getTaskTypeString()
+	public function getTaskState()
 	{
-		switch (strtolower($this->get('type')))
-		{
-			case Task::UPLOAD;
-				return 'Upload';
-			case Task::DOWNLOAD;
-				return 'Download';
-			case Task::WIPE;
-				return 'Wipe';
-			case Task::DEBUG;
-				return 'Debug';
-			case Task::MEMTEST;
-				return 'Memtest';
-			case Task::TESTDISK;
-				return 'Testdisk';
-			case Task::PHOTOREC;
-				return 'PhotoRec';
-			case Task::MULTICAST;
-				return 'Multicast';
-			case Task::VIRUS_SCAN;
-				return 'Virus Scan';
-			case Task::INVENTORY;
-				return 'Inventory';
-			case Task::PASSWORD_RESET;
-				return 'Pass Reset';
-			case Task::ALL_SNAPINS;
-				return 'All Snapins';
-			case Task::WAKEUP;
-				return 'Wake up';
-			case Task::SINGLE_SNAPIN;
-				return 'Single Snapin';
-			default:
-				return 'n/a';
-		}
+		return new TaskState($this->get('stateID'));
+	}
+	
+	public function getTaskStateText()
+	{
+		return (string)($this->getTaskState()->get('name') ? $this->getTaskState()->get('name') : _('Unknown'));
 	}
 }

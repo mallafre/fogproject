@@ -59,7 +59,7 @@ $sql = "select
 		from tasks 
 		inner join hosts on (taskHostID = hostID)
 		left outer join images on (hostImage = imageID )
-		where taskState in (0,1) order by taskCreateTime, taskName";	
+		where taskStateID in (0,1) order by taskCreateTime, taskName";	
 $res = mysql_query( $sql, $conn ) or die( mysql_error() );
 if ( mysql_num_rows( $res ) > 0 )
 {
@@ -75,8 +75,8 @@ if ( mysql_num_rows( $res ) > 0 )
 		if ( $ar[iState] > 0 )
 			$bgcolor = "#B8E2B6";
 
-		$state = state2text($ar["taskState"]);
-		if ( $ar["taskState"] == 0 && hasCheckedIn( $conn, $ar["taskID"] ) )
+		$state = state2text($ar["taskStateID"]);
+		if ( $ar["taskStateID"] == 0 && hasCheckedIn( $conn, $ar["taskID"] ) )
 			$state = "In Line";			
 
 		$hname = $ar["hostName"];

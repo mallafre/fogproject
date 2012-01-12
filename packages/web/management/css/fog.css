@@ -195,9 +195,9 @@ pre { white-space: pre-wrap; }
 #login-form .input { clear: right; display: block; margin-top: 5px; margin-bottom: 5px; padding: 4px; border: 1px solid #666; width: 200px; }
 #login-form input[type="text"]:focus, #login-form input[type="password"]:focus { background-image: none; }
 #login-form select { border: 1px solid #666; width: 210px; }
-#login-form-submit { width: 210px; margin: 10px 0 0 0; }
+#login-form-submit { min-width: 210px; margin: 10px 10px 0 0; float: right; }
 #login-form-submit:hover { border: 1px solid #fff; }
-#login-form-info { text-align: center; margin: 0 auto; padding: 10px; border: 1px solid #bbb; width: 300px; background: #fff; color: #333; font-size: 12px; border-radius: 3px; box-shadow: 0 0 10px #bbb; }
+#login-form-info { text-align: center; margin: 0 auto; padding: 10px; border: 1px solid #bbb; width: 300px; background: #fff; color: #333; font-size: 12px; border-radius: 3px; box-shadow: 0 0 10px #bbb; margin-top: 50px; }
 #login-form-info p { margin: 0; }
 #login-form-info b { color: #00567A; }
 #login-form-info .icon { vertical-align: text-bottom; }

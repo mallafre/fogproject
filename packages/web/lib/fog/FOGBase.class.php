@@ -38,6 +38,21 @@ abstract class FOGBase
 	}
 	
 	// Error - results in FOG halting with an error message
+	public function fatalError($txt, $data = array())
+	{
+		//if (!$this->isAJAXRequest() && !preg_match('#/service/#', $_SERVER['PHP_SELF']))
+		if (!preg_match('#/service/#', $_SERVER['PHP_SELF']))
+		{
+			printf('<div class="debug-error">FOG FATAL ERROR: %s: %s</div>%s', get_clasS($this), (count($data) ? vsprintf($txt, $data) : $txt), "\n");
+			
+			flush();
+			exit;
+		}
+		
+		// TODO: Log to Database
+	}
+	
+	// Error - results in FOG halting with an error message
 	public function error($txt, $data = array())
 	{
 		//if (!$this->isAJAXRequest() && !preg_match('#/service/#', $_SERVER['PHP_SELF']))
@@ -47,7 +62,7 @@ abstract class FOGBase
 			//exit;
 			
 			flush();
-			ob_flush();
+			//ob_flush();
 		}
 		
 		// TODO: Log to Database
@@ -61,7 +76,7 @@ abstract class FOGBase
 			printf('<div class="debug-error">FOG DEBUG: %s: %s</div>%s', get_clasS($this), (count($data) ? vsprintf($txt, $data) : $txt), "\n");
 			
 			flush();
-			ob_flush();
+			//ob_flush();
 		}
 		
 		// TODO: Log to Database
@@ -80,7 +95,7 @@ abstract class FOGBase
 			printf('<div class="debug-info">FOG INFO: %s: %s</div>%s', get_clasS($this), (count($data) ? vsprintf($txt, $data) : $txt), "\n");
 			
 			flush();
-			ob_flush();
+			//ob_flush();
 		}
 		
 		// TODO: Log to Database
@@ -89,7 +104,12 @@ abstract class FOGBase
 	// toString
 	public function __toString()
 	{
-		return get_class($this);
+		return (string)get_class($this);
+	}
+	
+	function toString()
+	{
+		return $this->__toString();
 	}
 	
 	// isLoaded

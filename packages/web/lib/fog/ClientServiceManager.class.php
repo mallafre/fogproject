@@ -102,7 +102,7 @@ class ClientServiceManager extends FOGBase
 		{
 			$sql = "INSERT INTO 
 					userTracking(utHostID, utUserName, utAction, utDateTime, utDesc, utDate)
-					values( '" . $this->DB->sanitize($loginEntry->getHostId()) . "', '" . $this->DB->sanitize($loginEntry->getUsername()) . "', '" . $this->DB->sanitize( $loginEntry->getAction() )  . "', FROM_UNIXTIME(" . $loginEntry->getDate()->getLong() . "),  '" . $loginEntry->getDescription() . "', DATE('" . $loginEntry->getDate()->toString( "Y-m-d" ) . "') )";	
+					values( '" . $this->DB->sanitize($loginEntry->getHostId()) . "', '" . $this->DB->sanitize($loginEntry->getUsername()) . "', '" . $this->DB->sanitize( $loginEntry->getAction() )  . "', FROM_UNIXTIME(" . $loginEntry->getDate()->toTimestamp() . "),  '" . $loginEntry->getDescription() . "', DATE('" . $loginEntry->getDate()->toString( "Y-m-d" ) . "') )";	
 
 			return $this->DB->query($sql)->affected_rows() == 1;	
 		}

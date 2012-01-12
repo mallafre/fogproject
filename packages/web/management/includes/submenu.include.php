@@ -376,11 +376,10 @@ if ($currentUser != null && $currentUser->isLoggedIn())
 	{
 		if (!preg_match('#indexold#', $_SERVER['PHP_SELF']))
 		{
-			$FOGSubMenu->addItems('tasks', array(	_('New Search')			=> "$_SERVER[PHP_SELF]?node=$node&sub=search",
-								_('Active Tasks')		=> "$_SERVER[PHP_SELF]?node=$node&sub=active",
-								_('Scheduled Tasks')		=> "$_SERVER[PHP_SELF]?node=$node&sub=scheduled",
+			$FOGSubMenu->addItems('tasks', array(	_('Active Tasks')		=> "$_SERVER[PHP_SELF]?node=$node&sub=active",
 								_('Active Multicast Tasks')	=> "$_SERVER[PHP_SELF]?node=$node&sub=active-multicast",
 								_('Active Snap-ins')		=> "$_SERVER[PHP_SELF]?node=$node&sub=active-snapins",
+								_('Scheduled Tasks')		=> "$_SERVER[PHP_SELF]?node=$node&sub=scheduled",
 						));
 		}
 		else

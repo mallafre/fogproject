@@ -188,7 +188,7 @@ class Host extends FOGController
 	// Custom functions
 	public function getActiveTaskCount()
 	{
-		return $this->FOGCore->getClass('TaskManager')->count(array('state' => array(0, 1), 'hostID' => $this->get('id')));
+		return $this->FOGCore->getClass('TaskManager')->count(array('stateID' => array(Task::TYPE_UPLOAD, Task::TYPE_DOWNLOAD), 'hostID' => $this->get('id')));
 	}
 	
 	public function isValidToImage()
@@ -210,22 +210,28 @@ class Host extends FOGController
 	}
 
 	// Should be called: createDeployTask
-	function createImagePackage($taskType, $taskName = '', $shutdown = false, $debug = false, $deploySnapins = true, $isGroupTask = false)
+	function createImagePackage($taskTypeID, $taskName = '', $shutdown = false, $debug = false, $deploySnapins = true, $isGroupTask = false)
 	{
 		try
 		{
-			// Variables
-			$taskType = strtoupper($taskType);	// U = Upload, D = Download
-			$isUpload = ($taskType == 'U');
-		
 			// Error checking
 			if ($this->getActiveTaskCount())
 			{
-				throw new Exception('Host is already a member of a active task');
+				throw new Exception(_('Host is already a member of a active task'));
 			}
 			if (!$this->isValid())
 			{
-				throw new Exception('Host is not valid');
+				throw new Exception(_('Host is not valid'));
+			}
+			
+			// TaskType: Variables
+			$TaskType = new TaskType($taskTypeID);
+			$isUpload = (preg_match('#type=up#i', $TaskType->get('kernelTemplate')));
+			
+			// TaskType: Error checking
+			if (!$TaskType->isValid())
+			{
+				throw new Exception(_('Task Type is not valid'));
 			}
 			
 			// Image: Variables
@@ -234,11 +240,11 @@ class Host extends FOGController
 			// Image: Error checking
 			if (!$Image->isValid())
 			{
-				throw new Exception('Image is not valid');
+				throw new Exception(_('Image is not valid'));
 			}
 			if (!$Image->getStorageGroup()->isValid())
 			{
-				throw new Exception('Storage Group is not valid');
+				throw new Exception(_('The Image\'s associated Storage Group is not valid'));
 			}
 			
 			// Storage Node: Variables
@@ -248,18 +254,18 @@ class Host extends FOGController
 			// Storage Node: Error Checking
 			if (!$StorageNode->isValid())
 			{
-				throw new Exception('Storage Node is not valid');
+				throw new Exception(_('The Storage Group\'s associated Storage Node is not valid'));
 			}
 			
 			// Variables
 			$mac = $this->getMACAddress()->getMACWithColon();
 			$localPXEFile = $this->FOGCore->makeTempFilePath();
 			$remotePXEFile = rtrim($this->FOGCore->getSetting('FOG_TFTP_PXE_CONFIG_DIR'), '/') . '/' . $this->getMACAddress()->getMACPXEPrefix();
-			
+
 			// Kernel Arguments: Define possible kernel arguments
 			// NOTE: slightly more manageable but needs more love
 			$kernelArgsArray = array(
-				// FOG
+				// FOG base
 				'initrd=' . $this->FOGCore->getSetting('FOG_PXE_BOOT_IMAGE'),
 				'root=/dev/ram0',
 				'rw',
@@ -273,17 +279,15 @@ class Host extends FOGController
 				'osid=' . $this->get('osID'),
 				'loglevel=4',
 				'consoleblank=0',
+				'irqpoll',
 				'chkdsk=' . ($this->FOGCore->getSetting('FOG_DISABLE_CHKDSK') == '1' ? '0' : '1'),
 				'img=' . $Image->get('path'),
 				'imgType=' . $Image->getImageType()->get('type'),
+				'imgid=' . $Image->get('id'),
 				
-			
-				// Dynamic kernel args - if 'active' is false, arg wont be used
-				array(	'value'		=> 'shutdown=' . $shutdown,
+				// Dynamic - if 'active' is true, then 'value' is used
+				array(	'value'		=> 'shutdown=1',
 					'active'	=> $shutdown
-				),
-				array(	'value'		=> 'mode=debug',
-					'active'	=> $debug
 				),
 				array(	'value'		=> 'keymap=' . $this->FOGCore->getSetting('FOG_KEYMAP'),
 					'active'	=> $this->FOGCore->getSetting('FOG_KEYMAP')
@@ -295,42 +299,41 @@ class Host extends FOGController
 					'active'	=> $this->FOGCore->getSetting('FOG_CHANGE_HOSTNAME_EARLY')
 				),
 				
-				// Type
-				'type=' . ($isUpload ? 'up' : 'down'),
-				
 				// Upload
+				// TODO: Move to database when FOG Variable templating is implemented
 				array(	'value'		=> 'pct=' . (is_numeric($GLOBALS['FOGCore']->getSetting('FOG_UPLOADRESIZEPCT')) && $GLOBALS['FOGCore']->getSetting('FOG_UPLOADRESIZEPCT') >= 5 && $GLOBALS['FOGCore']->getSetting('FOG_UPLOADRESIZEPCT') < 100 ? $this->FOGCore->getSetting('FOG_UPLOADRESIZEPCT') : '5'),
 					'active'	=> $isUpload
 				),
 				array(	'value'		=> 'ignorepg=' . ($GLOBALS['FOGCore']->getSetting( "FOG_UPLOADIGNOREPAGEHIBER" ) ? '1' : '0'),
 					'active'	=> $isUpload
 				),
-				array(	'value'		=> 'imgid=' . $Image->get('id'),
-					'active'	=> $isUpload
-				),
 				
+				// Task Type
+				$TaskType->get('kernelTemplate'),
 				
+				// Global
+				$this->FOGCore->getSetting('FOG_KERNEL_ARGS'),
+				
+				// Host
+				$this->get('kernelArgs'),
 				
 				// OLD DEPLOY
 				//append initrd=" . $GLOBALS['FOGCore']->getSetting( "FOG_PXE_BOOT_IMAGE" ) . "  root=/dev/ram0 rw ramdisk_size=" . $GLOBALS['FOGCore']->getSetting( "FOG_KERNEL_RAMDISK_SIZE" ) . " ip=dhcp dns=" . $GLOBALS['FOGCore']->getSetting( "FOG_PXE_IMAGE_DNSADDRESS" ) . " type=down img=" . $Image->get('path') . " mac=" . $member->getMACColon() . " ftp=" . sloppyNameLookup($GLOBALS['FOGCore']->getSetting( "FOG_TFTP_HOST" )) . " storage=" . $member->getNFSServer() . ":" . $member->getNFSRoot() . " web=" . sloppyNameLookup($GLOBALS['FOGCore']->getSetting( "FOG_WEB_HOST")) . $GLOBALS['FOGCore']->getSetting( "FOG_WEB_ROOT" ) . " osid=" . $member->getOSID() . " $mode $imgType $keymapapp shutdown=$shutdown loglevel=4 consoleblank=0 " . $GLOBALS['FOGCore']->getSetting( "FOG_KERNEL_ARGS" ) . " " . $member->getKernelArgs() . " " . $otherargs; 
 				// OLD UPLOAD
 				//append initrd=" . $GLOBALS['FOGCore']->getSetting( "FOG_PXE_BOOT_IMAGE" ) . "  root=/dev/ram0 rw ramdisk_size=" . $GLOBALS['FOGCore']->getSetting( "FOG_KERNEL_RAMDISK_SIZE" ) . " ip=dhcp dns=" . $GLOBALS['FOGCore']->getSetting( "FOG_PXE_IMAGE_DNSADDRESS" ) . " type=up img=$image imgid=$imageid mac=" . $member->getMACColon() . " storage=" . $nfsip . ":" . $nfsroot . " web=" . sloppyNameLookup($GLOBALS['FOGCore']->getSetting( "FOG_WEB_HOST")) . $GLOBALS['FOGCore']->getSetting( "FOG_WEB_ROOT" ) . " ignorepg=$ignorepg osid=" . $member->getOSID() . " $mode $pct $imgType $keymapapp shutdown=$shutdown loglevel=4 consoleblank=0 " . $GLOBALS['FOGCore']->getSetting( "FOG_KERNEL_ARGS" ) . " " . $member->getKernelArgs() . " " . $otherargs; 
-				
-				// User
-				$this->FOGCore->getSetting('FOG_KERNEL_ARGS'),
-				$this->get('kernelArgs'),
 			);
-			
-			// 
 			
 			// Kernel Arguments: Build kernelArgs array based on 'active' element
 			foreach ($kernelArgsArray AS $arg)
 			{
-				if (!is_array($arg) && !empty($arg) || (is_array($arg) && $arg['active'] && $arg = $arg['value'] && !empty($arg)))
+				if (!is_array($arg) && !empty($arg) || (is_array($arg) && $arg['active'] && !empty($arg)))
 				{
-					$kernelArgs[] = $arg;
+					$kernelArgs[] = (is_array($arg) ? $arg['value'] : $arg);
 				}
 			}
+			
+			// Kernel Arguments: Remove duplicates
+			$kernelArgs = array_unique($kernelArgs);
 			
 			// Kernel Arguements: Error checking
 			if (!count($kernelArgs))
@@ -345,11 +348,14 @@ class Host extends FOGController
 			$output[] = "KERNEL " . ($this->get('kernel') ? $this->get('kernel') : $this->FOGCore->getSetting('FOG_TFTP_PXE_KERNEL'));
 			$output[] = "APPEND " . implode(' ', (array)$kernelArgs);
 			
+			// DEBUG
+			//$this->fatalError(implode("<br/>", $output));
+			
 			// PXE: Save PXE File to tmp file
 			if (!@file_put_contents($localPXEFile, implode("\n", $output)))
 			{
 				$error = error_get_last();
-				throw new Exception(sprintf('Failed to write TMP PXE File. File: %s, Error: %s', $localPXEFile, $error['message']));
+				throw new Exception(sprintf(_('Failed to write TMP PXE File. File: %s, Error: %s'), $localPXEFile, $error['message']));
 			}
 			
 			// FTP: Connect -> Upload new PXE file
@@ -370,8 +376,8 @@ class Host extends FOGController
 				'createdBy'	=> $this->FOGUser->get('name'),
 				'hostID'	=> $this->get('id'),
 				'isForced'	=> 0,
-				'state'		=> 0,
-				'type'		=> $taskType
+				'stateID'	=> Task::STATE_QUEUED,
+				'typeID'	=> $taskTypeID
 			));
 			
 			// Task: Save to database
@@ -413,24 +419,19 @@ class Host extends FOGController
 		catch (Exception $e)
 		{
 			// Failure
-			//$this->debug('Failed to %s. Error: %s', array(__FUNCTION__, $e->getMessage()));
-			//throw new Exception(sprintf('Failed to %s. Error: %s', __FUNCTION__, $e->getMessage()));
 			throw new Exception($e->getMessage());
 		}
 	}
 	
-	function createSingleRunScheduledPackage($taskType, $taskName = '', $scheduledDeployTime, $enableShutdown = false, $enableSnapins = false, $isGroupTask = false, $arg2 = null)
+	function createSingleRunScheduledPackage($taskTypeID, $taskName = '', $scheduledDeployTime, $enableShutdown = false, $enableSnapins = false, $isGroupTask = false, $arg2 = null)
 	{
 		try
 		{
 			// Varaibles
-			$taskType = strtoupper($taskType);
-			$isUpload = ($taskType == 'U');
-			
 			$findWhere = array(
 				'isActive' 	=> '1',
 				'isGroupTask' 	=> $isGroupTask,
-				'taskType' 	=> $taskType,
+				'taskType' 	=> $taskTypeID,
 				'type' 		=> 'S',		// S = Single Schedule Deployment, C = Cron-style Schedule Deployment
 				'hostID' 	=> $this->get('id'),
 				'scheduleTime'	=> $scheduledDeployTime
@@ -439,11 +440,21 @@ class Host extends FOGController
 			// Error checking
 			if ($scheduledDeployTime < time())
 			{
-				throw new Exception(sprintf('Scheduled date is in the past. Date: %s', date('Y/d/m H:i', $scheduledDeployTime)));
+				throw new Exception(sprintf(_('Scheduled date is in the past. Date: %s'), date('Y/d/m H:i', $scheduledDeployTime)));
 			}
 			if ($this->FOGCore->getClass('ScheduledTaskManager')->count($findWhere))
 			{
-				throw new Exception('A task already exists for this Host at this scheduled date & time');
+				throw new Exception(_('A task already exists for this Host at this scheduled date & time'));
+			}
+			
+			// TaskType: Variables
+			$TaskType = new TaskType($taskTypeID);
+			$isUpload = (preg_match('#type=up#i', $TaskType->get('kernelTemplate')));
+			
+			// TaskType: Error checking
+			if (!$TaskType->isValid())
+			{
+				throw new Exception(_('Task Type is not valid'));
 			}
 			
 			// Task: Merge $findWhere array with other Task data -> Create ScheduledTask Object
@@ -474,41 +485,37 @@ class Host extends FOGController
 		}
 	}
 	
-	function createCronScheduledPackage($taskType, $taskName = '', $minute = 1, $hour = 23, $dayOfMonth = '*', $month = '*', $dayOfWeek = '*', $enableShutdown = false, $enableSnapins = true, $isGroupTask = false, $arg2 = null)
+	function createCronScheduledPackage($taskTypeID, $taskName = '', $minute = 1, $hour = 23, $dayOfMonth = '*', $month = '*', $dayOfWeek = '*', $enableShutdown = false, $enableSnapins = true, $isGroupTask = false, $arg2 = null)
 	{
 		try
 		{
-			// Varaibles
-			$taskType = strtoupper($taskType);
-			$isUpload = ($taskType == 'U');
-			
 			// Error checking
 			if ($minute != '*' && ($minute < 0 || $minute > 59))
 			{
-				throw new Exception('Minute value is not valid');
+				throw new Exception(_('Minute value is not valid'));
 			}
 			if ($hour != '*' && ($hour < 0 || $hour > 23))
 			{
-				throw new Exception('Hour value is not valid');
+				throw new Exception(_('Hour value is not valid'));
 			}
 			if ($dayOfMonth != '*' && ($dayOfMonth < 0 || $dayOfMonth > 31))
 			{
-				throw new Exception('Day of Month value is not valid');
+				throw new Exception(_('Day of Month value is not valid'));
 			}
 			if ($month != '*' && ($month < 0 || $month > 12))
 			{
-				throw new Exception('Month value is not valid');
+				throw new Exception(_('Month value is not valid'));
 			}
 			if ($dayOfWeek != '*' && ($dayOfWeek < 0 || $dayOfWeek > 6))
 			{
-				throw new Exception('Day of Week value is not valid');
+				throw new Exception(_('Day of Week value is not valid'));
 			}
 			
 			// Variables
 			$findWhere = array(
 				'isActive' 	=> '1',
 				'isGroupTask' 	=> $isGroupTask,
-				'taskType' 	=> $taskType,
+				'taskType' 	=> $taskTypeID,
 				'type' 		=> 'C',		// S = Single Schedule Deployment, C = Cron-style Schedule Deployment
 				'hostID' 	=> $this->get('id'),
 				'minute' 	=> $minute,
@@ -521,7 +528,17 @@ class Host extends FOGController
 			// Error checking: Active Scheduled Task
 			if ($this->FOGCore->getClass('ScheduledTaskManager')->count($findWhere))
 			{
-				throw new Exception('A task already exists for this Host at this cron schedule');
+				throw new Exception(_('A task already exists for this Host at this cron schedule'));
+			}
+			
+			// TaskType: Variables
+			$TaskType = new TaskType($taskTypeID);
+			$isUpload = (preg_match('#type=up#i', $TaskType->get('kernelTemplate')));
+			
+			// TaskType: Error checking
+			if (!$TaskType->isValid())
+			{
+				throw new Exception(_('Task Type is not valid'));
 			}
 			
 			// Task: Merge $findWhere array with other Task data -> Create ScheduledTask Object

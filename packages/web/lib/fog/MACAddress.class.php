@@ -1,7 +1,7 @@
 <?php
 
 // Blackout - 10:15 AM 1/10/2011
-class MACAddress
+class MACAddress extends FOGBase
 {
 	private $MAC;
 	
