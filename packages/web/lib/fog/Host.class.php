@@ -164,10 +164,10 @@ class Host extends FOGController
 		return $this;
 	}
 	
-	public function load()
+	public function load($field = 'id')
 	{
 		// Save
-		parent::load();
+		parent::load($field);
 
 		// Load 'additionalMACs'
 		$this->DB->query("SELECT * FROM `hostMAC` WHERE `hmHostID`='%s'", array($this->get('id')));
