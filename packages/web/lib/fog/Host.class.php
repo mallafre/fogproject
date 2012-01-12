@@ -277,7 +277,7 @@ class Host extends FOGController
 				'storage=' . $StorageNode->get('ip') . ':' . $StorageNode->get('path'),
 				'storageip=' . $StorageNode->get('ip'),
 				'web=' . $this->FOGCore->resolveHostname($this->FOGCore->getSetting('FOG_WEB_HOST')) . '/' . ltrim($this->FOGCore->getSetting('FOG_WEB_ROOT'), '/'),
-				'osid=' . $this->get('osID'),
+				'osid=' . $Image->get('osID'),
 				'loglevel=4',
 				'consoleblank=0',
 				'irqpoll',
