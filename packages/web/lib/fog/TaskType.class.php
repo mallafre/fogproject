@@ -12,9 +12,31 @@ class TaskType extends FOGController
 		'name'			=> 'ttName',
 		'description'		=> 'ttDescription',
 		'icon'			=> 'ttIcon',
-		'kernelTemplate'	=> 'ttKernelTemplate',
+		'kernel'		=> 'ttKernel',
+		'kernelArgs'		=> 'ttKernelArgs',
 		'type'			=> 'ttType',		// fog or user
 		'isAdvanced'		=> 'ttIsAdvanced',
 		'access'		=> 'ttIsAccess'		// both, host or group
 	);
+	
+	// Custom functions
+	public function isUpload()
+	{
+		return preg_match('#type=up#i', $this->get('kernelArgs'));
+	}
+	
+	public function isDownload()
+	{
+		return preg_match('#type=down#i', $this->get('kernelArgs'));
+	}
+	
+	public function isMulticast()
+	{
+		return preg_match('#mc=yes#i', $this->get('kernelArgs'));
+	}
+	
+	public function isDebug()
+	{
+		return (preg_match('#mode=debug#i', $this->get('kernelArgs')) || preg_match('#mode=onlydebug#i', $this->get('kernelArgs')) ? true : false);
+	}
 }

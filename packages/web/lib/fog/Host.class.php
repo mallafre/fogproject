@@ -226,7 +226,7 @@ class Host extends FOGController
 			
 			// TaskType: Variables
 			$TaskType = new TaskType($taskTypeID);
-			$isUpload = (preg_match('#type=up#i', $TaskType->get('kernelTemplate')));
+			$isUpload = $TaskType->isUpload();
 			
 			// TaskType: Error checking
 			if (!$TaskType->isValid())
@@ -275,6 +275,7 @@ class Host extends FOGController
 				'mac=' . $mac,
 				'ftp=' . $this->FOGCore->resolveHostname($this->FOGCore->getSetting('FOG_TFTP_HOST')),
 				'storage=' . $StorageNode->get('ip') . ':' . $StorageNode->get('path'),
+				'storageip=' . $StorageNode->get('ip'),
 				'web=' . $this->FOGCore->resolveHostname($this->FOGCore->getSetting('FOG_WEB_HOST')) . '/' . ltrim($this->FOGCore->getSetting('FOG_WEB_ROOT'), '/'),
 				'osid=' . $this->get('osID'),
 				'loglevel=4',
@@ -308,8 +309,13 @@ class Host extends FOGController
 					'active'	=> $isUpload
 				),
 				
+				// Multicast
+				array(	'value'		=> 'port=666',
+					'active'	=> $TaskType->isMulticast()
+				),
+				
 				// Task Type
-				$TaskType->get('kernelTemplate'),
+				$TaskType->get('kernelArgs'),
 				
 				// Global
 				$this->FOGCore->getSetting('FOG_KERNEL_ARGS'),
@@ -345,7 +351,7 @@ class Host extends FOGController
 			$output[] = "# " . _("Created by FOG Imaging System");
 			$output[] = "DEFAULT fog";
 			$output[] = "LABEL fog";
-			$output[] = "KERNEL " . ($this->get('kernel') ? $this->get('kernel') : $this->FOGCore->getSetting('FOG_TFTP_PXE_KERNEL'));
+			$output[] = "KERNEL " . ($TaskType->get('kernel') ? $TaskType->get('kernel') : ($this->get('kernel') ? $this->get('kernel') : $this->FOGCore->getSetting('FOG_TFTP_PXE_KERNEL')));
 			$output[] = "APPEND " . implode(' ', (array)$kernelArgs);
 			
 			// DEBUG
@@ -449,7 +455,7 @@ class Host extends FOGController
 			
 			// TaskType: Variables
 			$TaskType = new TaskType($taskTypeID);
-			$isUpload = (preg_match('#type=up#i', $TaskType->get('kernelTemplate')));
+			$isUpload = $TaskType->isUpload();
 			
 			// TaskType: Error checking
 			if (!$TaskType->isValid())
@@ -533,7 +539,7 @@ class Host extends FOGController
 			
 			// TaskType: Variables
 			$TaskType = new TaskType($taskTypeID);
-			$isUpload = (preg_match('#type=up#i', $TaskType->get('kernelTemplate')));
+			$isUpload = $TaskType->isUpload();
 			
 			// TaskType: Error checking
 			if (!$TaskType->isValid())

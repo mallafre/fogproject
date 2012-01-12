@@ -1372,7 +1372,7 @@ class HostManagementPage extends FOGPage
 					<h2><?php print _("Advanced Settings"); ?></h2>
 					<p><input type="checkbox" name="shutdown" id="shutdown" value="1" autocomplete="off"> <label for="shutdown"><?php print _("Schedule <u>Shutdown</u> after task completion"); ?></label></p>
 					<?php
-					if (!preg_match('#mode=debug#i', $TaskType->get('kernelTemplate')))
+					if (!$TaskType->isDebug())
 					{
 						?>
 						<p><input type="radio" name="scheduleType" id="scheduleInstant" value="instant" autocomplete="off" checked="checked" /> <label for="scheduleInstant"><?php print _("Schedule <u>Instant Deployment</u>"); ?></label></p>

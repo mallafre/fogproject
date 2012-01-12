@@ -1248,6 +1248,37 @@ $databaseSchema[] = array(
 	"UPDATE `" . DATABASE_NAME . "`.`schemaVersion` set vValue = '32'",
 );
 
+// 33
+$databaseSchema[] = array(
+	// 33 - Blackout - 2:31 PM 12/01/2012
+	// More TaskType conversion
+	"ALTER TABLE `" . DATABASE_NAME . "`.`tasktypes` CHANGE `ttKernelTemplate` `ttKernelArgs` TEXT CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL ",
+	"ALTER TABLE `" . DATABASE_NAME . "`.`tasktypes` ADD `ttKernel` VARCHAR( 100 ) NOT NULL AFTER `ttIcon`",
+	"TRUNCATE `" . DATABASE_NAME . "`.`tasktypes`",
+	"INSERT INTO `" . DATABASE_NAME . "`.`tasktypes` (`ttID`, `ttName`, `ttDescription`, `ttIcon`, `ttKernel`, `ttKernelArgs`, `ttType`, `ttIsAdvanced`, `ttIsAccess`) VALUES
+	(1, 'Download', 'Deploy action will send an image saved on the FOG server to the client computer with all included snapins.', 'senddebug.png', '', 'type=down', 'fog', '0', 'both'),
+	(2, 'Upload', 'Upload will pull an image from a client computer that will be saved on the server.', 'restoredebug.png', '', 'type=up', 'fog', '0', 'host'),
+	(3, 'Debug', 'Debug mode will load the boot image and load a prompt so you can run any commands you wish. When you are done, you must remember to remove the PXE file, by clicking on \"Active Tasks\" and clicking on the \"Kill Task\" button.', 'debug.png', '', 'mode=onlydebug', 'fog', '1', 'host'),
+	(4, 'Memtest86+', 'Memtest86+ loads Memtest86+ on the client computer and will have it continue to run until stopped. When you are done, you must remember to remove the PXE file, by clicking on \"Active Tasks\" and clicking on the \"Kill Task\" button.', 'memtest.png', 'fog/memtest/memtest', '', 'fog', '1', 'both'),
+	(5, 'Test Disk', 'Test Disk loads the testdisk utility that can be used to check a hard disk and recover lost partitions.', 'testdisk.png', '', 'mode=checkdisk', 'fog', '1', 'both'),
+	(6, 'Disk Surface Test', 'Disk Surface Test checks the hard drive''s surface sector by sector for any errors and reports back if errors are present.', 'surfacetest.png', '', 'mode=badblocks', 'fog', '1', 'both'),
+	(7, 'Recover', 'Recover loads the photorec utility that can be used to recover lost files from a hard drisk. When recovering files, make sure you save them to your NFS volume (ie: /images).', 'recover.png', '', 'mode=photorec', 'fog', '1', 'both'),
+	(8, 'Multi-Cast', 'Deploy action will send an image saved on the FOG server to the client computer with all included snapins.', 'senddebug.png', '', 'type=down mc=yes', 'fog', '0', 'group'),
+	(10, 'Hardware Inventory', 'The hardware inventory task will boot the client computer and pull basic hardware informtation from it and report it back to the FOG server.', 'inventory.png', '', 'mac_deployed=${HOST_MAC} mode=autoreg deployed=1', 'fog', '1', 'both'),
+	(11, 'Password Reset', 'Password reset will blank out a Windows user password that may have been lost or forgotten.', 'winpass.png', '', 'mode=winpassreset', 'fog', '1', 'both'),
+	(12, 'All Snapins', 'This option allows you to send all the snapins to host without imaging the computer. (Requires FOG Service to be installed on client)', 'snap.png', '', '', 'fog', '1', 'both'),
+	(13, 'Single Snapin', 'This option allows you to send a single snapin to a host. (Requires FOG Service to be installed on client)', 'snap.png', '', '', 'fog', '1', 'both'),
+	(14, 'Wake-Up', 'Wake Up will attempt to send the Wake-On-LAN packet to the computer to turn the computer on. In switched environments, you typically need to configure your hardware to allow for this (iphelper).', 'wake.png', '', '', 'fog', '1', 'both'),
+	(15, 'Download - Debug', 'Download - Debug mode allows FOG to setup the environment to allow you send a specific image to a computer, but instead of sending the image, FOG will leave you at a prompt right before sending. If you actually wish to send the image all you need to do is type \"fog\" and hit enter.', 'senddebug.png', '', 'type=down mode=debug', 'fog', '1', 'host'),
+	(16, 'Upload - Debug', 'mode allows FOG to setup the environment to allow you Upload a specific image to a computer, but instead of Upload the image, FOG will leave you at a prompt right before restoring. If you actually wish to Upload the image all you need to do is type \"fog\" and hit enter.', 'restoredebug.png', '', 'type=up mode=debug', 'fog', '1', 'host'),
+	(17, 'Download without Snapins', 'Deploy without snapins allows FOG to image the workstation, but after the task is complete any snapins linked to the host or group will NOT be sent.', 'sendnosnapin.png', '', '', 'fog', '1', 'both'),
+	(18, 'Fast Wipe', 'Full Wipe will boot the client computer and perform a full disk wipe. This method writes a few passes of random data to the hard disk.', 'veryfastwipe.png', '', 'mode=wipe wipemode=fast', 'fog', '1', 'both'),
+	(19, 'Normal Wipe', 'Normal Wipe will boot the client computer and perform a simple disk wipe. This method writes one pass of zero''s to the hard disk.', 'quickwipe.png', '', 'mode=wipe wipemode=normal', 'fog', '1', 'both'),
+	(20, 'Full Wipe', 'Full Wipe will boot the client computer and perform a full disk wipe. This method writes a few passes of random data to the hard disk.', 'fullwipe.png', '', 'mode=wipe wipemode=full', 'fog', '1', 'both'),
+	(21, 'Virus Scan', 'Anti-Virus loads Clam AV on the client boot image, updates the scanner and then scans the Windows partition.', 'clam.png', '', 'mode=clamav avmode=s', 'fog', '1', 'both'),
+	(22, 'Virus Scan - Quarantine', 'Anti-Virus loads Clam AV on the client boot image, updates the scanner and then scans the Windows partition.', 'clam.png', '', 'mode=clamav avmode=q', 'fog', '1', 'both');"
+);
+
 
 
 ?>
