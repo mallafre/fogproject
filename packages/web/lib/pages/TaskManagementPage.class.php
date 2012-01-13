@@ -26,7 +26,7 @@ class TaskManagementPage extends FOGPage
 	public function active()
 	{
 		// Set title
-		$this->title = _('All Active Tasks');
+		$this->title = _('Active Tasks');
 		
 		// Header row
 		$this->headerData = array(
@@ -163,7 +163,7 @@ class TaskManagementPage extends FOGPage
 	public function active_multicast()
 	{
 		// Set title
-		$this->title = _('All Active Multi-Cast Tasks');
+		$this->title = _('Active Multi-cast Tasks');
 		
 		// Header row
 		$this->headerData = array(

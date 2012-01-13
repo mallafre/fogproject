@@ -39,7 +39,7 @@
 				{
 					var newContentContainer = $('#' + newContentID);
 					
-					if (newContentContainer.exists())
+					if (newContentContainer.length > 0)
 					{
 						// Found new content container - show
 						// Fade out current list
