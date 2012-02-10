@@ -22,6 +22,36 @@ class TaskManager extends FOGManagerController
 		return (array)$this->find(array('stateID' => array(1, 2)));
 	}
 	
+	// I know, I know this needs to be cleaned up : )
+	public function getQueuedTasksByStorageGroup($storageGroupId)
+	{
+		if ( $this->DB != null )
+		{
+			$sql = "SELECT 
+					taskID
+				FROM
+					tasks
+				WHERE 
+					taskStateID = '2' and
+					taskTypeID in ( 'U', 'D' ) and
+					taskNFSGroupID = '" . $this->DB->sanitize($storageGroupId) . "'";
+					
+			$tasks = array();	
+			if ( $this->DB->query($sql) )
+			{
+				while( $ar = $this->DB->fetch()->get() )
+				{
+					$tasks[] = new Task($ar["taskID"]);
+				}	
+			}
+			
+			$tasks;
+			return $arHosts;
+								
+		}
+		return null;
+	}
+	
 	// LEGACY
 	// NOTE: Dont use this, use $Host->getActiveTaskCount() instead
 	public function getCountOfActiveTasksForHost($host)

@@ -56,6 +56,16 @@ class StorageGroup extends FOGController
 		}
 	}
 	
+	function getTotalSupportedClients()
+	{
+		$clients = 0;
+		foreach( $this->getStorageNodes() AS $node )
+		{
+			$clients += $node->get('maxclients');
+		}
+		return $clients;
+	}
+	
 	function getMasterStorageNode()
 	{
 		// Return master

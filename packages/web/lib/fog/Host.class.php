@@ -383,7 +383,9 @@ class Host extends FOGController
 				'hostID'	=> $this->get('id'),
 				'isForced'	=> 0,
 				'stateID'	=> Task::STATE_QUEUED,
-				'typeID'	=> $taskTypeID
+				'typeID'	=> $taskTypeID, 
+				'NFSGroupID' 	=> $Image->getStorageGroup()->get('id'), 
+				'NFSMemberID'	=> $Image->getStorageGroup()->getOptimalStorageNode()->get('id')
 			));
 			
 			// Task: Save to database

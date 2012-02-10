@@ -2842,32 +2842,7 @@ function getGlobalQueueSize( $conn )
 }
 
 
-/* 
- * Replaces function getNumber InQueue 
- * Handles Queue by NFS Server Group
- *
- */
-function getNumberInQueueByNFSGroup( $conn, $state, $groupid )
-{
-	if ( $conn != null && $state != null && $groupid != null )
-	{
-		$sql = "SELECT 
-				COUNT(*) as cnt
-			FROM
-				tasks
-			WHERE 
-				taskStateID = '" . mysql_real_escape_string( $state ) . "' and
-				taskTypeID in ( 'U', 'D' ) and
-				taskNFSGroupID = '" . mysql_real_escape_string( $groupid ) . "'";
-		$res = mysql_query( $sql, $conn ) or criticalError( mysql_error(), _("FOG :: Database error!") );
-		
-		if ( $ar = mysql_fetch_array( $res ) )
-		{
-			return $ar["cnt"];
-		}				
-	}
-	return null;
-}
+
 
 function getNFSGroupIDByTaskID( $conn, $taskID )
 {
@@ -2979,30 +2954,7 @@ function getNFSNodeNameById( $conn, $nodeid )
 	return null;
 }
 
-function checkIn( $conn, $jobid )
-{
-	if ( $conn != null && $jobid != null )
-	{
-		$sql = "update tasks set taskCheckIn = NOW() where taskID = '" . mysql_real_escape_string( $jobid ) . "'";
-		if ( mysql_query( $sql, $conn ) )
-			return true;
-	}
-	return false;
-}
 
-function isForced( $conn, $jobid )
-{
-	if ( $conn != null && $jobid != null )
-	{
-		$sql = "select count(*) as c from tasks where taskID = '" . mysql_real_escape_string( $jobid ) . "' and taskForce = 1";
-		$res = mysql_query( $sql, $conn ) or criticalError( mysql_error(), _("FOG :: Database error!") );
-		if ( $ar = mysql_fetch_array( $res ) )
-		{
-			if ( $ar["c"] == "1" ) return true;
-		} 
-	}
-	return false;
-}
 
 function getNewStorageStringForImage( $conn, $nodeid )
 {
@@ -3099,27 +3051,6 @@ function doImage( $conn, $jobid, $blUpdateNFS=false, $nodeid=null )
 	return false;
 }
 
-function getTotalClusteredQueueSize( $conn, $groupid )
-{
-	if ( $conn != null && $groupid != null )
-	{
-		$sql = "SELECT
-				SUM(ngmMaxClients) as max
-			FROM
-				nfsGroupMembers
-			WHERE
-				ngmGroupID = '" . mysql_real_escape_string( $groupid ) . "' and 
-				ngmIsEnabled = '1'";
-		
-		$res = mysql_query( $sql, $conn ) or die( mysql_error() );
-
-		while( $ar = mysql_fetch_array( $res ) )
-		{
-			return $ar["max"];
-		}
-	}
-	return null;
-}
 
 
 function getNumberInFrontOfMe( $conn, $jobid, $groupid=-1 )
