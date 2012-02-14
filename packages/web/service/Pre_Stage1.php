@@ -12,14 +12,13 @@ if ( $mac == null  )
 	die( _("Invalid MAC Address"));
 	
 $host = $mac->getHost();
-
-if ( $host == null ) 
+if ( $host == null || $host->get('id') <= 0 ) 
 	die( _("Unable to locate host in database, please ensure that mac address is correct.") );
 	
 	
 // Clean old task status
 $taskManager = new TaskManager();
-$tasks = $taskManager->find(array('stateID' => array(2), 'hostID' => $host->get('id')));
+$tasks = $taskManager->find(array('stateID' => 2, 'hostID' => $host->get('id')));
 foreach ($tasks as $task)
 {
 	$task->set('stateID', '1' )->save();
@@ -61,86 +60,71 @@ if ( $task->get('isForced') )
 	exit;
 }			
 
+$storageGroup->updateStorageNodes();
 // check if there are any open spots in the group's queue
-
 $totalSlots = $storageGroup->getTotalSupportedClients();
 $taskManager = new TaskManager();
-$usedSlots = count($taskManager->getQueuedTasksByStorageGroup($storageGroup->get('id')));
+$usedSlots = $taskManager->getCountQueuedTasksByStorageGroup($storageGroup->get('id'));
+$inFrontOfMe = $taskManager->getCountInFrontOfHost($storageGroup, $task); 
 
-if ( $usedSlots < $totalSlots )
+if ( $usedSlots >= $totalSlots )
 {
-						// there is an open spot somewhere
-						// now we need to see if it is
-						// intended for us
-						
-						// get the number of machines that are in line
-						// in front of me for the whole cluster
-						$groupInFrontOfMe = getNumberInFrontOfMe( $conn, $jobid, $nfsGroupID );
-						
-						$groupOpenSlots = $clusterMaxClients - $groupNumRunning;
-						if ( $groupOpenSlots > $groupInFrontOfMe )
-						{
-							$clusterNodes = getAllNodeInNFSGroup( $conn, $nfsGroupID );
-							$arBlamedNodes = getAllBlamedNodes( $conn, $jobid, $hostid );
-							//print_r ( $arBlamedNodes );
-							//die ("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-							$strNotes = "";
+	echo _("Waiting for a slot").", " . $inFrontOfMe . " "._("PCs are in front of me.");						
+	exit;
+}
 
-							if ( count( $clusterNodes ) > 0 )
-							{
-								$bestNode = -1;
-								$clientsOnBestNode = 999999999;
-								for( $i = 0; $i < count( $clusterNodes ); $i++ )
-								{
-									$nodeActiveTasks = getNumberInQueueByNFSServer( $conn, 1, $clusterNodes[$i] );
-									$nodeMaxClients = getNodeQueueSize( $conn, $clusterNodes[$i] );
 
-									if ( $nodeActiveTasks < $nodeMaxClients )
-									{	
+// At this point we know there are open slots, but are we next in line for that slot (or has the next is line timed out?)
+//echo $inFrontOfMe;
+$groupOpenSlots = $totalSlots - $usedSlots;
+if ( $groupOpenSlots <= $inFrontOfMe )
+{
+	echo _("There are open slots, but I am waiting for")." " . $inFrontOfMe . " "._("CPUs in front of me.");							
+	exit;
+}
 
-										if ( $nodeActiveTasks < $clientsOnBestNode )
-										{
-											if ( ! in_array( $clusterNodes[$i], $arBlamedNodes ) )
-											{
-												// new best
-												$bestNode = $clusterNodes[$i];
-												$clientsOnBestNode = $nodeActiveTasks;
-											}
-											else
-											{
-												$strNotes .= _("Storage Node").": " . getNFSNodeNameById( $conn, $clusterNodes[$i] ) ." " ._("is open, but has recently failed").".\n";
-											}
-										}										
-									}									
-								}
+$nodes = $storageGroup->get('storageNodes');
 
-								if ( $bestNode != -1 )
-								{								
-									if ( doImage( $conn, $jobid, true, $bestNode ) ) 
-									{
-										echo "##@" . getNewStorageStringForImage( $conn, $bestNode ); 
-										@logImageTask( $conn, "s", $hostid, mysql_real_escape_string( getImageName( $conn, $hostid ) ) );
-									}
-									else
-										echo _("Error attempting to start imaging process");								
-								}
-								else
-									echo _("Unable to determine best node for transfer!")."\n\n" . $strNotes ;
-							}
-							else
-								echo _("No Storage servers are in this cluster!");
-						}	
-						else
-							echo _("There are open slots, but I am waiting for")." " . $groupInFrontOfMe . " "._("CPUs in front of me.");							
+if ( count( $nodes ) <= 0 )
+{
+	echo _("No Storage servers are in this cluster!");
+	exit;
+}
+							
+
+/*
+ * This section determines the best storage node within a group to use
+ */							
+$bestNode = null;																
+$clientsOnBestNode = 999999999;
+$msgs = "";
+foreach ($nodes as $node)
+{
+	$nodeUsedSlots = $taskManager->getCountQueuedTasksByStorageNode( $node );
+	if ( $nodeUsedSlots < $node->get('maxclients') && $nodeUsedSlots < $clientsOnBestNode  )
+	{	
+		if ( $node->getNodeFailure($host) === null )
+		{
+			$bestNode = $node;
+			$clientsOnBestNode = $nodeUsedSlots;
+		}
+		else
+			$msgs .= _("Storage Node").": " . $node->get('name') ." " ._("is open, but has recently failed").".\n";
+	}
+}
+
+if ( $bestNode != null )
+{
+	if ( $task->set('stateID', '2' )->set('NFSMemberID', $bestNode->get('id'))->save() )
+	{
+		echo "##@GO";
+	//	@logImageTask( $conn, "s", $hostid, mysql_real_escape_string( getImageName( $conn, $hostid ) ) );
+	}
+	else
+		echo _("Error attempting to start imaging process");										
 }
 else
-	echo _("Waiting for a slot").", " . getNumberInFrontOfMe( $conn, $jobid, $nfsGroupID ) . " "._("PCs are in front of me.");
-				
-				
-
-
-			
-
-
-
+{
+	echo _("Unable to determine best node for transfer!")."\n\n" . $strNotes ;
+}	
 ?>

@@ -9,6 +9,10 @@ abstract class FOGController extends FOGBase
 	// Name -> Database field name
 	public $databaseFields = array();
 	
+	// ->load() queries, this way subclasses can override (ie: NodeFailure)
+	protected $loadQueryTemplateSingle = "SELECT * FROM `%s` WHERE `%s`='%s'";
+	protected $loadQueryTemplateMultiple = "SELECT * FROM `%s` WHERE %s";
+	
 	// Do not update these database fields
 	public $databaseFieldsToIgnore = array(
 		'createdBy',
@@ -279,7 +283,6 @@ abstract class FOGController extends FOGBase
 			{
 				throw new Exception(sprintf('Operation field not set: %s', strtoupper($field)));
 			}
-			
 			// Build query
 			if (is_array($this->get($field)))
 			{
@@ -289,7 +292,7 @@ abstract class FOGController extends FOGBase
 					$fieldData[] = sprintf("`%s`='%s'", $this->DB->sanitize($this->databaseFields[$field]), $this->DB->sanitize($fieldValue));
 				}
 				
-				$query = sprintf("SELECT * FROM `%s` WHERE %s",
+				$query = sprintf($this->loadQueryTemplateMultiple,
 					$this->DB->sanitize($this->databaseTable),
 					implode(' OR ', $fieldData)
 				);
@@ -297,22 +300,23 @@ abstract class FOGController extends FOGBase
 			else
 			{
 				// Single value
-				$query = sprintf("SELECT * FROM `%s` WHERE `%s`='%s'",
+				$query = sprintf($this->loadQueryTemplateSingle,
 					$this->DB->sanitize($this->databaseTable),
 					$this->DB->sanitize($this->databaseFields[$field]),
 					$this->DB->sanitize($this->get($field))
 				);
 			}
-			
+
 			// Did we find a row in the database?
 			if (!$queryData = $this->DB->query($query)->fetch()->get())
 			{
 				throw new Exception(($this->DB->error() ? $this->DB->error() : 'Row not found'));
 			}
-			
+
 			// Loop returned rows -> Set new data
 			foreach ($queryData AS $key => $value)
 			{
+
 				$this->set($this->key($key), (string)$value);
 			}
 			

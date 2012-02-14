@@ -59,6 +59,18 @@ class StorageNode extends FOGController
 	{
 		return new StorageGroup($this->get('storageGroupID'));
 	}
+	
+	function getNodeFailure($host)
+	{
+		$nodeFailure = new NodeFailure(array(
+						'storageNodeID' => $this->get('id'), 
+						'hostID' 	=> $this->DB->sanitize($host instanceof Host ? $host->get('id') : $host )
+					    )
+					);
+		if ( $nodeFailure->load(array('storageNodeID', 'hostID')) )
+			return $nodeFailure;
+		return null;
+	}
 
 	// Legacy functions - remove once updated in other areas
 	function getID() { return $this->get('id'); }

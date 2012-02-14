@@ -22,34 +22,47 @@ class TaskManager extends FOGManagerController
 		return (array)$this->find(array('stateID' => array(1, 2)));
 	}
 	
-	// I know, I know this needs to be cleaned up : )
-	public function getQueuedTasksByStorageGroup($storageGroupId)
+	public function getCountInFrontOfHost($storageGroup, $task)
 	{
-		if ( $this->DB != null )
-		{
-			$sql = "SELECT 
-					taskID
-				FROM
-					tasks
-				WHERE 
-					taskStateID = '2' and
-					taskTypeID in ( 'U', 'D' ) and
-					taskNFSGroupID = '" . $this->DB->sanitize($storageGroupId) . "'";
-					
-			$tasks = array();	
-			if ( $this->DB->query($sql) )
-			{
-				while( $ar = $this->DB->fetch()->get() )
-				{
-					$tasks[] = new Task($ar["taskID"]);
-				}	
-			}
-			
-			$tasks;
-			return $arHosts;
-								
-		}
-		return null;
+		$count = $this->DB->query("SELECT
+						COUNT(*) AS count
+					FROM
+						tasks
+					WHERE
+						taskStateID = '1' AND
+						taskTypeID in ('U', 'D') AND
+						taskNFSGroupID = '%s' AND
+						taskID < '%s' AND
+						(UNIX_TIMESTAMP() - UNIX_TIMESTAMP(taskCheckIn)) < '%s'", 
+						array(
+							$this->DB->sanitize($storageGroup instanceof StorageGroup ? $storageGroup->get('id') : $storageGroup ),
+							$this->DB->sanitize($task instanceof Task ? $task->get('id') : $task ),
+							$GLOBALS['FOGCore']->getSetting( "FOG_CHECKIN_TIMEOUT" )
+						  )
+					)->fetch()->get('count');
+		return ($count ? $count : 0);
+
+	}
+	
+	public function getCountQueuedTasksByStorageGroup($storageGroup)
+	{
+		return $this->count(array(	
+						'stateID'	=> 2,
+						'typeID'	=> array('U', 'D'),
+						'NFSGroupID'	=> $this->DB->sanitize($storageGroup instanceof StorageGroup ? $storageGroup->get('id') : $storageGroup )
+					 )
+				   );
+	
+	}
+	
+	public function getCountQueuedTasksByStorageNode($storageNode)
+	{
+		return $this->count(array(	
+						'stateID'	=> 2,
+						'typeID'	=> array('U', 'D'),
+						'NFSGroupID'	=> $this->DB->sanitize($storageNode instanceof StorageNode ? $storageNode->get('id') : $storageNode )
+					 )
+				   );	
 	}
 	
 	// LEGACY
