@@ -243,7 +243,7 @@ class FOGCore extends FOGBase
 	public function getClass($class)
 	{
 		$args = func_get_args();
-		array_pop($args);
+		array_shift($args);
 		
 		if (count($args))
 		{
@@ -253,7 +253,7 @@ class FOGCore extends FOGBase
 			//$r = new ReflectionClass($class);
 			//return new $r->newInstanceArgs($args);
 			
-			return new $class($args);
+			return new $class((count($args) === 1 ? $args[0] : $args));
 		}
 		else
 		{

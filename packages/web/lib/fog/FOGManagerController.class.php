@@ -101,7 +101,7 @@ abstract class FOGManagerController extends FOGBase
 			$this->DB->query("SELECT * FROM `%s`%s ORDER BY `%s` %s", array(
 				$this->databaseTable,
 				(count($whereArray) ? ' WHERE ' . implode(' ' . $whereOperator . ' ', $whereArray) : ''),
-				$this->databaseFields[$orderBy],
+				($this->databaseFields[$orderBy] ? $this->databaseFields[$orderBy] : $this->databaseFields['id']),
 				$sort
 			));
 			

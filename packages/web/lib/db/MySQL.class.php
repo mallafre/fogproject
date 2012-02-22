@@ -238,21 +238,7 @@ class MySQL
 	
 	public function num_rows()
 	{
-		try
-		{
-			if (!$this->queryResult)
-			{
-				throw new Exception('No query result present. Use query() first');
-			}
-			
-			return mysql_num_rows($this->queryResult);
-		}
-		catch (Exception $e)
-		{
-			FOGCore::debug(sprintf('Failed to %s: %s', __FUNCTION__, $e->getMessage()));
-		}
-		
-		return 0;
+		return (is_resource($this->queryResult) ? mysql_num_rows($this->queryResult) : null);
 	}
 
 	public function age()
@@ -301,5 +287,24 @@ class MySQL
 	public function getLink()
 	{
 		return $this->link;
+	}
+	
+	public function dump($exit = false)
+	{
+		printf('<p>Last Error: %s</p><p>Last Query: %s</p><p>Last Query Result: %s</p><p>Last Num Rows: %s</p><p>Last Affected Rows: %s</p><p>Last Result: %s</p>',
+			$this->error(),
+			$this->query,
+			(is_bool($this->queryResult) === true ? ($this->queryResult == true ? 'true' : 'false') : $this->queryResult),
+			$this->num_rows(),
+			$this->affected_rows(),
+			(is_array($this->result) ? '<pre>' . print_r($this->result, 1) . '</pre>' : (is_bool($this->result) === true ? ($this->result == true ? 'true' : 'false') : $this->result))
+		);
+		
+		if ($exit)
+		{
+			exit;
+		}
+		
+		return $this;
 	}
 }

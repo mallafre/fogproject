@@ -325,7 +325,8 @@ abstract class FOGController extends FOGBase
 		}
 		catch (Exception $e)
 		{
-			$this->debug('Database Load Failed: Class: %s, ID: %s, Error: %s', array(get_class($this), $this->get('id'), $e->getMessage()));
+			// Unset ID -> Error
+			$this->set('id', 0)->debug('Database Load Failed: Class: %s, ID: %s, Error: %s', array(get_class($this), $this->get('id'), $e->getMessage()));
 		}
 	
 		// Fail
