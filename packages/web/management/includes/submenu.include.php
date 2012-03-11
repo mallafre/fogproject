@@ -141,7 +141,7 @@ if ($currentUser != null && $currentUser->isLoggedIn())
 
 			// Primary Group
 			$group = $FOGCore->getClass('GroupManager')->getGroupsWithMember($id);
-			//var_dump($group);exit;
+			
 			if ($group[0])
 			{
 				$FOGSubMenu->addNotes('host', array(_("Primary Group")	=> $group[0]->get('name')), 'id');

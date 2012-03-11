@@ -30,7 +30,7 @@ abstract class FOGPage extends FOGBase
 	
 	// Variables
 	// Page title
-	public $titleDisplay = true;
+	public $titleEnabled = true;
 	public $title;
 	
 	// Render engine
@@ -47,6 +47,7 @@ abstract class FOGPage extends FOGBase
 	protected $ajax = false;	// becomes true if AJAX request
 	protected $request = array();
 	protected $formAction;
+	protected $formPostAction;
 	
 	// __construct
 	public function __construct($name = '')

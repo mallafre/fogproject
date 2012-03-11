@@ -7,15 +7,30 @@ class FOGPageManager extends FOGBase
 	public $debug = true;
 	public $info = false;
 	
-	private $nodes = array();
-	private $nodeVariable = 'node';
-	private $subVariable = 'sub';
-	
 	private $pageTitle;
+	private $nodes = array();
 	
+	private $classVariable = 'node';
+	private $methodVariable = 'sub';
+	
+	private $classValue;
+	private $methodValue;
+	
+	// Construct
+	public function __construct()
+	{
+		// FOGBase Constructor
+		parent::__construct();
+	
+		// Save class & method values into class - used many times through out
+		$this->classValue = ($GLOBALS[$this->classVariable] ? preg_replace('#[^\w]#', '_', urldecode($GLOBALS[$this->classVariable])) : 'home');
+		$this->methodValue = preg_replace('#[^\w]#', '_', urldecode($GLOBALS[$this->methodVariable]));	// No default value as we want to detect an empty string for 'list' or 'search' default page
+	}
+	
+	// Util functions - easy access to class & child class data
 	public function getFOGPageClass()
 	{
-		return $this->nodes[$GLOBALS[$this->nodeVariable]];
+		return $this->nodes[$this->classValue];
 	}
 	
 	public function getFOGPageName()
@@ -28,9 +43,9 @@ class FOGPageManager extends FOGBase
 		return $this->getFOGPageClass()->title;
 	}
 	
-	public function isFOGPageTitleDisplayEnabled()
+	public function isFOGPageTitleEnabled()
 	{
-		return ($this->getFOGPageClass()->titleDisplay == true && !empty($this->getFOGPageClass()->title));
+		return ($this->getFOGPageClass()->titleEnabled == true && !empty($this->getFOGPageClass()->title));
 	}
 
 	// Register FOGPage
@@ -55,13 +70,13 @@ class FOGPageManager extends FOGBase
 		}
 		catch (Exception $e)
 		{
-			$this->debug('Failed to add Page: Node: %s, Class: %s, Error: %s', array($node, $class, $e->getMessage()));
+			$this->debug('Failed to add Page: Node: %s, Class: %s, Error: %s', array($this->classValue, $class, $e->getMessage()));
 		}
 		
 		return $this;
 	}
 	
-	// Call FOGPage->method based on $node and $sub
+	// Call FOGPage->method based on $this->classValue and $this->methodValue
 	public function render()
 	{
 		$this->loadPageClasses();
@@ -69,29 +84,28 @@ class FOGPageManager extends FOGBase
 		try
 		{
 			// Variables
-			$node = ($GLOBALS[$this->nodeVariable] ? preg_replace('#[^\w]#', '_', urldecode($GLOBALS[$this->nodeVariable])) : 'home');
-			$sub = $method = preg_replace('#[^\w]#', '_', urldecode($GLOBALS[$this->subVariable]));
-			$class = $this->getFOGPageClass();
+			$class = $this->getFOGPageClass();	// Class that will be used
+			$method = $this->methodValue;		// Method that will be called in the above class. This value changes while $this->methodValue remains constant.
 		
 			// Error checking
-			if (!array_key_exists($node, $this->nodes))
+			if (!array_key_exists($this->classValue, $this->nodes))
 			{
 				throw new Exception(sprintf('No FOGPage Class found for this node. You should try the old "includes" style management code <a href="%s">found here</a>', preg_replace("#index\.php#", 'indexold.php', $_SERVER['PHP_SELF']) . "?$_SERVER[QUERY_STRING]"));
 			}
 			
 			// Figure out which method to call - default to index() if method is not found
-			if (empty($sub) || !method_exists($class, $sub))
+			if (empty($method) || !method_exists($class, $method))
 			{
-				if (!empty($sub) && $sub != 'list')
+				if (!empty($method) && $method != 'list')
 				{
-					$this->debug('Class: %s, Method: %s, Error: Method not found in class, defaulting to index()', array(get_class($class), $sub));
+					$this->debug('Class: %s, Method: %s, Error: Method not found in class, defaulting to index()', array(get_class($class), $method));
 				}
 				
 				$method = 'index';
 			}
 			
 			// FOG - Default view override
-			if ($sub != 'list' && $method == 'index' && $this->FOGCore->getSetting('FOG_VIEW_DEFAULT_SCREEN') != 'LIST' && method_exists($class, 'search'))
+			if ($this->methodValue != 'list' && $method == 'index' && $this->FOGCore->getSetting('FOG_VIEW_DEFAULT_SCREEN') != 'LIST' && method_exists($class, 'search'))
 			{
 				$method = 'search';
 			}
@@ -123,7 +137,7 @@ class FOGPageManager extends FOGBase
 		}
 		catch (Exception $e)
 		{
-			$this->debug('Failed to Render Page: Node: %s, Error: %s', array($node, $e->getMessage()));
+			$this->debug('Failed to Render Page: Node: %s, Error: %s', array($this->classValue, $e->getMessage()));
 		}
 		
 		return false;

@@ -40,12 +40,12 @@ class Image extends FOGController
 	
 	public function getOS()
 	{
-		return new OS($this->data['osID']);
+		return new OS($this->get('osID'));
 	}
 	
 	public function getImageType()
 	{
-		return new ImageType($this->data['imageTypeID']);
+		return new ImageType($this->get('imageTypeID'));
 	}
 	
 	// Legacy functions - remove once updated in other areas

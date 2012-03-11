@@ -229,7 +229,7 @@ class ImageManagementPage extends FOGPage
 		// Title - set title for page title in window
 		$this->title = sprintf('%s: %s', _('Edit'), $Image->get('name'));
 		// But disable displaying in content
-		$this->titleDisplay = false;
+		$this->titleEnabled = false;
 		
 		// Hook
 		$this->HookManager->processEvent('IMAGE_ADD', array('Image' => &$Image));

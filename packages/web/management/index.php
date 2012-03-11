@@ -28,26 +28,27 @@ require_once(BASEPATH . '/commons/init.database.php');
 if (IS_INCLUDED !== true) die(_('Unable to load system configuration information'));
 
 // User session data
-$currentUser = (!empty($_SESSION['FOG_USER_OBJECT']) ? unserialize($_SESSION['FOG_USER_OBJECT']) : null);
+$currentUser = (!empty($_SESSION['FOG_USER']) ? unserialize($_SESSION['FOG_USER']) : null);
 
 // Process Login
 require_once('./includes/processlogin.include.php');
 
 // Login form + logout
-if ($node == 'logout' || $currentUser == null || !$currentUser->isLoggedIn())
+if ($node == 'logout' || $currentUser == null || !method_exists($currentUser, 'isLoggedIn') || !$currentUser->isLoggedIn())
 {
-	if ($node == 'logout' && ($currentUser instanceof User))
-	{
-		$currentUser->logout();
-		
-		unset($currentUser);
-	}
-	
-	$_SESSION['AllowAJAXTasks'] = false;
-	
 	// Hook
 	$HookManager->processEvent('LOGOUT', array('user' => &$currentUser));
 	
+	// Logout
+	if (method_exists($currentUser, 'logout'))
+	{
+		$currentUser->logout();
+	}
+	
+	// Unset session variables
+	unset($currentUser, $_SESSION['FOG_USER'], $_SESSION['FOG_USERNAME'], $_SESSION['AllowAJAXTasks']);
+	
+	// Show login form
 	require_once('./includes/loginform.include.php');
 }
 
@@ -121,7 +122,7 @@ $HookManager->processEvent('CSS');
 		<div id="content-inner">
 			<?php
 			
-			if ($FOGPageManager->isFOGPageTitleDisplayEnabled())
+			if ($FOGPageManager->isFOGPageTitleEnabled())
 			{
 				printf('<h2>%s</h2>', $FOGPageManager->getFOGPageTitle());
 			}

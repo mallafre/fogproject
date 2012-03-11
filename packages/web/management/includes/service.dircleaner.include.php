@@ -73,7 +73,7 @@ else if ( $_GET["delid"] !== null && is_numeric( $_GET["delid"] ) )
 			{
 				$checked = " checked=\"checked\" ";
 			}
-			echo ( "<tr><td width=\"270\">&nbsp;"._("Directory Cleaner Enabled?")."</td><td>&nbsp;<input type=\"checkbox\" name=\"en\" $checked /></td><td><span class=\"icon icon-help hand\" title=\"" . _("This setting will globally enable or disable the directory cleaner service module.  If you disable the module, it will be disabled for all clients, regardsless of the host specific setting.") . "\"></span></td></tr>" );
+			echo ( "<tr><td width=\"270\">&nbsp;"._("Directory Cleaner Enabled?")."</td><td>&nbsp;<input type=\"checkbox\" name=\"en\" $checked /></td><td><span class=\"icon icon-help hand\" title=\"" . _("This setting will globally enable or disable the directory cleaner service module.  If you disable the module, it will be disabled for all clients, regardless of the host specific setting.") . "\"></span></td></tr>" );
 			echo ( "<tr><td colspan='3'><center><input type=\"submit\" value=\""._("Update")."\" /></center></td></tr>" );			
 		echo ( "</table></center>" );
 	echo ( "</form>" );

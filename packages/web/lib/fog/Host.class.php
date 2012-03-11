@@ -66,7 +66,7 @@ class Host extends FOGController
 	
 	public function getOS()
 	{
-		return new OS($this->get('osID'));
+		return $this->getImage()->getOS();
 	}
 	
 	public function getPrinters()
@@ -79,15 +79,13 @@ class Host extends FOGController
 		return $this->get('mac');
 	}
 	
-	// Overrides
-	public function get($key = '')
+	private function loadPrinters()
 	{
-		if ($this->key($key) == 'printers' && !$this->isLoaded('printers'))
+		if (!$this->isLoaded('printers'))
 		{
-			// Printers
 			if ($this->get('id'))
 			{
-				$this->DB->query("SELECT * FROM  printerAssoc inner join printers on ( printerAssoc.paPrinterID = printers.pID ) WHERE printerAssoc.paHostID = '%s' ORDER BY printers.pAlias", $this->get('id'));
+				$this->DB->query("SELECT printers.* FROM printerAssoc inner join printers on ( printerAssoc.paPrinterID = printers.pID ) WHERE printerAssoc.paHostID = '%s' ORDER BY printers.pAlias", $this->get('id'));
 				
 				while ($printer = $this->DB->fetch()->get())
 				{
@@ -96,6 +94,16 @@ class Host extends FOGController
 			}
 			
 			$this->set('printers', (array)$printers);
+		}
+	}
+	
+	// Overrides
+	public function get($key = '')
+	{
+		if ($this->key($key) == 'printers')
+		{
+			// Printers
+			$this->loadPrinters();
 		}
 		else if ($this->key($key) == 'optimalStorageNode' && !$this->isLoaded('optimalStorageNode'))
 		{
@@ -125,6 +133,19 @@ class Host extends FOGController
 			$value = (array)$newValue;
 		}
 		
+		// Printers
+		if ($this->key($key) == 'printers')
+		{
+			$this->loadPrinters();
+		
+			foreach ((array)$value AS $printer)
+			{
+				$newValue[] = ($printer instanceof Printer ? $printer : new Printer($printer));
+			}
+			
+			$value = (array)$newValue;
+		}
+		
 		// Set
 		return parent::set($key, $value);
 	}
@@ -137,7 +158,13 @@ class Host extends FOGController
 			$value = new MACAddress($value);
 		}
 		
-		
+		// Printers
+		if ($this->key($key) == 'printers' && !($value instanceof Printer))
+		{
+			$this->loadPrinters();
+			
+			$value = new Printer($value);
+		}
 		
 		// Add
 		return parent::add($key, $value);
@@ -148,6 +175,7 @@ class Host extends FOGController
 		// Save
 		parent::save();
 
+		// Additional MAC Addresses
 		// Remove existing Additional MAC Addresses
 		$this->DB->query("DELETE FROM `hostMAC` WHERE `hmHostID`='%s'", array($this->get('id')));
 		
@@ -157,6 +185,22 @@ class Host extends FOGController
 			if (($MAC instanceof MACAddress) && $MAC->isValid())
 			{
 				$this->DB->query("INSERT INTO `hostMAC` (`hmHostID`, `hmMAC`) VALUES('%s', '%s')", array($this->get('id'), $MAC));
+			}
+		}
+		
+		// Printers
+		if ($this->isLoaded('printers'))
+		{
+			// Remove old printers
+			$this->DB->query("DELETE FROM `printerAssoc` WHERE `paHostID` = '%s'", array($this->get('id')));
+			
+			// Create assoc
+			foreach ($this->get('printers') AS $i => $Printer)
+			{
+				if (($Printer instanceof Printer) && $Printer->isValid())
+				{
+					$this->DB->query("INSERT INTO `printerAssoc` (paHostID, paPrinterID, paIsDefault) VALUES ('%s', '%s', '%s')", array($this->get('id'), $Printer->get('id'), ($i === 0 ? '1' : '0')));
+				}
 			}
 		}
 		
@@ -581,6 +625,41 @@ class Host extends FOGController
 	{
 		// HTTP request to WOL script
 		$this->FOGCore->wakeOnLAN($this->getMACAddress());
+	}
+	
+	// Printer Management
+	public function addPrinter($printers)
+	{
+		// Add printer
+		foreach ((array)$printers AS $printer)
+		{
+			$this->add('printers', $printer);
+		}
+		
+		// Return
+		return $this;
+	}
+	
+	public function removePrinter($printerRemoveArray)
+	{
+		// Build array of Printer ID's to remove
+		foreach ((array)$printerRemoveArray AS $printerRemoveID)
+		{
+			// Get printer ID to remove from list
+			$printerRemoveIDArray[] = ($printerRemoveID instanceof Printer ? $printerRemoveID->get('id') : (int)$printerRemoveID);
+		}
+		
+		// Iterate Printers -> Build new Printer array exluding all Printers that are in $printerRemoveIDArray
+		foreach ($this->get('printers') AS $Printer)
+		{
+			if (!in_array($Printer->get('id'), $printerRemoveIDArray))
+			{
+				$newPrinterArray[] = $Printer;
+			}
+		}
+		
+		// Set new 'printers' data -> Return
+		return $this->set('printers', (array)$newPrinterArray);;
 	}
 	
 	

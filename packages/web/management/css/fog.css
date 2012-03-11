@@ -18,7 +18,7 @@
 }
 
 html, body { height: 100%; }
-body { margin: 0; padding: 0; background: #FFFFFF url(../images/body-bkg.gif) repeat-x; font-family: Ubuntu, Arial, Helvetica, sans-serif; font-size: 13px; color: #333333; }
+body { margin: 0; padding: 0; background: #FFFFFF url(../images/body-bkg.gif) repeat-x; font-family: Ubuntu, Arial, Helvetica, sans-serif; font-size: 13px; color: #555; }
 
 h1, h2, h3, h4, h5, h6 { margin: 13px 0; /*text-transform: lowercase;*/ font-weight: normal; color: #4c68a0; }
 h1 { font-size: 32px; }
@@ -47,6 +47,7 @@ fieldset { border: 1px solid #94C3D3; border-radius: 5px; margin-bottom: 40px; p
 /* Form elements */
 /*input { min-width: 200px; }*/
 input, textarea, select { font-family: "Trebuchet MS", Arial, Helvetica, sans-serif; font-size: 13px; color: #333333; border: 1px solid #94c3d3; border-radius: 3px; background-color: #fff; vertical-align: top; padding: 4px 8px; }
+select { padding: 4px 3px 4px 8px; }
 input:focus, textarea:focus { border-color: #5372af; background-image: url('../images/icon_pencil.png'); background-repeat: no-repeat; background-position: 97% center; }
 input[type="text"] { width: 200px; }
 input[type="text"]:focus { width: 181px; padding-right: 27px; }
@@ -268,9 +269,9 @@ pre { white-space: pre-wrap; }
 .graph.pie-graph { height: 120px; margin: 5px 0 0 0; }
 
 /* Dashboard - 3 row boxes */
-#dashboard-boxes { list-style: none; padding: 0 2px; margin-bottom: 10px; height: 160px; }
-#dashboard-boxes li { border: 2px solid #545454; float: left; width: 242px; padding: 2px; margin: 0 3px; height: 150px; }
-#dashboard-boxes li h4 { text-align: center; background: #c7cede; padding: 2px; font-size: 12px; font-weight: bold; }
+#dashboard-boxes { list-style: none; padding: 0 2px; margin-bottom: 10px; height: 160px; font-size: 12px; }
+#dashboard-boxes li { border: 2px solid #C7CEDE; float: left; width: 242px; padding: 2px; margin: 0 3px; height: 150px; border-radius: 5px; overflow: hidden; }
+#dashboard-boxes li h4 { text-align: center; background: #c7cede; padding: 5px; margin: 0; font-size: 13px; font-weight: bold; border-radius: 2px; }
 #dashboard-boxes li p { margin: 0; line-height: 20px; }
 #dashboard-boxes table td { padding: 4px 5px; }
 
@@ -279,7 +280,8 @@ pre { white-space: pre-wrap; }
 #diskusage-selector select { font-size: 10px; border: 1px solid #666; }
 
 /* Dashboard - Bandwidth Graph */
-#graph-bandwidth-filters { border: 0px solid red; width: 721px; position: absolute; z-index: 10; margin-top: -13px; padding-left: 50px; }
+#graph-bandwidth { margin-top: 20px; }
+#graph-bandwidth-filters { border: 0px solid red; width: 721px; position: absolute; z-index: 10; margin-top: -6px; padding-left: 50px; }
 #graph-bandwidth-filters a { background: #666; color: #fff; font-size: 10px; margin: 0 5px; padding: 2px 5px; text-decoration: none; }
 #graph-bandwidth-filters a.active { background: #888; }
 #graph-bandwidth-filters a:hover { background: #888; }

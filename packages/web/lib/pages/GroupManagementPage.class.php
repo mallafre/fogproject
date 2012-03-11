@@ -208,7 +208,7 @@ class GroupManagementPage extends FOGPage
 		// Title - set title for page title in window
 		$this->title = sprintf('%s: %s', _('Edit'), $Group->get('name'));
 		// But disable displaying in content
-		$this->titleDisplay = false;
+		$this->titleEnabled = false;
 		
 		// Hook
 		$this->HookManager->processEvent('GROUP_EDIT', array('Group' => &$Group));

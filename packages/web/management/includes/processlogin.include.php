@@ -35,8 +35,8 @@ if ( $userMan != null && isset($_POST["uname"]) && isset($_POST["upass"]) && $co
 			$HookManager->processEvent('LoginSuccess', array('user' => &$currentUser, 'username' => &$username, 'password' => &$password));
 			
 			// Set session
-			$_SESSION['FOG_USER_OBJECT'] = serialize($currentUser);
-			$_SESSION['FOG_USER'] = $currentUser->get('name');
+			$_SESSION['FOG_USER'] = serialize($currentUser);
+			$_SESSION['FOG_USERNAME'] = $currentUser->get('name');
 			
 			// Check if we were going to a particular page before the login page was presented - if we were, rebuild URL
 			unset($_POST['upass'], $_POST['uname'], $_POST['ulang']);

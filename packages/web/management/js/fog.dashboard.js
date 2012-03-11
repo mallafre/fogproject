@@ -290,12 +290,16 @@ function UpdateBandwidth()
 
 function UpdateBandwidthGraph(data)
 {
-	if (GraphBandwidthDebug && console) console.profile();
+	if (GraphBandwidthDebug && window.console) console.profile();
 
 	// Parse new data coming in -> add to data array
 	if (typeof(data) != 'undefined')
 	{
-		Now = new Date().getTime();
+		// Create date object
+		var d = new Date();
+		
+		// Convert to msec -> add local time zone offset -> get UTC time in msec
+		Now = d.getTime() + (d.getTimezoneOffset() * 60000);
 		
 		for (i in data)
 		{
@@ -348,5 +352,5 @@ function UpdateBandwidthGraph(data)
 	GraphBandwidthPlot.setupGrid();
 	GraphBandwidthPlot.draw();
 	
-	if (GraphBandwidthDebug && console) console.profileEnd();
+	if (GraphBandwidthDebug && window.console) console.profileEnd();
 }

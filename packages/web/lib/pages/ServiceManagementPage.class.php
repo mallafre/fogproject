@@ -60,7 +60,7 @@ class ServiceManagementPage extends FOGPage
 					<p><?php echo(_("The Auto Log Out service module will log a user out of a workstation after x minutes of inactivity.")); ?></p>
 					<h2><?php echo(_("Service Status")); ?></h2>	
 					<table cellpadding=0 cellspacing=0 border=0 width=100%>
-					<tr><td width="270"><?php print _("Auto Log Out Enabled?"); ?></td><td><input type="checkbox" name="en"<?php print ($this->FOGCore->getSetting("FOG_SERVICE_AUTOLOGOFF_ENABLED") ? ' checked="checked"' : ''); ?> /></td><td><span class="icon icon-help hand" title="<?php print _("This setting will globally enable or disable the auto log out service module.  If you disable the module, it will be disabled for all clients, regardsless of the Servicespecific setting."); ?>"></span></td></tr>
+					<tr><td width="270"><?php print _("Auto Log Out Enabled?"); ?></td><td><input type="checkbox" name="en"<?php print ($this->FOGCore->getSetting("FOG_SERVICE_AUTOLOGOFF_ENABLED") ? ' checked="checked"' : ''); ?> /></td><td><span class="icon icon-help hand" title="<?php print _("This setting will globally enable or disable the auto log out service module.  If you disable the module, it will be disabled for all clients, regardless of the Servicespecific setting."); ?>"></span></td></tr>
 					<tr><td>&nbsp;</td><td><input type="submit" value="<?php print _("Update"); ?>" /></td></tr>			
 					</table>
 					<h2><?php print _("Default Setting"); ?></h2>
@@ -78,7 +78,7 @@ class ServiceManagementPage extends FOGPage
 				<p><?php echo(_("Client updater will keeps your FOG client up to date.")); ?></p>
 				<h2><?php echo(_("Service Status")); ?></h2>
 				<table cellpadding=0 cellspacing=0 border=0 width=100%>
-				<tr><td width="270"><?php print _("Client Update Enabled?"); ?></td><td><input type="checkbox" name="en"<?php print ($this->FOGCore->getSetting("FOG_SERVICE_CLIENTUPDATER_ENABLED") ? ' checked="checked"' : ''); ?> /></td><td><span class="icon icon-help hand" title="<?php print _("This setting will globally enable or disable the client updater service module.  If you disable the module, it will be disabled for all clients, regardsless of the Servicespecific setting."); ?>"></span></td></tr>
+				<tr><td width="270"><?php print _("Client Update Enabled?"); ?></td><td><input type="checkbox" name="en"<?php print ($this->FOGCore->getSetting("FOG_SERVICE_CLIENTUPDATER_ENABLED") ? ' checked="checked"' : ''); ?> /></td><td><span class="icon icon-help hand" title="<?php print _("This setting will globally enable or disable the client updater service module.  If you disable the module, it will be disabled for all clients, regardless of the Servicespecific setting."); ?>"></span></td></tr>
 				<tr><td>&nbsp;</td><td><input type="submit" value="<?php print _("Update"); ?>" /></td></tr>			
 				</table>
 				
@@ -95,7 +95,7 @@ class ServiceManagementPage extends FOGPage
 					
 					
 						<table cellpadding=0 cellspacing=0 border=0 width=100%>
-							<tr><td width="270"><?php print _("Directory Cleaner Enabled?"); ?></td><td><input type="checkbox" name="en"<?php print ($this->FOGCore->getSetting("FOG_SERVICE_DIRECTORYCLEANER_ENABLED") ? ' checked="checked"' : ''); ?> /></td><td><span class="icon icon-help hand" title="<?php print _("This setting will globally enable or disable the directory cleaner service module.  If you disable the module, it will be disabled for all clients, regardsless of the Servicespecific setting."); ?>"></span></td></tr>
+							<tr><td width="270"><?php print _("Directory Cleaner Enabled?"); ?></td><td><input type="checkbox" name="en"<?php print ($this->FOGCore->getSetting("FOG_SERVICE_DIRECTORYCLEANER_ENABLED") ? ' checked="checked"' : ''); ?> /></td><td><span class="icon icon-help hand" title="<?php print _("This setting will globally enable or disable the directory cleaner service module.  If you disable the module, it will be disabled for all clients, regardless of the Servicespecific setting."); ?>"></span></td></tr>
 							<tr><td>&nbsp;</td><td><input type="submit" value="<?php print _("Update"); ?>" /></td></tr>			
 						</table>
 						
@@ -148,7 +148,7 @@ class ServiceManagementPage extends FOGPage
 
 
 					<table cellpadding=0 cellspacing=0 border=0 width=100%>
-					<tr><td width="270"><?php print _("Display Manager Enabled?"); ?></td><td><input type="checkbox" name="en"<?php print ($this->FOGCore->getSetting("FOG_SERVICE_DISPLAYMANAGER_ENABLED") ? ' checked="checked"' : ''); ?> /></td><td><span class="icon icon-help hand" title="<?php print _("This setting will globally enable or disable the display manager service module.  If you disable the module, it will be disabled for all clients, regardsless of the Servicespecific setting."); ?>"></span></td></tr>
+					<tr><td width="270"><?php print _("Display Manager Enabled?"); ?></td><td><input type="checkbox" name="en"<?php print ($this->FOGCore->getSetting("FOG_SERVICE_DISPLAYMANAGER_ENABLED") ? ' checked="checked"' : ''); ?> /></td><td><span class="icon icon-help hand" title="<?php print _("This setting will globally enable or disable the display manager service module.  If you disable the module, it will be disabled for all clients, regardless of the Servicespecific setting."); ?>"></span></td></tr>
 					<tr><td>&nbsp;</td><td><input type="submit" value="<?php print _("Update"); ?>" /></td></tr>			
 					</table>
 
@@ -173,7 +173,7 @@ class ServiceManagementPage extends FOGPage
 
 
 					<table cellpadding=0 cellspacing=0 border=0 width=100%>
-					<tr><td width="270"><?php print _("Green FOG Enabled?"); ?></td><td><input type="checkbox" name="en"<?php print ($this->FOGCore->getSetting("FOG_SERVICE_GREENFOG_ENABLED") ? ' checked="checked"' : ''); ?> /></td><td><span class="icon icon-help hand" title="<?php print _("This setting will globally enable or disable the Green FOG service module.  If you disable the module, it will be disabled for all clients, regardsless of the Servicespecific setting."); ?>"></span></td></tr>
+					<tr><td width="270"><?php print _("Green FOG Enabled?"); ?></td><td><input type="checkbox" name="en"<?php print ($this->FOGCore->getSetting("FOG_SERVICE_GREENFOG_ENABLED") ? ' checked="checked"' : ''); ?> /></td><td><span class="icon icon-help hand" title="<?php print _("This setting will globally enable or disable the Green FOG service module.  If you disable the module, it will be disabled for all clients, regardless of the Servicespecific setting."); ?>"></span></td></tr>
 					<tr><td>&nbsp;</td><td><input type="submit" value="<?php print _("Update"); ?>" /></td></tr>			
 					</table>
 
@@ -225,7 +225,7 @@ class ServiceManagementPage extends FOGPage
 					<p><?php echo(_("The hostname changer is a service module that rename the client's hostname after imaging.  This service also handles Microsoft Active Directory integration.")); ?></p>
 					<h2><?php echo(_("Service Status")); ?></h2>
 					<table cellpadding=0 cellspacing=0 border=0 width=100%>
-						<tr><td width="270"><?php print _("Hostname Changer Enabled?"); ?></td><td><input type="checkbox" name="en"<?php print ($this->FOGCore->getSetting("FOG_SERVICE_HOSTNAMECHANGER_ENABLED") ? ' checked="checked"' : ''); ?> /></td><td><span class="icon icon-help hand" title="<?php print _("This setting will globally enable or disable the hostname changer service module.  If you disable the module, it will be disabled for all clients, regardsless of the Servicespecific setting."); ?>"></span></td></tr>
+						<tr><td width="270"><?php print _("Hostname Changer Enabled?"); ?></td><td><input type="checkbox" name="en"<?php print ($this->FOGCore->getSetting("FOG_SERVICE_HOSTNAMECHANGER_ENABLED") ? ' checked="checked"' : ''); ?> /></td><td><span class="icon icon-help hand" title="<?php print _("This setting will globally enable or disable the hostname changer service module.  If you disable the module, it will be disabled for all clients, regardless of the Servicespecific setting."); ?>"></span></td></tr>
 						<tr><td>&nbsp;</td><td><input type="submit" value="<?php print _("Update"); ?>" /></td></tr>			
 					</table>
 
@@ -243,7 +243,7 @@ class ServiceManagementPage extends FOGPage
 					<h2><?php echo(_("Service Status")); ?></h2>
 					
 					<table cellpadding=0 cellspacing=0 border=0 width=100%>
-						<tr><td width="270"><?php print _("ServiceRegister Enabled?"); ?></td><td><input type="checkbox" name="en"<?php print ($this->FOGCore->getSetting("FOG_SERVICE_HOSTREGISTER_ENABLED") ? ' checked="checked"' : ''); ?> /></td><td><span class="icon icon-help hand" title="<?php print _("This setting will globally enable or disable the Serviceregister service module.  If you disable the module, it will be disabled for all clients, regardsless of the Servicespecific setting."); ?>"></span></td></tr>
+						<tr><td width="270"><?php print _("ServiceRegister Enabled?"); ?></td><td><input type="checkbox" name="en"<?php print ($this->FOGCore->getSetting("FOG_SERVICE_HOSTREGISTER_ENABLED") ? ' checked="checked"' : ''); ?> /></td><td><span class="icon icon-help hand" title="<?php print _("This setting will globally enable or disable the Serviceregister service module.  If you disable the module, it will be disabled for all clients, regardless of the Servicespecific setting."); ?>"></span></td></tr>
 						<tr><td>&nbsp;</td><td><input type="submit" value="<?php print _("Update"); ?>" /></td></tr>			
 					</table>
 
@@ -259,7 +259,7 @@ class ServiceManagementPage extends FOGPage
 				<p><? echo(_("Printer Manager is a service module that will install, remove, and set the default printer on clients.")); ?></p>
 				<h2><? echo(_("Service Status")); ?></h2>
 				<table cellpadding=0 cellspacing=0 border=0 width=100%>
-					<tr><td width="270"><?php print _("Printer Manager Enabled?"); ?></td><td><input type="checkbox" name="en"<?php print ($this->FOGCore->getSetting("FOG_SERVICE_PRINTERMANAGER_ENABLED") ? ' checked="checked"' : ''); ?> /></td><td><span class="icon icon-help hand" title="<?php print _("This setting will globally enable or disable the printer manager service module.  If you disable the module, it will be disabled for all clients, regardsless of the Servicespecific setting."); ?>"></span></td></tr>
+					<tr><td width="270"><?php print _("Printer Manager Enabled?"); ?></td><td><input type="checkbox" name="en"<?php print ($this->FOGCore->getSetting("FOG_SERVICE_PRINTERMANAGER_ENABLED") ? ' checked="checked"' : ''); ?> /></td><td><span class="icon icon-help hand" title="<?php print _("This setting will globally enable or disable the printer manager service module.  If you disable the module, it will be disabled for all clients, regardless of the Servicespecific setting."); ?>"></span></td></tr>
 					<tr><td>&nbsp;</td><td><input type="submit" value="<?php print _("Update"); ?>" /></td></tr>			
 				</table>
 
@@ -277,7 +277,7 @@ class ServiceManagementPage extends FOGPage
 					<h2><?php echo(_("Service Status")); ?></h2>
 					
 					<table cellpadding=0 cellspacing=0 border=0 width=100%>
-						<tr><td width="270"><?php print _("Snapin Client Enabled?"); ?></td><td><input type="checkbox" name="en"<?php print ($this->FOGCore->getSetting("FOG_SERVICE_SNAPIN_ENABLED") ? ' checked="checked"' : ''); ?> /></td><td><span class="icon icon-help hand" title="<?php print _("This setting will globally enable or disable the snapin service module.  If you disable the module, it will be disabled for all clients, regardsless of the Servicespecific setting."); ?>"></span></td></tr>
+						<tr><td width="270"><?php print _("Snapin Client Enabled?"); ?></td><td><input type="checkbox" name="en"<?php print ($this->FOGCore->getSetting("FOG_SERVICE_SNAPIN_ENABLED") ? ' checked="checked"' : ''); ?> /></td><td><span class="icon icon-help hand" title="<?php print _("This setting will globally enable or disable the snapin service module.  If you disable the module, it will be disabled for all clients, regardless of the Servicespecific setting."); ?>"></span></td></tr>
 						<tr><td>&nbsp;</td><td><input type="submit" value="<?php print _("Update"); ?>" /></td></tr>			
 					</table>
 		
@@ -295,7 +295,7 @@ class ServiceManagementPage extends FOGPage
 					<h2><?php echo(_("Service Status")); ?></h2>
 					
 					<table cellpadding=0 cellspacing=0 border=0 width=100%>
-						<tr><td width="270"><?php print _("Task Reboot Enabled?"); ?></td><td><input type="checkbox" name="en"<?php print ($this->FOGCore->getSetting("FOG_SERVICE_TASKREBOOT_ENABLED") ? ' checked="checked"' : ''); ?> /></td><td><span class="icon icon-help hand" title="<?php print _("This setting will globally enable or disable the task reboot service module.  If you disable the module, it will be disabled for all clients, regardsless of the Servicespecific setting."); ?>"></span></td></tr>
+						<tr><td width="270"><?php print _("Task Reboot Enabled?"); ?></td><td><input type="checkbox" name="en"<?php print ($this->FOGCore->getSetting("FOG_SERVICE_TASKREBOOT_ENABLED") ? ' checked="checked"' : ''); ?> /></td><td><span class="icon icon-help hand" title="<?php print _("This setting will globally enable or disable the task reboot service module.  If you disable the module, it will be disabled for all clients, regardless of the Servicespecific setting."); ?>"></span></td></tr>
 						<tr><td>&nbsp;</td><td><input type="submit" value="<?php print _("Update"); ?>" /></td></tr>			
 					</table>
 		
@@ -368,7 +368,7 @@ class ServiceManagementPage extends FOGPage
 					<h2><?php echo(_("Service Status")); ?></h2>
 					
 					<table cellpadding=0 cellspacing=0 border=0 width=100%>
-						<tr><td width="270"><?php print _("User Tracker Enabled?"); ?></td><td><input type="checkbox" name="en"<?php print ($this->FOGCore->getSetting("FOG_SERVICE_USERTRACKER_ENABLED") ? ' checked="checked"' : ''); ?> /></td><td><span class="icon icon-help hand" title="<?php print _("This setting will globally enable or disable the user tracker service module.  If you disable the module, it will be disabled for all clients, regardsless of the Servicespecific setting."); ?>"></span></td></tr>
+						<tr><td width="270"><?php print _("User Tracker Enabled?"); ?></td><td><input type="checkbox" name="en"<?php print ($this->FOGCore->getSetting("FOG_SERVICE_USERTRACKER_ENABLED") ? ' checked="checked"' : ''); ?> /></td><td><span class="icon icon-help hand" title="<?php print _("This setting will globally enable or disable the user tracker service module.  If you disable the module, it will be disabled for all clients, regardless of the Servicespecific setting."); ?>"></span></td></tr>
 						<tr><td>&nbsp;</td><td><input type="submit" value="<?php print _("Update"); ?>" /></td></tr>			
 					</table>
 		

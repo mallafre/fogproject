@@ -56,9 +56,9 @@ abstract class FOGController extends FOGBase
 			$this->databaseFieldsFlipped = array_flip($this->databaseFields);
 			
 			// Created By
-			if (array_key_exists('createdBy', $this->databaseFields) && !empty($_SESSION['FOG_USER']))
+			if (array_key_exists('createdBy', $this->databaseFields) && !empty($_SESSION['FOG_USERNAME']))
 			{
-				$this->set('createdBy', $_SESSION['FOG_USER']);
+				$this->set('createdBy', $_SESSION['FOG_USERNAME']);
 			}
 			
 			// Add incoming data
@@ -231,10 +231,7 @@ abstract class FOGController extends FOGBase
 			// Build update field array using filtered data
 			foreach ($fieldsToUpdate AS $name => $fieldName)
 			{
-				if ($this->get($name) != '')
-				{
-					$updateData[] = sprintf("`%s`='%s'", $this->DB->sanitize($fieldName), $this->DB->sanitize($this->get($name)));
-				}
+				$updateData[] = sprintf("`%s` = '%s'", $this->DB->sanitize($fieldName), $this->DB->sanitize($this->get($name)));
 			}
 			
 			// Insert & Update query all-in-one

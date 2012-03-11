@@ -240,7 +240,7 @@ class HostManagementPage extends FOGPage
 		// Title - set title for page title in window
 		$this->title = sprintf('%s: %s', _('Edit'), $Host->get('name'));
 		// But disable displaying in content
-		$this->titleDisplay = false;
+		$this->titleEnabled = false;
 		
 		// Hook
 		$this->HookManager->processEvent('HOST_EDIT', array('Host' => &$Host));
@@ -263,9 +263,9 @@ class HostManagementPage extends FOGPage
 							<tr><td><?php print _("Primary MAC"); ?></td><td><input type="text" id="mac" name="mac" value="<?php print $Host->get('mac'); ?>" /> * &nbsp; <span id="priMaker"></span> </td></tr>
 							<tr><td><?php print _("Host Description"); ?></td><td><textarea name="description" rows="5" cols="40"><?php print $Host->get('description'); ?></textarea></td></tr>
 							<tr><td><?php print _("Host Image"); ?></td><td><?php print $this->FOGCore->getClass('ImageManager')->buildSelectBox($Host->get('imageID')); ?></td></tr>
-							<tr><td><?php print _("Host Kernel"); ?></td><td><input type="text" name="kern" value="<?php print $Host->get('kern'); ?>" /></td></tr>
-							<tr><td><?php print _("Host Kernel Arguments"); ?></td><td><input type="text" name="args" value="<?php print $Host->get('args'); ?>" /></td></tr>
-							<tr><td><?php print _("Host Primary Disk"); ?></td><td><input type="text" name="dev" value="<?php print $Host->get('dev'); ?>" /></td></tr>
+							<tr><td><?php print _("Host Kernel"); ?></td><td><input type="text" name="kern" value="<?php print $Host->get('kernel'); ?>" /></td></tr>
+							<tr><td><?php print _("Host Kernel Arguments"); ?></td><td><input type="text" name="args" value="<?php print $Host->get('kernelArgs'); ?>" /></td></tr>
+							<tr><td><?php print _("Host Primary Disk"); ?></td><td><input type="text" name="dev" value="<?php print $Host->get('kernelDevice'); ?>" /></td></tr>
 							<tr><td>&nbsp;</td><td><input type="submit" value="<?php print _("Update"); ?>" /></td></tr>
 						</table>
 					</form>
@@ -358,8 +358,8 @@ class HostManagementPage extends FOGPage
 						<p><?php print _("Select Management Level for this Host"); ?></p>
 						<p>
 							<input type="radio" name="level" value="0"<?php print ($Host->get('printerLevel') === '0' || $Host->get('printerLevel') === '' ? ' checked="checked"' : ''); ?> /><?php print _("No Printer Management"); ?><br/>
-							<input type="radio" name="level" value="1"<?php print ($Host->get('printerLevel') === '0' ? ' checked="checked"' : ''); ?> /><?php print _("Add Only"); ?><br/>
-							<input type="radio" name="level" value="2"<?php print ($Host->get('printerLevel') === '0' ? ' checked="checked"' : ''); ?> /><?php print _("Add and Remove"); ?><br/>
+							<input type="radio" name="level" value="1"<?php print ($Host->get('printerLevel') === '1' ? ' checked="checked"' : ''); ?> /><?php print _("Add Only"); ?><br/>
+							<input type="radio" name="level" value="2"<?php print ($Host->get('printerLevel') === '2' ? ' checked="checked"' : ''); ?> /><?php print _("Add and Remove"); ?><br/>
 						</p>
 						
 						<table cellpadding=0 cellspacing=0 border=0 width=100%>
@@ -373,6 +373,22 @@ class HostManagementPage extends FOGPage
 							</thead>
 							<tbody>
 								<?php
+								
+								foreach ($Host->get('printers') AS $Printer)
+								{
+									//var_dump($Printer);
+									printf('<tr>
+										<td>%s</td>
+										<td>%s</td>
+										<td>%s</td>
+										<td><input type="checkbox" name="printerRemove[]" value="%s" /></td>
+									</tr>',
+										($Printer->get('default') ? _('Yes') : ''),
+										$Printer->get('name'),
+										$Printer->get('model'),
+										$Printer->get('id')
+									);
+								}
 								
 								//var_dump($Host->get('printers'));
 								
@@ -417,7 +433,7 @@ class HostManagementPage extends FOGPage
 						<?php
 						print $this->FOGCore->getClass('PrinterManager')->buildSelectBox('', "prnt")
 						?>
-						
+						<br />
 						<input type="submit" value="<?php print _("Update"); ?>" />
 					</form>
 				</div>
@@ -850,197 +866,234 @@ class HostManagementPage extends FOGPage
 			}
 			
 			// Tabs
-			if ($this->REQUEST['tab'] == 'host-general')
+			switch ($this->REQUEST['tab'])
 			{
-				// Error checking
-				if (empty($_POST['mac']))
-				{
-					throw new Exception('MAC Address is required');
-				}
-				
-				// Variables
-				$mac = new MACAddress($_POST['mac']);
-				
-				// Error checking
-				if (!$mac->isValid())
-				{
-					throw new Exception('MAC Address is not valid');
-				}
-			
-				// Define new Image object with data provided
-				$Host	->set('name',		$_POST['host'])
-					->set('description',	$_POST['description'])
-					->set('ip',		$_POST['ip'])
-					->set('mac',		$mac)
-					->set('osID',		$_POST['os'])
-					->set('imageID',	$_POST['image'])
-					->set('kernel',		$_POST['kern'])
-					->set('kernelArgs',	$_POST['args'])
-					->set('kernelDevice',	$_POST['dev']);
-				
-				// Add Additional MAC Addresses
-				$Host->set('additionalMACs', (array)$_POST['additionalMACs']);
-			}
-			elseif ($this->REQUEST['tab'] == 'host-active-directory')
-			{
-				$Host	->set('useAD',		($_POST["domain"] == "on" ? '1' : '0'))
-					->set('ADDomain',	$_POST['domainname'])
-					->set('ADOU',		$_POST['ou'])
-					->set('ADUser',		$_POST['domainuser'])
-					->set('ADPass',		$_POST['domainpassword']);
-			}
-			elseif ($this->REQUEST['tab'] == 'host-printers')
-			{
-				/*
-				if ( $_POST["update"] == "1" )
-				{
-					if ( $_POST["level"] !== null )
+				// General
+				case 'host-general';
+					// Error checking
+					if (empty($_POST['mac']))
 					{
-						$level = mysql_real_escape_string( $_POST["level"] );
-						$sql = "update hosts set hostPrinterLevel = '$level' where hostID = '$id'";
-						if ( mysql_query( $sql, $GLOBALS['conn'] ) )
-						{
-							if ( $_POST["prnt"] !== null && is_numeric( $_POST["prnt"] ) && $_POST["prnt"]  >=  0 )
-							{
-								$printer = mysql_real_escape_string( $_POST["prnt"] );
-								
-								if ( ! addPrinter( $GLOBALS['conn'], $id, $printer ) )
-									msgBox( _("Failed to add printer") );
-														
-							}		
-						}
-						else
-						{
-							msgBox( mysql_error() );
-						}
+						throw new Exception('MAC Address is required');
 					}
-				}
-				
-				if ( $_GET["default"] !== null )
-				{
-					setDefaultPrinter( $GLOBALS['conn'], $_GET["default"] );
-				}
-				
-				if ( $_GET["dellinkid"] !== null )
-				{
-					deletePrinter( $GLOBALS['conn'], $_GET["dellinkid"] );
-				}
-				*/
-			}
-			elseif ($this->REQUEST['tab'] == 'host-snapins')
-			{
-				// ADD
-				/*
-				// Hook
-				$HookManager->processEvent('HostEditAddSnapinUpdate');
-				
-				$snap = mysql_real_escape_string( $_POST["snap"] );
-				$ret = "";
-				if ( ! addSnapinToHost( $GLOBALS['conn'], $id, $snap, $ret ) )
-				{
-					// Hook
-					$HookManager->processEvent('HostEditAddSnapinUpdateFail');
 					
-					msgBox($ret);
-				}
-				else
-				{
-					// Hook
-					$HookManager->processEvent('HostEditAddSnapinUpdateSuccess');
-				}
-				*/
-				
-				
-				// DELETE
-				/*
-				// Hook
-				$HookManager->processEvent('HostEditRemoveSnapinUpdate');
-				
-				$snap = mysql_real_escape_string( $_GET["delsnaplinkid"] );
-				$ret = "";
-				if ( ! deleteSnapinFromHost( $GLOBALS['conn'], $id, $snap, $ret ) )
-				{
-					// Hook
-					$HookManager->processEvent('HostEditRemoveSnapinUpdateFail');
-				
-					msgBox($ret);
-				}
-				else
-				{
-					// Hook
-					$HookManager->processEvent('HostEditRemoveSnapinUpdateSuccess');
-				}
-				*/
-			}
-			elseif ($this->REQUEST['tab'] == 'host-service')
-			{
-				/*
-				if ( $_GET["updatemodulestatus"] == "1" )
-				{
+					// Variables
+					$mac = new MACAddress($_POST['mac']);
 					
-					//$clientupdaterchecked = " checked=\"checked\" ";
-					//$hostregisterchecked = " checked=\"checked\" ";
-					//$printermanagerchecked = " checked=\"checked\" ";					
-					//$taskrebootchecked = " checked=\"checked\" ";
-					//$usertrackerchecked = " checked=\"checked\" ";
-				
-				
-					$dircleanupstate = "0";
-					$usercleanupstate = "0";
-					$displaymanagerstate = "0";
-					$alostate = "0";
-					$gfstate = "0";
-					$snapinstate = "0";		
-					$hncstate = "0";
-					$custate = "0";
-					$hrstate = "0";
-					$pmstate = "0";
-					$trstate = "0";
-					$utstate = "0";
-					
-					if ( $_POST["dircleanen"] == "on" ) $dircleanupstate = "1";
-					if ( $_POST["usercleanen"] == "on" ) $usercleanupstate = "1";
-					if ( $_POST["displaymanager"] == "on" ) $displaymanagerstate = "1";
-					if ( $_POST["alo"] == "on" ) $alostate = "1";
-					if ( $_POST["gf"] == "on" ) $gfstate = "1";
-					if ( $_POST["snapin"] == "on" ) $snapinstate = "1";
-					if ( $_POST["hostnamechanger"] == "on" ) $hncstate = "1";
-					if ( $_POST["clientupdater"] == "on" ) $custate = "1";
-					if ( $_POST["hostregister"] == "on" ) $hrstate = "1";
-					if ( $_POST["printermanager"] == "on" ) $pmstate = "1";
-					if ( $_POST["taskreboot"] == "on" ) $trstate = "1";
-					if ( $_POST["usertracker"] == "on" ) $utstate = "1";
-
-					setHostModuleStatus( $GLOBALS['conn'], $dircleanupstate, $id, 'dircleanup' );
-					setHostModuleStatus( $GLOBALS['conn'], $usercleanupstate, $id, 'usercleanup' );
-					setHostModuleStatus( $GLOBALS['conn'], $displaymanagerstate, $id, 'displaymanager' );
-					setHostModuleStatus( $GLOBALS['conn'], $alostate, $id, 'autologout' );
-					setHostModuleStatus( $GLOBALS['conn'], $gfstate, $id, 'greenfog' );
-					setHostModuleStatus( $GLOBALS['conn'], $snapinstate, $id, 'snapin' );
-					setHostModuleStatus( $GLOBALS['conn'], $hncstate, $id, 'hostnamechanger' );
-					setHostModuleStatus( $GLOBALS['conn'], $custate, $id, 'clientupdater' );
-					setHostModuleStatus( $GLOBALS['conn'], $hrstate, $id, 'hostregister' );
-					setHostModuleStatus( $GLOBALS['conn'], $pmstate, $id, 'printermanager' );
-					setHostModuleStatus( $GLOBALS['conn'], $trstate, $id, 'taskreboot' );
-					setHostModuleStatus( $GLOBALS['conn'], $utstate, $id, 'usertracker' );
-
-					// update screen settings
-					$x = mysql_real_escape_string( $_POST["x"] );
-					$y = mysql_real_escape_string( $_POST["y"] );
-					$r = mysql_real_escape_string( $_POST["r"] );
-					if ( $x == "" && $y == "" && $z == "" )
+					// Error checking
+					if (!$mac->isValid())
 					{
-						$sql = "DELETE FROM hostScreenSettings WHERE hssHostID = '$id'";
-						$res = mysql_query( $sql, $GLOBALS['conn'] ) or criticalError( mysql_error(), _("FOG :: Database error!") );
+						throw new Exception('MAC Address is not valid');
+					}
+				
+					// Define new Image object with data provided
+					$Host	->set('name',		$_POST['host'])
+						->set('description',	$_POST['description'])
+						->set('ip',		$_POST['ip'])
+						->set('mac',		$mac)
+						->set('osID',		$_POST['os'])
+						->set('imageID',	$_POST['image'])
+						->set('kernel',		$_POST['kern'])
+						->set('kernelArgs',	$_POST['args'])
+						->set('kernelDevice',	$_POST['dev']);
+					
+					// Add Additional MAC Addresses
+					$Host	->set('additionalMACs', (array)$_POST['additionalMACs']);
+					
+					break;
+				
+				// Active Directory
+				case 'host-active-directory';
+				
+					$Host	->set('useAD',		($_POST["domain"] == "on" ? '1' : '0'))
+						->set('ADDomain',	$_POST['domainname'])
+						->set('ADOU',		$_POST['ou'])
+						->set('ADUser',		$_POST['domainuser'])
+						->set('ADPass',		$_POST['domainpassword']);
+					
+					break;
+				
+				// Printers
+				case 'host-printers';
+				
+					// Set printer level for Host
+					$Host->set('printerLevel', (int)$this->REQUEST['level']);
+				
+					// Add printer
+					if (!empty($this->REQUEST['prnt']))
+					{
+						$Host->addPrinter($this->REQUEST['prnt']);
+					}
+					
+					// Remove printer
+					if (!empty($this->REQUEST['printerRemove']))
+					{
+						$Host->removePrinter($this->REQUEST['printerRemove']);
+					}
+					
+					/*
+					
+					if ( $_GET["default"] !== null )
+					{
+						setDefaultPrinter( $GLOBALS['conn'], $_GET["default"] );
+					}
+					
+					if ( $_GET["dellinkid"] !== null )
+					{
+						deletePrinter( $GLOBALS['conn'], $_GET["dellinkid"] );
+					}
+					*/
+					
+					break;
+				
+				// Snapins
+				case 'host-snapins';
+					// ADD
+					/*
+					// Hook
+					$HookManager->processEvent('HostEditAddSnapinUpdate');
+					
+					$snap = mysql_real_escape_string( $_POST["snap"] );
+					$ret = "";
+					if ( ! addSnapinToHost( $GLOBALS['conn'], $id, $snap, $ret ) )
+					{
+						// Hook
+						$HookManager->processEvent('HostEditAddSnapinUpdateFail');
+						
+						msgBox($ret);
 					}
 					else
 					{
+						// Hook
+						$HookManager->processEvent('HostEditAddSnapinUpdateSuccess');
+					}
+					*/
+					
+					
+					// DELETE
+					/*
+					// Hook
+					$HookManager->processEvent('HostEditRemoveSnapinUpdate');
+					
+					$snap = mysql_real_escape_string( $_GET["delsnaplinkid"] );
+					$ret = "";
+					if ( ! deleteSnapinFromHost( $GLOBALS['conn'], $id, $snap, $ret ) )
+					{
+						// Hook
+						$HookManager->processEvent('HostEditRemoveSnapinUpdateFail');
+					
+						msgBox($ret);
+					}
+					else
+					{
+						// Hook
+						$HookManager->processEvent('HostEditRemoveSnapinUpdateSuccess');
+					}
+					*/
+					
+					break;
+					
+				// Service
+				case 'host-service';
+					/*
+					if ( $_GET["updatemodulestatus"] == "1" )
+					{
+						
+						//$clientupdaterchecked = " checked=\"checked\" ";
+						//$hostregisterchecked = " checked=\"checked\" ";
+						//$printermanagerchecked = " checked=\"checked\" ";					
+						//$taskrebootchecked = " checked=\"checked\" ";
+						//$usertrackerchecked = " checked=\"checked\" ";
+					
+					
+						$dircleanupstate = "0";
+						$usercleanupstate = "0";
+						$displaymanagerstate = "0";
+						$alostate = "0";
+						$gfstate = "0";
+						$snapinstate = "0";		
+						$hncstate = "0";
+						$custate = "0";
+						$hrstate = "0";
+						$pmstate = "0";
+						$trstate = "0";
+						$utstate = "0";
+						
+						if ( $_POST["dircleanen"] == "on" ) $dircleanupstate = "1";
+						if ( $_POST["usercleanen"] == "on" ) $usercleanupstate = "1";
+						if ( $_POST["displaymanager"] == "on" ) $displaymanagerstate = "1";
+						if ( $_POST["alo"] == "on" ) $alostate = "1";
+						if ( $_POST["gf"] == "on" ) $gfstate = "1";
+						if ( $_POST["snapin"] == "on" ) $snapinstate = "1";
+						if ( $_POST["hostnamechanger"] == "on" ) $hncstate = "1";
+						if ( $_POST["clientupdater"] == "on" ) $custate = "1";
+						if ( $_POST["hostregister"] == "on" ) $hrstate = "1";
+						if ( $_POST["printermanager"] == "on" ) $pmstate = "1";
+						if ( $_POST["taskreboot"] == "on" ) $trstate = "1";
+						if ( $_POST["usertracker"] == "on" ) $utstate = "1";
+
+						setHostModuleStatus( $GLOBALS['conn'], $dircleanupstate, $id, 'dircleanup' );
+						setHostModuleStatus( $GLOBALS['conn'], $usercleanupstate, $id, 'usercleanup' );
+						setHostModuleStatus( $GLOBALS['conn'], $displaymanagerstate, $id, 'displaymanager' );
+						setHostModuleStatus( $GLOBALS['conn'], $alostate, $id, 'autologout' );
+						setHostModuleStatus( $GLOBALS['conn'], $gfstate, $id, 'greenfog' );
+						setHostModuleStatus( $GLOBALS['conn'], $snapinstate, $id, 'snapin' );
+						setHostModuleStatus( $GLOBALS['conn'], $hncstate, $id, 'hostnamechanger' );
+						setHostModuleStatus( $GLOBALS['conn'], $custate, $id, 'clientupdater' );
+						setHostModuleStatus( $GLOBALS['conn'], $hrstate, $id, 'hostregister' );
+						setHostModuleStatus( $GLOBALS['conn'], $pmstate, $id, 'printermanager' );
+						setHostModuleStatus( $GLOBALS['conn'], $trstate, $id, 'taskreboot' );
+						setHostModuleStatus( $GLOBALS['conn'], $utstate, $id, 'usertracker' );
+
+						// update screen settings
+						$x = mysql_real_escape_string( $_POST["x"] );
+						$y = mysql_real_escape_string( $_POST["y"] );
+						$r = mysql_real_escape_string( $_POST["r"] );
+						if ( $x == "" && $y == "" && $z == "" )
+						{
+							$sql = "DELETE FROM hostScreenSettings WHERE hssHostID = '$id'";
+							$res = mysql_query( $sql, $GLOBALS['conn'] ) or criticalError( mysql_error(), _("FOG :: Database error!") );
+						}
+						else
+						{
+							$sql = "SELECT
+									COUNT(*) as cnt
+								FROM
+									hostScreenSettings
+								WHERE
+									hssHostID = '$id'";
+							$res = mysql_query( $sql, $GLOBALS['conn'] ) or criticalError( mysql_error(), _("FOG :: Database error!") );
+							$blFound = false;
+							while( $ar = mysql_fetch_array( $res ) )
+							{
+								if ( $ar["cnt"] > 0 ) $blFound = true;
+							}
+
+							if ( $blFound )
+							{
+								$sql = "UPDATE
+										hostScreenSettings
+										set
+											hssWidth = '$x',
+											hssHeight = '$y',
+											hssRefresh = '$r'
+										WHERE
+											hssHostID = '$id'";
+							}
+							else
+							{
+								$sql = "INSERT INTO hostScreenSettings(hssHostID, hssWidth, hssHeight, hssRefresh) values('$id', '$x', '$y', '$r')";
+							}
+							if ( ! mysql_query( $sql, $GLOBALS['conn'] ) )
+								criticalError( mysql_error(), _("FOG :: Database error!") );
+						}
+						// Update auto log off times.
+						$tme = mysql_real_escape_string( $_POST["tme"] );
 						$sql = "SELECT
 								COUNT(*) as cnt
 							FROM
-								hostScreenSettings
+								hostAutoLogOut
 							WHERE
-								hssHostID = '$id'";
+								haloHostID = '$id'";
 						$res = mysql_query( $sql, $GLOBALS['conn'] ) or criticalError( mysql_error(), _("FOG :: Database error!") );
 						$blFound = false;
 						while( $ar = mysql_fetch_array( $res ) )
@@ -1051,90 +1104,63 @@ class HostManagementPage extends FOGPage
 						if ( $blFound )
 						{
 							$sql = "UPDATE
-									hostScreenSettings
+									hostAutoLogOut
 									set
-										hssWidth = '$x',
-										hssHeight = '$y',
-										hssRefresh = '$r'
+										haloTime = '$tme'
 									WHERE
-										hssHostID = '$id'";
+										haloHostID = '$id'";
 						}
 						else
 						{
-							$sql = "INSERT INTO hostScreenSettings(hssHostID, hssWidth, hssHeight, hssRefresh) values('$id', '$x', '$y', '$r')";
+							$sql = "INSERT INTO hostAutoLogOut(haloHostID, haloTime) values('$id', '$tme')";
 						}
 						if ( ! mysql_query( $sql, $GLOBALS['conn'] ) )
 							criticalError( mysql_error(), _("FOG :: Database error!") );
+
 					}
-					// Update auto log off times.
-					$tme = mysql_real_escape_string( $_POST["tme"] );
-					$sql = "SELECT
-							COUNT(*) as cnt
-						FROM
-							hostAutoLogOut
-						WHERE
-							haloHostID = '$id'";
-					$res = mysql_query( $sql, $GLOBALS['conn'] ) or criticalError( mysql_error(), _("FOG :: Database error!") );
-					$blFound = false;
-					while( $ar = mysql_fetch_array( $res ) )
+					*/
+					
+					break;
+				
+				// Hardware Inventory
+				case 'host-hardware-inventory';
+					/*
+					if ( $_POST["update"] == "1" )
 					{
-						if ( $ar["cnt"] > 0 ) $blFound = true;
+
+						$prim = mysql_real_escape_string( $_POST["pu"] );
+						$other1 = mysql_real_escape_string( $_POST["other1"] );
+						$other2 = mysql_real_escape_string( $_POST["other2"] );
+						$sql = "update inventory set iPrimaryUser = '$prim', iOtherTag = '$other1', iOtherTag1 ='$other2' where iHostID = '$id'";
+						if ( !mysql_query( $sql, $GLOBALS['conn'] ) )
+						{
+							msgBox( mysql_error() );
+						}
+					}
+					*/
+					
+					break;
+				
+				// Virus History
+				case 'host-virus-history';
+					/*
+					if ( $_GET["delvid"] !== null && is_numeric( $_GET["delvid"] ) )
+					{		
+						$vid = mysql_real_escape_string( $_GET["delvid"] );
+						clearAVRecord( $GLOBALS['conn'], $vid );
 					}
 
-					if ( $blFound )
+					if ( $_GET["delvid"] == "all"  )
 					{
-						$sql = "UPDATE
-								hostAutoLogOut
-								set
-									haloTime = '$tme'
-								WHERE
-									haloHostID = '$id'";
+						$member = getImageMemberFromHostID( $GLOBALS['conn'], $id );
+						if ( $member != null )
+						{
+							clearAVRecordsForHost( $GLOBALS['conn'], $member->getMACColon() );
+						}
 					}
-					else
-					{
-						$sql = "INSERT INTO hostAutoLogOut(haloHostID, haloTime) values('$id', '$tme')";
-					}
-					if ( ! mysql_query( $sql, $GLOBALS['conn'] ) )
-						criticalError( mysql_error(), _("FOG :: Database error!") );
-
-				}
-				*/
-			}
-			elseif ($this->REQUEST['tab'] == 'host-hardware-inventory')
-			{
-				/*
-				if ( $_POST["update"] == "1" )
-				{
-
-					$prim = mysql_real_escape_string( $_POST["pu"] );
-					$other1 = mysql_real_escape_string( $_POST["other1"] );
-					$other2 = mysql_real_escape_string( $_POST["other2"] );
-					$sql = "update inventory set iPrimaryUser = '$prim', iOtherTag = '$other1', iOtherTag1 ='$other2' where iHostID = '$id'";
-					if ( !mysql_query( $sql, $GLOBALS['conn'] ) )
-					{
-						msgBox( mysql_error() );
-					}
-				}
-				*/
-			}
-			elseif ($this->REQUEST['tab'] == 'host-virus-history')
-			{
-				/*
-				if ( $_GET["delvid"] !== null && is_numeric( $_GET["delvid"] ) )
-				{		
-					$vid = mysql_real_escape_string( $_GET["delvid"] );
-					clearAVRecord( $GLOBALS['conn'], $vid );
-				}
-
-				if ( $_GET["delvid"] == "all"  )
-				{
-					$member = getImageMemberFromHostID( $GLOBALS['conn'], $id );
-					if ( $member != null )
-					{
-						clearAVRecordsForHost( $GLOBALS['conn'], $member->getMACColon() );
-					}
-				}
-				*/
+					*/
+					
+					break;
 			}
 		
 			// Save to database
