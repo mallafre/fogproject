@@ -36,8 +36,10 @@ class Host extends FOGController
 		'groups',
 		'primayGroup',
 		'primayGroupID',
+		'optimalStorageNode',
 		'printers',
-		'optimalStorageNode'
+		'snapins',
+		'modules'
 	);
 	
 	// Required database fields
@@ -69,11 +71,6 @@ class Host extends FOGController
 		return $this->getImage()->getOS();
 	}
 	
-	public function getPrinters()
-	{
-		return $this->get('printers');
-	}
-	
 	public function getMACAddress()
 	{
 		return $this->get('mac');
@@ -97,6 +94,24 @@ class Host extends FOGController
 		}
 	}
 	
+	private function loadSnapins()
+	{
+		if (!$this->isLoaded('snapins'))
+		{
+			if ($this->get('id'))
+			{
+				$this->DB->query("SELECT snapins.* FROM snapinAssoc INNER JOIN snapins ON ( snapinAssoc.saSnapinID = snapins.sID ) WHERE snapinAssoc.saHostID = '%s' ORDER BY snapins.sName", $this->get('id'));
+				
+				while ($snapin = $this->DB->fetch()->get())
+				{
+					$snapins[] = new Snapin($snapin);
+				}
+			}
+			
+			$this->set('snapins', (array)$snapins);
+		}
+	}
+	
 	// Overrides
 	public function get($key = '')
 	{
@@ -104,6 +119,11 @@ class Host extends FOGController
 		{
 			// Printers
 			$this->loadPrinters();
+		}
+		if ($this->key($key) == 'snapins')
+		{
+			// Snapins
+			$this->loadSnapins();
 		}
 		else if ($this->key($key) == 'optimalStorageNode' && !$this->isLoaded('optimalStorageNode'))
 		{
@@ -123,7 +143,7 @@ class Host extends FOGController
 		}
 		
 		// Additional MAC Addresses
-		if ($this->key($key) == 'additionalMACs')
+		else if ($this->key($key) == 'additionalMACs')
 		{
 			foreach ((array)$value AS $MAC)
 			{
@@ -134,13 +154,26 @@ class Host extends FOGController
 		}
 		
 		// Printers
-		if ($this->key($key) == 'printers')
+		else if ($this->key($key) == 'printers')
 		{
 			$this->loadPrinters();
 		
 			foreach ((array)$value AS $printer)
 			{
 				$newValue[] = ($printer instanceof Printer ? $printer : new Printer($printer));
+			}
+			
+			$value = (array)$newValue;
+		}
+		
+		// Snapins
+		else if ($this->key($key) == 'snapins')
+		{
+			$this->loadSnapins();
+		
+			foreach ((array)$value AS $snapin)
+			{
+				$newValue[] = ($snapin instanceof Snapin ? $snapin : new Snapin($snapin));
 			}
 			
 			$value = (array)$newValue;
@@ -159,11 +192,19 @@ class Host extends FOGController
 		}
 		
 		// Printers
-		if ($this->key($key) == 'printers' && !($value instanceof Printer))
+		else if ($this->key($key) == 'printers' && !($value instanceof Printer))
 		{
 			$this->loadPrinters();
 			
 			$value = new Printer($value);
+		}
+		
+		// Printers
+		else if ($this->key($key) == 'snapins' && !($value instanceof Snapin))
+		{
+			$this->loadSnapins();
+			
+			$value = new Snapin($value);
 		}
 		
 		// Add
@@ -191,15 +232,31 @@ class Host extends FOGController
 		// Printers
 		if ($this->isLoaded('printers'))
 		{
-			// Remove old printers
+			// Remove old rows
 			$this->DB->query("DELETE FROM `printerAssoc` WHERE `paHostID` = '%s'", array($this->get('id')));
 			
 			// Create assoc
-			foreach ($this->get('printers') AS $i => $Printer)
+			foreach ($this->getPrinters() AS $i => $Printer)
 			{
 				if (($Printer instanceof Printer) && $Printer->isValid())
 				{
 					$this->DB->query("INSERT INTO `printerAssoc` (paHostID, paPrinterID, paIsDefault) VALUES ('%s', '%s', '%s')", array($this->get('id'), $Printer->get('id'), ($i === 0 ? '1' : '0')));
+				}
+			}
+		}
+		
+		// Snapins
+		if ($this->isLoaded('snapins'))
+		{
+			// Remove old rows
+			$this->DB->query("DELETE FROM `snapinAssoc` WHERE `saHostID` = '%s'", array($this->get('id')));
+			
+			// Create assoc
+			foreach ($this->getSnapins() AS $i => $Snapin)
+			{
+				if (($Snapin instanceof Snapin) && $Snapin->isValid())
+				{
+					$this->DB->query("INSERT INTO `snapinAssoc` (saHostID, saSnapinID) VALUES ('%s', '%s')", array($this->get('id'), $Snapin->get('id')));
 				}
 			}
 		}
@@ -210,7 +267,7 @@ class Host extends FOGController
 	
 	public function load($field = 'id')
 	{
-		// Save
+		// Load
 		parent::load($field);
 
 		// Load 'additionalMACs'
@@ -628,38 +685,125 @@ class Host extends FOGController
 	}
 	
 	// Printer Management
-	public function addPrinter($printers)
+	public function getPrinters()
 	{
-		// Add printer
-		foreach ((array)$printers AS $printer)
+		return $this->get('printers');
+	}
+	
+	public function addPrinter($addArray)
+	{
+		// Add
+		foreach ((array)$addArray AS $item)
 		{
-			$this->add('printers', $printer);
+			$this->add('printers', $item);
 		}
 		
 		// Return
 		return $this;
 	}
 	
-	public function removePrinter($printerRemoveArray)
+	public function removePrinter($removeArray)
 	{
-		// Build array of Printer ID's to remove
-		foreach ((array)$printerRemoveArray AS $printerRemoveID)
+		// Build array of ID's to remove
+		foreach ((array)$removeArray AS $removeID)
 		{
-			// Get printer ID to remove from list
-			$printerRemoveIDArray[] = ($printerRemoveID instanceof Printer ? $printerRemoveID->get('id') : (int)$printerRemoveID);
+			$removeIDArray[] = ($removeID instanceof Printer ? $removeID->get('id') : (int)$removeID);
 		}
 		
-		// Iterate Printers -> Build new Printer array exluding all Printers that are in $printerRemoveIDArray
-		foreach ($this->get('printers') AS $Printer)
+		// Iterate -> Build new array exluding all ID's that are in $removeIDArray
+		foreach ($this->getPrinters() AS $item)
 		{
-			if (!in_array($Printer->get('id'), $printerRemoveIDArray))
+			if (!in_array($item->get('id'), $removeIDArray))
 			{
-				$newPrinterArray[] = $Printer;
+				$newArray[] = $item;
 			}
 		}
 		
-		// Set new 'printers' data -> Return
-		return $this->set('printers', (array)$newPrinterArray);;
+		// Set new data -> Return
+		return $this->set('printers', (array)$newArray);
+	}
+	
+	// Snapin Management
+	public function getSnapins()
+	{
+		return $this->get('snapins');
+	}
+	
+	public function addSnapin($addArray)
+	{
+		// Add
+		foreach ((array)$addArray AS $item)
+		{
+			$this->add('snapins', $item);
+		}
+		
+		// Return
+		return $this;
+	}
+	
+	public function removeSnapin($removeArray)
+	{
+		// Build array of ID's to remove
+		foreach ((array)$removeArray AS $removeID)
+		{
+			$removeIDArray[] = ($removeID instanceof Snapin ? $removeID->get('id') : (int)$removeID);
+		}
+		
+		// Iterate -> Build new array exluding all ID's that are in $removeIDArray
+		foreach ($this->getSnapins() AS $item)
+		{
+			if (!in_array($item->get('id'), $removeIDArray))
+			{
+				$newArray[] = $item;
+			}
+		}
+		
+		// Set new data -> Return
+		return $this->set('snapins', (array)$newArray);
+	}
+	
+	// Modules
+	public function getModules($Module = '')
+	{
+		return $this->get('modules');
+	}
+	
+	public function getModuleStatus($Module = '')
+	{
+		return $this->get('modules');
+	}
+	
+	public function addModule($addArray)
+	{
+		// Add
+		foreach ((array)$addArray AS $item)
+		{
+			$this->add('modules', $item);
+		}
+		
+		// Return
+		return $this;
+	}
+	
+	public function removeModule($removeArray)
+	{
+		// Build array of ID's to remove
+		foreach ((array)$removeArray AS $removeID)
+		{
+			$removeIDArray[] = ($removeID instanceof Module ? $removeID->get('id') : (int)$removeID);
+		}
+		
+		// Iterate -> Build new array exluding all ID's that are in $removeIDArray
+		foreach ($this->getModules() AS $item)
+		{
+			if (!in_array($item->get('id'), $removeIDArray))
+			{
+				$newArray[] = $item;
+			}
+		}
+		
+		// Set new data -> Return
+		return $this->set('modules', (array)$newArray);
 	}
 	
 	

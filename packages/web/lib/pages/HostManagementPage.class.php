@@ -365,18 +365,17 @@ class HostManagementPage extends FOGPage
 						<table cellpadding=0 cellspacing=0 border=0 width=100%>
 							<thead>
 								<tr class="header">
-									<td>&nbsp;<b><?php print _("Default"); ?></b></td>
-									<td>&nbsp;<b><?php print _("Printer Alias"); ?></b></td>
-									<td>&nbsp;<b><?php print _("Printer Model"); ?></b></td>
-									<td><b><?php print _("Remove"); ?></b></td>
+									<td><?php print _("Default"); ?></td>
+									<td><?php print _("Printer Alias"); ?></td>
+									<td><?php print _("Printer Model"); ?></td>
+									<td><?php print _("Remove"); ?></td>
 								</tr>
 							</thead>
 							<tbody>
 								<?php
 								
-								foreach ($Host->get('printers') AS $Printer)
+								foreach ($Host->getPrinters() AS $Printer)
 								{
-									//var_dump($Printer);
 									printf('<tr>
 										<td>%s</td>
 										<td>%s</td>
@@ -390,43 +389,9 @@ class HostManagementPage extends FOGPage
 									);
 								}
 								
-								//var_dump($Host->get('printers'));
-								
-								// TODO: Complete
-								/*
-										$sql = "SELECT 
-												* 
-											FROM 
-												printerAssoc
-												inner join printers on ( printerAssoc.paPrinterID = printers.pID )
-											WHERE
-												printerAssoc.paHostID = '$id'
-											ORDER BY
-												printers.pAlias";
-										$res = mysql_query( $sql ) or die( mysql_error() );
-										if ( mysql_num_rows( $res ) > 0 )
-										{
-											$i = 0;
-											while ( $ar = mysql_fetch_array( $res ) )
-											{
-												$bgcolor = "alt1";
-												if ( $i++ % 2 == 0 ) $bgcolor = "alt2";
-												
-												$default = "<a href="?node=$_GET[node]&sub=$_GET[sub]&id=$_GET[id]&default=$ar[paID]"><img src=\<?php print /images/no.png" class="noBorder" /></a>";
-												if ( $ar["paIsDefault"] == "1" )
-													$default = "<img src=\<?php print /images/yes.png" class="noBorder" />";
-												
-												<tr class="$bgcolor"><td>&nbsp;<?php print $default; ?></td><td>&nbsp;<?php print trimString( $ar["pAlias"], 30 ); ?></td><td>&nbsp;<?php print trimString( $ar["pModel"], 30 ); ?></td><td><a href="?node=$_GET[node]&sub=$_GET[sub]&id=<?php print $id; ?>&dellinkid=<?php print $ar["paID"]; ?>"><img src="images/deleteSmall.png" class="link" /></a></td></tr>
-											}
-										}
-										else
-										{
-											<tr><td colspan="4" class="c"><?php print _("No printers linked to this host; ?>); ?></td></tr>
-										}
-								*/
 								?>
 							</tbody>
-						</table>			
+						</table>
 						
 						<br /><br />
 						<h2>Add new printer</h2>
@@ -443,42 +408,36 @@ class HostManagementPage extends FOGPage
 					<form method="POST" action="<?php print $this->formAction; ?>&tab=host-snapins">
 						<input type="hidden" name="id" value="<?php print $this->REQUEST['id']; ?>" />
 						<h2><?php print _("Snapins"); ?></h2>
-						<table cellpadding=0 cellspacing=0 border=0 width="100%">
-								<tr class="header"><td>&nbsp;<b><?php print _("Snapin Name"); ?></b></td><td><b><?php print _("Remove"); ?></b></td></tr>
+						
+						<table cellpadding=0 cellspacing=0 border=0 width=100%>
+							<thead>
+								<tr class="header">
+									<td><?php print _("Snapin Name"); ?></td>
+									<td><?php print _("Remove"); ?></td>
+								</tr>
+							</thead>
+							<tbody>
 								<?php
-								/*
-								$sql = "SELECT
-										*
-									FROM
-										snapinAssoc
-										inner join snapins on ( snapinAssoc.saSnapinID = snapins.sID )
-									WHERE
-										snapinAssoc.saHostID = '$id'
-									ORDER BY
-										snapins.sName";
-								$resSnap = mysql_query( $sql ) or die( mysql_error() );
-								if ( mysql_num_rows( $resSnap ) > 0 )
+								
+								foreach ($Host->getSnapins() AS $Snapin)
 								{
-									$i = 0;
-									while ( $arSp = mysql_fetch_array( $resSnap ) )
-									{
-										$bgcolor = "alt1";
-										if ( $i++ % 2 == 0 ) $bgcolor = "alt2";
-										<tr class="$bgcolor"><td>" . $arSp["sName"] . "</td><td><a href="?node=$node&sub=$sub&id=" . $id . "&delsnaplinkid=" . $arSp["sID"] . "&tab=$tab"><img src="images/deleteSmall.png" class="link" /></a></td></tr>
-									}
+									printf('<tr>
+										<td>%s</td>
+										<td><input type="checkbox" name="snapinRemove[]" value="%s" /></td>
+									</tr>',
+										$Snapin->get('name'),
+										$Snapin->get('id')
+									);
 								}
-								else
-								{
-									<tr><td colspan="2" class="c"><?php print _("No snapins linked to this host"); ?></td></tr>
-								}
-								*/
+								
 								?>
+							</tbody>
 						</table>
 						
 						<br /><br />
 						<h2><?php print _("Add new snapin package"); ?></h2>
 						<?php print $this->FOGCore->getClass('SnapinManager')->buildSelectBox(); ?>
-						<p><input type="submit" value="<?php print _("Add Snapin"); ?>" /></p>
+						<p><input type="submit" value="<?php print _("Update Snapins"); ?>" /></p>
 					</form>
 				</div>
 				
@@ -487,85 +446,28 @@ class HostManagementPage extends FOGPage
 					<form method="POST" action="<?php print $this->formAction; ?>&tab=host-service">
 						<input type="hidden" name="id" value="<?php print $this->REQUEST['id']; ?>" />
 						<h2><?php print _("Service Configuration"); ?></h2>
-						<?php
-						
-						/*
-						$sql = "SELECT * FROM moduleStatusByHost WHERE msHostID = '$id'";
-						$res = mysql_query( $sql ) or criticalError( mysql_error(), _("FOG :: Database error!") );
-						$checked = " checked="checked" ";
-						$ucchecked = " checked="checked" ";
-						$dmchecked = " checked="checked" ";
-						$alochecked = " checked="checked" ";
-						$gfchecked = " checked="checked" ";
-						$snapinchecked = " checked="checked" ";
-						$hostnamechangerchecked = " checked="checked" ";
-						$clientupdaterchecked = " checked="checked" ";
-						$hostregisterchecked = " checked="checked" ";
-						$printermanagerchecked = " checked="checked" ";					
-						$taskrebootchecked = " checked="checked" ";
-						$usertrackerchecked = " checked="checked" ";	
-															
-						while( $ar = mysql_fetch_array( $res ) )
-						{
-							if ( $ar["msModuleID"] == "dircleanup" && $ar["msState"] == "0" )
-								$checked="";
-
-							if ( $ar["msModuleID"] == "usercleanup" && $ar["msState"] == "0" )
-								$ucchecked="";
-
-							if ( $ar["msModuleID"] == "displaymanager" && $ar["msState"] == "0" )
-								$dmchecked="";
-
-							if ( $ar["msModuleID"] == "autologout" && $ar["msState"] == "0" )
-								$alochecked="";
-
-							if ( $ar["msModuleID"] == "greenfog" && $ar["msState"] == "0" )
-								$gfchecked="";
-								
-							if ( $ar["msModuleID"] == "snapin" && $ar["msState"] == "0" )
-								$snapinchecked="";							
-								
-							if ( $ar["msModuleID"] == "hostnamechanger" && $ar["msState"] == "0" )
-								$hostnamechangerchecked="";					
-								
-							if ( $ar["msModuleID"] == "clientupdater" && $ar["msState"] == "0" )
-								$clientupdaterchecked="";										
-								
-							if ( $ar["msModuleID"] == "hostregister" && $ar["msState"] == "0" )
-								$hostregisterchecked="";
-								
-							if ( $ar["msModuleID"] == "printermanager" && $ar["msState"] == "0" )
-								$printermanagerchecked="";
-								
-							if ( $ar["msModuleID"] == "taskreboot" && $ar["msState"] == "0" )
-								$taskrebootchecked="";							
-
-							if ( $ar["msModuleID"] == "usertracker" && $ar["msState"] == "0" )
-								$usertrackerchecked="";
-						}
-						*/
-						
-						?>
 						<fieldset>
-						<legend><?php print _("General"); ?></legend>
+							<legend><?php print _("General"); ?></legend>
 							<table cellpadding=0 cellspacing=0 border=0 width="100%">
-								<tr><td width="270"><?php print _("Hostname Changer Enabled?"); ?></td><td><input type="checkbox" name="hostnamechanger" $hostnamechangerchecked /></td><td><span class="icon icon-help hand" title="<?php print _("This setting will enable or disable the hostname changer module on this specific host.  If the module is globally disabled, this setting is ignored."); ?>"></span></td></tr>						
-								<tr><td width="270"><?php print _("Directory Cleaner Enabled?"); ?></td><td><input type="checkbox" name="dircleanen" $checked /></td><td><span class="icon icon-help hand" title="<?php print _("This setting will enable or disable the directory cleaner service module on this specific host.  If the module is globally disabled, this setting is ignored."); ?>"></span></td></tr>
-								<tr><td width="270"><?php print _("User Cleanup Enabled?"); ?></td><td><input type="checkbox" name="usercleanen" $ucchecked /></td><td><span class="icon icon-help hand" title="<?php print _("This setting will enable or disable the user cleaner service module on this specific host.  If the module is globally disabled, this setting is ignored.  The user clean up service will remove all stale users on the local machine, accept for user accounts that are whitelisted.  This is typically used when dynamic local users is implemented on the workstation."); ?>"></span></td></tr>
-								<tr><td width="270"><?php print _("Display Manager Enabled?"); ?></td><td><input type="checkbox" name="displaymanager" $dmchecked /></td><td><span class="icon icon-help hand" title="<?php print _("This setting will enable or disable the display manager service module on this specific host.  If the module is globally disabled, this setting is ignored. "); ?>"></span></td></tr>
-								<tr><td width="270"><?php print _("Auto Log Out Enabled?"); ?></td><td><input type="checkbox" name="alo" $alochecked /></td><td><span class="icon icon-help hand" title="<?php print _("This setting will enable or disable the auto log out service module on this specific host.  If the module is globally disabled, this setting is ignored. "); ?>"></span></td></tr>
-								<tr><td width="270"><?php print _("Green FOG Enabled?"); ?></td><td><input type="checkbox" name="gf" $gfchecked /></td><td><span class="icon icon-help hand" title="<?php print _("This setting will enable or disable the green fog service module on this specific host.  If the module is globally disabled, this setting is ignored. "); ?>"></span></td></tr>							
-								<tr><td width="270"><?php print _("Snapin Enabled?"); ?></td><td><input type="checkbox" name="snapin" $snapinchecked /></td><td><span class="icon icon-help hand" title="<?php print _("This setting will enable or disable the snapin service module on this specific host.  If the module is globally disabled, this setting is ignored. "); ?>"></span></td></tr>														
-								<tr><td width="270"><?php print _("Client Updater Enabled?"); ?></td><td><input type="checkbox" name="clientupdater" $clientupdaterchecked /></td><td><span class="icon icon-help hand" title="<?php print _("This setting will enable or disable the client updater service module on this specific host.  If the module is globally disabled, this setting is ignored. "); ?>"></span></td></tr>														
-								<tr><td width="270"><?php print _("Host Registration Enabled?"); ?></td><td><input type="checkbox" name="hostregister" $hostregisterchecked /></td><td><span class="icon icon-help hand" title="<?php print _("This setting will enable or disable the host register service module on this specific host.  If the module is globally disabled, this setting is ignored. "); ?>"></span></td></tr>														
-								<tr><td width="270"><?php print _("Printer Manager Enabled?"); ?></td><td><input type="checkbox" name="printermanager" $printermanagerchecked /></td><td><span class="icon icon-help hand" title="<?php print _("This setting will enable or disable the printer manager service module on this specific host.  If the module is globally disabled, this setting is ignored. "); ?>"></span></td></tr>														
-								<tr><td width="270"><?php print _("Task Reboot Enabled?"); ?></td><td><input type="checkbox" name="taskreboot" $taskrebootchecked /></td><td><span class="icon icon-help hand" title="<?php print _("This setting will enable or disable the task reboot service module on this specific host.  If the module is globally disabled, this setting is ignored. "); ?>"></span></td></tr>														
-								<tr><td width="270"><?php print _("User Tracker Enabled?"); ?></td><td><input type="checkbox" name="usertracker" $usertrackerchecked /></td><td><span class="icon icon-help hand" title="<?php print _("This setting will enable or disable the user tracker service module on this specific host.  If the module is globally disabled, this setting is ignored. "); ?>"></span></td></tr>														
+								<?php
+								
+								foreach ($this->FOGCore->getClass('ModuleManager')->find() AS $Module)
+								{
+									printf('<tr><td width="270">%s</td><td><input type="checkbox" name="%s" value="1"%s /></td><td><span class="icon icon-help hand" title="%s"></span></td></tr>',
+										$Module->get('name') . ' ' . _('Enabled?'),
+										$Module->get('shortName'),
+										($Host->getModuleStatus($Module) ? ' checked="checked"' : ''),
+										str_replace('"', '\"', $Module->get('description'))
+									);
+										
+								}
+								?>
+																						
 								<tr><td>&nbsp;</td><td><input type="submit" value="<?php print _("Update"); ?>" /></td></tr>
 							</table>
 						</fieldset>
 						<fieldset>
-						<legend><?php print _("Host Screen Resolution"); ?></legend>
+							<legend><?php print _("Host Screen Resolution"); ?></legend>
 							<table cellpadding=0 cellspacing=0 border=0 width="100%">
 							<?php
 							/*
@@ -918,28 +820,23 @@ class HostManagementPage extends FOGPage
 					// Set printer level for Host
 					$Host->set('printerLevel', (int)$this->REQUEST['level']);
 				
-					// Add printer
+					// Add
 					if (!empty($this->REQUEST['prnt']))
 					{
 						$Host->addPrinter($this->REQUEST['prnt']);
 					}
 					
-					// Remove printer
+					// Remove
 					if (!empty($this->REQUEST['printerRemove']))
 					{
 						$Host->removePrinter($this->REQUEST['printerRemove']);
 					}
 					
+					// TODO: Set default printer
 					/*
-					
 					if ( $_GET["default"] !== null )
 					{
 						setDefaultPrinter( $GLOBALS['conn'], $_GET["default"] );
-					}
-					
-					if ( $_GET["dellinkid"] !== null )
-					{
-						deletePrinter( $GLOBALS['conn'], $_GET["dellinkid"] );
 					}
 					*/
 					
@@ -947,48 +844,18 @@ class HostManagementPage extends FOGPage
 				
 				// Snapins
 				case 'host-snapins';
-					// ADD
-					/*
-					// Hook
-					$HookManager->processEvent('HostEditAddSnapinUpdate');
 					
-					$snap = mysql_real_escape_string( $_POST["snap"] );
-					$ret = "";
-					if ( ! addSnapinToHost( $GLOBALS['conn'], $id, $snap, $ret ) )
+					// Add
+					if (!empty($this->REQUEST['snapin']))
 					{
-						// Hook
-						$HookManager->processEvent('HostEditAddSnapinUpdateFail');
-						
-						msgBox($ret);
+						$Host->addSnapin($this->REQUEST['snapin']);
 					}
-					else
+					
+					// Remove
+					if (!empty($this->REQUEST['snapinRemove']))
 					{
-						// Hook
-						$HookManager->processEvent('HostEditAddSnapinUpdateSuccess');
+						$Host->removeSnapin($this->REQUEST['snapinRemove']);
 					}
-					*/
-					
-					
-					// DELETE
-					/*
-					// Hook
-					$HookManager->processEvent('HostEditRemoveSnapinUpdate');
-					
-					$snap = mysql_real_escape_string( $_GET["delsnaplinkid"] );
-					$ret = "";
-					if ( ! deleteSnapinFromHost( $GLOBALS['conn'], $id, $snap, $ret ) )
-					{
-						// Hook
-						$HookManager->processEvent('HostEditRemoveSnapinUpdateFail');
-					
-						msgBox($ret);
-					}
-					else
-					{
-						// Hook
-						$HookManager->processEvent('HostEditRemoveSnapinUpdateSuccess');
-					}
-					*/
 					
 					break;
 					
