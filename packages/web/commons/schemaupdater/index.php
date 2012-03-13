@@ -1281,8 +1281,8 @@ $databaseSchema[] = array(
 
 // 34
 // Blackout - 9:00 AM 13/03/2012
-// NOTE: Add module information to database
 $databaseSchema[] = array(
+	// modules: Create module table -> Insert module information
 	"CREATE TABLE IF NOT EXISTS `" . DATABASE_NAME . "`.`modules` ( `id` mediumint(9) NOT NULL AUTO_INCREMENT, `name` varchar(50) NOT NULL, `short_name` varchar(30) NOT NULL, `description` text NOT NULL, PRIMARY KEY (`id`) ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=13",
 	"INSERT INTO `modules` (`id`, `name`, `short_name`, `description`) VALUES
 		(1, 'Directory Cleaner', 'dircleanup', 'This setting will enable or disable the directory cleaner service module on this specific host.  If the module is globally disabled, this setting is ignored.'),
@@ -1296,7 +1296,13 @@ $databaseSchema[] = array(
 		(9, 'Hostname Changer', 'hostnamechanger', 'This setting will enable or disable the hostname changer module on this specific host.  If the module is globally disabled, this setting is ignored.'),
 		(10, 'Printer Manager', 'printermanager', 'This setting will enable or disable the printer manager service module on this specific host.  If the module is globally disabled, this setting is ignored.'),
 		(11, 'Task Reboot', 'taskreboot', 'This setting will enable or disable the task reboot service module on this specific host.  If the module is globally disabled, this setting is ignored.'),
-		(12, 'User Tracker', 'usertracker', 'This setting will enable or disable the user tracker service module on this specific host.  If the module is globally disabled, this setting is ignored.');"
+		(12, 'User Tracker', 'usertracker', 'This setting will enable or disable the user tracker service module on this specific host.  If the module is globally disabled, this setting is ignored.');",
+	// modulestatusbyhost: Create unique with Host ID and Module ID - this prevents duplicate modules per host
+	// TODO: Create function to first remove dups, if not done this query will fail!!
+	"ALTER TABLE `modulestatusbyhost` ADD UNIQUE ( `msHostID` , `msModuleID`)",
+	// snapinassoc: Create unique with Host ID and Snapin ID - this prevents duplicate snapins per host
+	// TODO: Create function to first remove dups, if not done this query will fail!!
+	"ALTER TABLE `snapinassoc` ADD UNIQUE ( `saHostID` , `saSnapinID`)",
 
 );
 

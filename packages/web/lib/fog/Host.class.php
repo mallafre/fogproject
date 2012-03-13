@@ -199,7 +199,7 @@ class Host extends FOGController
 			$value = new Printer($value);
 		}
 		
-		// Printers
+		// Snapins
 		else if ($this->key($key) == 'snapins' && !($value instanceof Snapin))
 		{
 			$this->loadSnapins();
@@ -209,6 +209,24 @@ class Host extends FOGController
 		
 		// Add
 		return parent::add($key, $value);
+	}
+	
+	public function remove($key, $object)
+	{
+		// Printers
+		if ($this->key($key) == 'printers')
+		{
+			$this->loadPrinters();
+		}
+		
+		// Snapins
+		else if ($this->key($key) == 'snapins')
+		{
+			$this->loadSnapins();
+		}
+		
+		// Remove
+		return parent::remove($key, $object);
 	}
 	
 	public function save()
@@ -704,23 +722,15 @@ class Host extends FOGController
 	
 	public function removePrinter($removeArray)
 	{
-		// Build array of ID's to remove
-		foreach ((array)$removeArray AS $removeID)
+		// Iterate array (or other as array)
+		foreach ((array)$removeArray AS $remove)
 		{
-			$removeIDArray[] = ($removeID instanceof Printer ? $removeID->get('id') : (int)$removeID);
+			// Create object if needed -> Remove object from data
+			$this->remove('printers', ($remove instanceof Printer ? $remove : new Printer((int)$remove)));
 		}
 		
-		// Iterate -> Build new array exluding all ID's that are in $removeIDArray
-		foreach ($this->getPrinters() AS $item)
-		{
-			if (!in_array($item->get('id'), $removeIDArray))
-			{
-				$newArray[] = $item;
-			}
-		}
-		
-		// Set new data -> Return
-		return $this->set('printers', (array)$newArray);
+		// Return
+		return $this;
 	}
 	
 	// Snapin Management
@@ -743,23 +753,15 @@ class Host extends FOGController
 	
 	public function removeSnapin($removeArray)
 	{
-		// Build array of ID's to remove
-		foreach ((array)$removeArray AS $removeID)
+		// Iterate array (or other as array)
+		foreach ((array)$removeArray AS $remove)
 		{
-			$removeIDArray[] = ($removeID instanceof Snapin ? $removeID->get('id') : (int)$removeID);
+			// Create object if needed -> Remove object from data
+			$this->remove('snapins', ($remove instanceof Snapin ? $remove : new Snapin((int)$remove)));
 		}
 		
-		// Iterate -> Build new array exluding all ID's that are in $removeIDArray
-		foreach ($this->getSnapins() AS $item)
-		{
-			if (!in_array($item->get('id'), $removeIDArray))
-			{
-				$newArray[] = $item;
-			}
-		}
-		
-		// Set new data -> Return
-		return $this->set('snapins', (array)$newArray);
+		// Return
+		return $this;
 	}
 	
 	// Modules
@@ -770,6 +772,7 @@ class Host extends FOGController
 	
 	public function getModuleStatus($Module = '')
 	{
+		// TODO: Complete me!
 		return $this->get('modules');
 	}
 	
@@ -787,23 +790,15 @@ class Host extends FOGController
 	
 	public function removeModule($removeArray)
 	{
-		// Build array of ID's to remove
-		foreach ((array)$removeArray AS $removeID)
+		// Iterate array (or other as array)
+		foreach ((array)$removeArray AS $remove)
 		{
-			$removeIDArray[] = ($removeID instanceof Module ? $removeID->get('id') : (int)$removeID);
+			// Create object if needed -> Remove object from data
+			$this->remove('modules', ($remove instanceof Module ? $remove : new Module((int)$remove)));
 		}
 		
-		// Iterate -> Build new array exluding all ID's that are in $removeIDArray
-		foreach ($this->getModules() AS $item)
-		{
-			if (!in_array($item->get('id'), $removeIDArray))
-			{
-				$newArray[] = $item;
-			}
-		}
-		
-		// Set new data -> Return
-		return $this->set('modules', (array)$newArray);
+		// Return
+		return $this;
 	}
 	
 	
