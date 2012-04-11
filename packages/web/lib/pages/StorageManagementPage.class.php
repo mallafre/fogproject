@@ -212,7 +212,7 @@ class StorageManagementPage extends FOGPage
 				'name'		=> $_POST['name'],
 				'type'		=> ($_POST['isGuest'] == 'on' ? '1' : '0'),
 				'password'	=> $_POST['password'],
-				'createdBy'	=> $this->FOGCore->get('name')
+				'createdBy'	=> $_SESSION['FOG_USERNAME']
 			));
 			
 			// Save
@@ -671,7 +671,7 @@ class StorageManagementPage extends FOGPage
 				'name'		=> $_POST['name'],
 				'type'		=> ($_POST['isGuest'] == 'on' ? '1' : '0'),
 				'password'	=> $_POST['password'],
-				'createdBy'	=> $this->FOGCore->get('name')
+				'createdBy'	=> $_SESSION['FOG_USERNAME']
 			));
 			
 			// Save
