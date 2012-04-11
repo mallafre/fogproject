@@ -72,10 +72,35 @@ class UserManagementPage extends FOGPage
 		$this->title = _('Search');
 		
 		// Set search form
-		$this->searchFormURL = 'ajax/users.search.php';
+		//$this->searchFormURL = 'ajax/users.search.php';
+		$this->searchFormURL = sprintf('%s?node=%s&sub=search', $_SERVER['PHP_SELF'], $this->node);
 		
 		// Hook
 		$this->HookManager->processEvent('USER_SEARCH');
+
+		// Output
+		$this->render();
+	}
+	
+	public function search_post()
+	{
+		// Variables
+		$keyword = preg_replace('#%+#', '%', '%' . preg_replace('#[[:space:]]#', '%', $this->REQUEST['crit']) . '%');
+		$findWhere = array(
+			'name'		=> $keyword
+		);
+	
+		// Find data -> Push data
+		foreach ($this->FOGCore->getClass('UserManager')->find($findWhere, 'OR') AS $User)
+		{
+			$this->data[] = array(
+				'id'	=> $User->get('id'),
+				'name'	=> $User->get('name')
+			);
+		}
+		
+		// Hook
+		$this->HookManager->processEvent('USER_DATA', array('headerData' => &$this->headerData, 'data' => &$this->data, 'templates' => &$this->templates, 'attributes' => &$this->attributes));
 
 		// Output
 		$this->render();

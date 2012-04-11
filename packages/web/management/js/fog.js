@@ -138,8 +138,12 @@ var Loader;
 				{
 					$this.val('')
 				}
+			// Stop submit event for parent form - when you press enter in the search box
+			}).parents('form').submit(function()
+			{
+				return false;
 			});
-			
+						
 			function PerformSearch()
 			{
 				// Extract Query
