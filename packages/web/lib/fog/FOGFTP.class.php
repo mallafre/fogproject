@@ -4,7 +4,7 @@
 class FOGFTP extends FOGGetSet
 {
 	// Debug & Info
-	public $debug = true;
+	public $debug = false;
 	public $info = false;
 	
 	// Data
@@ -20,6 +20,8 @@ class FOGFTP extends FOGGetSet
 	private $link;
 	private $loginLink;
 	private $lastConnectionHash;
+	
+	public $passiveMode = true;
 	
 	public function connect()
 	{
@@ -43,6 +45,11 @@ class FOGFTP extends FOGGetSet
 		{
 			$error = error_get_last();
 			throw new Exception(sprintf('%s: Login failed. Host: %s, Username: %s, Password: %s, Error: %s', get_class($this), $this->get('host'), $this->get('username'), $this->get('password'), $error['message']));
+		}
+		
+		if ($this->passiveMode)
+		{
+			ftp_pasv($this->link, true);
 		}
 		
 		// Store connection hash

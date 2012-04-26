@@ -52,11 +52,8 @@ class TaskManagementPage extends FOGPage
 			array('width' => 50, 'class' => 'c')
 		);
 		
-		// Find data
-		$Tasks = $this->FOGCore->getClass('TaskManager')->find(array('stateID' => array(Task::TYPE_UPLOAD, Task::TYPE_DOWNLOAD)));
-		
-		// Row data
-		foreach ($Tasks AS $Task)
+		// Tasks
+		foreach ($this->FOGCore->getClass('TaskManager')->getActiveTasks() AS $Task)
 		{
 			$this->data[] = array(
 				'task_id'	=> $Task->get('id'),
@@ -68,7 +65,7 @@ class TaskManagementPage extends FOGPage
 				
 				// TODO: Move this to template logic
 				'details_taskname'	=> ($Task->get('name')	? sprintf('<div class="task-name">%s</div>', $Task->get('name')) : ''),
-				'details_taskforce'	=> ($Task->get('isForced') ? sprintf('<span class="icon icon-forced" title="%s"></span>', _('Task forced to start')) : ($Task->get('typeID') == Task::TYPE_UPLOAD || $Task->get('typeID') == Task::TYPE_DOWNLOAD ? sprintf('<a href="?node=tasks&sub=force-task&id=%s"><span class="icon icon-force" title="%s"></span></a>', $Task->get('id'), _('Force task to start')) : '&nbsp;')),
+				'details_taskforce'	=> ($Task->get('isForced') ? sprintf('<span class="icon icon-forced" title="%s"></span>', _('Task forced to start')) : ($Task->get('typeID') == 1 || $Task->get('typeID') == 2 ? sprintf('<a href="?node=tasks&sub=force-task&id=%s"><span class="icon icon-force" title="%s"></span></a>', $Task->get('id'), _('Force task to start')) : '&nbsp;')),
 				
 				'host_id'	=> $Task->get('hostID'),
 				'host_name'	=> $Task->getHost()->get('name'),
@@ -207,7 +204,7 @@ class TaskManagementPage extends FOGPage
 				FROM 
 					(select * from multicastSessions where msState in (0,1)) multicastSessions  
 					inner join multicastSessionsAssoc on ( multicastSessionsAssoc.msID = multicastSessions.msID )
-					inner join ( select * from tasks where taskStateID in (1, 2) ) tasks on ( multicastSessionsAssoc.tID = tasks.taskID )
+					inner join ( select * from tasks where taskStateID in (1, 2, 3) ) tasks on ( multicastSessionsAssoc.tID = tasks.taskID )
 					inner join hosts on (taskHostID = hostID)
 				GROUP BY
 					multicastSessions.msID");

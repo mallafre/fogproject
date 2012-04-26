@@ -61,17 +61,59 @@ class Task extends FOGController
 		return $this->getHost()->getImage();
 	}
 	
+	public function getInFrontOfHostCount()
+	{
+		$count = $this->DB->query("SELECT
+						COUNT(*) AS count
+					FROM
+						tasks
+					WHERE
+						taskStateID IN (1, 2) AND
+						taskTypeID IN (%s) AND
+						taskNFSGroupID = '%s' AND
+						taskID < '%s' AND
+						(UNIX_TIMESTAMP() - UNIX_TIMESTAMP(taskCreateTime)) < '%s'",
+						array(
+							'1', 	// Download only - TODO: DB lookup on TaskTypes -> Build Array
+							$this->get('NFSGroupID'),
+							$this->get('id'),
+							$this->FOGCore->getSetting('FOG_CHECKIN_TIMEOUT')
+						  )
+					)->fetch()->get('count');
+		return ($count ? $count : 0);
+
+	}
+	
 	// Overrides
+	public function set($key, $value)
+	{
+		// Check in time: Convert Unix time to MySQL datetime
+		if ($this->key($key) == 'checkInTime' && is_numeric($value) && strlen($value) == 10)
+		{
+			$value = date('Y-m-d H:i:s', $value);
+		}
+		
+		// Return
+		return parent::set($key, $value);
+	}
+	
 	public function destroy()
 	{
-		// FTP: Create FTP object
-		$ftp = new FOGFTP(array(	'host'		=> $this->FOGCore->getSetting('FOG_TFTP_HOST'),
-						'username'	=> $this->FOGCore->getSetting('FOG_TFTP_FTP_USERNAME'),
-						'password' 	=> $this->FOGCore->getSetting('FOG_TFTP_FTP_PASSWORD')
-				));
-		// FTP: Connect -> Upload new PXE file -> Disconnect
-		$ftp->connect()->delete(rtrim($this->FOGCore->getSetting('FOG_TFTP_PXE_CONFIG_DIR'), '/') . '/' . $this->getHost()->getMACAddress()->getMACPXEPrefix())->close();
+		// Remove PXE file
+		if ($this->getHost()->isValid())
+		{
+			// FTP: Connect
+			$this->FOGFTP	->set('host', 		$this->FOGCore->getSetting('FOG_TFTP_HOST'))
+					->set('username',	$this->FOGCore->getSetting('FOG_TFTP_FTP_USERNAME'))
+					->set('password',	$this->FOGCore->getSetting('FOG_TFTP_FTP_PASSWORD'))
+					->connect()
+			// FTP: Delete
+					->delete(rtrim($this->FOGCore->getSetting('FOG_TFTP_PXE_CONFIG_DIR'), '/') . '/' . $this->getHost()->getMACAddress()->getMACPXEPrefix())
+			// FTP: Close
+					->close();
+		}
 		
+
 		// TODO 
 		// Snapins: Cancel snapin tasks
 		

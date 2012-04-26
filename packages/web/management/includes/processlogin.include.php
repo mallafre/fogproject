@@ -39,14 +39,22 @@ if ( $userMan != null && isset($_POST["uname"]) && isset($_POST["upass"]) && $co
 			$_SESSION['FOG_USERNAME'] = $currentUser->get('name');
 			
 			// Check if we were going to a particular page before the login page was presented - if we were, rebuild URL
-			unset($_POST['upass'], $_POST['uname'], $_POST['ulang']);
-			foreach ($_POST AS $key => $value)
+			$redirect = array_merge($_GET, $_POST); // $_REQUEST contains $_COOKIES which we dont want
+			
+			unset($redirect['upass'], $redirect['uname'], $redirect['ulang']);
+			
+			if (in_array($redirect['node'], array('login', 'logout')))
 			{
-				$redirect[] = $key . '=' . $value;
+				unset($redirect['node']);
+			}
+			
+			foreach ($redirect AS $key => $value)
+			{
+				$redirectData[] = $key . '=' . $value;
 			}
 			
 			// Redirect after successful login - this will stop the "resend data" prompt if you refresh after logging in
-			$FOGCore->redirect($_SERVER['PHP_SELF'] . ($redirect ? '?' . implode('&', $redirect) : ''));
+			$FOGCore->redirect($_SERVER['PHP_SELF'] . ($redirectData ? '?' . implode('&', (array)$redirectData) : ''));
 		 }
 		 else
 		 {

@@ -180,7 +180,7 @@ function ActiveTasksButtonHook()
 			'beforeSend':	function()
 			{
 				// Loader
-				$this.find('span').removeClass().addClass('loading');
+				$this.find('span').removeClass().addClass('icon icon-loading');
 				
 				// Unhook this button - multiple clicks now do nothing
 				$this.unbind('click').click(function() { return false; });

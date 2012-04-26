@@ -395,13 +395,9 @@ class PrinterManagementPage extends FOGPage
 		
 		// TODO: Put table rows into variables -> Add hooking
 		?>
-		<form method="post" action="<?php print $this->formAction; ?>">
-		<p class="C"><?php printf('%s <b>%s</b>?', _('Are you sure you wish to remove the user'), $Printer->get('name')); ?></p>
-		<p class="C"><input type="submit" value="" class="icon icon-kill hand" /></p>
-		
-		<p><?php print _("Click on the icon below to delete this printer from the FOG database."); ?></p>
-		<p ><a href="?node=" . $_GET["node"] . "&sub=" . $_GET["sub"] . "&rm=1&id=" . $id . ""><img class="link" src="images/delete.png"></a></p>
-		
+		<p class="c"><?php print _("Click on the icon below to delete this printer from the FOG database."); ?></p>
+		<form method="post" action="<?php print $this->formAction; ?>" class="c">
+		<input type="submit" value="<?php print $this->title; ?>" />
 		</form>
 		<?php
 	}

@@ -39,7 +39,7 @@ class HostManagementPage extends FOGPage
 			'<a href="?node=host&sub=edit&id=${id}" title="Edit">${name}</a>',
 			'${mac}',
 			'${ip}',
-			'<a href="?node=host&sub=deploy&id=${id}"><span class="icon icon-download" title="Deploy"></span></a> <a href="?node=host&sub=deploy&type=8&id=${id}"><span class="icon icon-multicast" title="Multi-cast Deploy"></span></a> <a href="?node=host&sub=edit&id=${id}"><span class="icon icon-edit" title="Edit"></span></a>'
+			'<a href="?node=host&sub=deploy&sub=deploy&type=1&id=${id}"><span class="icon icon-download" title="Deploy"></span></a> <a href="?node=host&sub=deploy&type=8&id=${id}"><span class="icon icon-multicast" title="Multi-cast Deploy"></span></a> <a href="?node=host&sub=edit&id=${id}"><span class="icon icon-edit" title="Edit"></span></a>'
 		);
 		
 		// Row attributes
@@ -1080,8 +1080,10 @@ class HostManagementPage extends FOGPage
 	
 		// TODO: Put table rows into variables -> Add hooking
 		?>
-		<p class="C"><?php printf('%s <b>%s</b>?', _('Click on the icon below to delete this host from the FOG database.'), $Host->get('name')); ?></p>
-		<p class="C"><a href="<?php print $this->formAction . '&confirm=1'; ?>"><span class="icon icon-kill"></span></a></p>
+		<p class="c"><?php printf('%s <b>%s</b>?', _('Click on the icon below to delete this host from the FOG database.'), $Host->get('name')); ?></p>
+		<form method="post" action="<?php print $this->formAction; ?>" class="c">
+		<input type="submit" value="<?php print $this->title; ?>" />
+		</form>
 		<?php
 	}
 	
@@ -1355,6 +1357,59 @@ class HostManagementPage extends FOGPage
 			// Failure
 			printf('<div class="task-start-failed"><p>%s</p><p>%s</p></div>', _('Failed to create deploy task'), $e->getMessage());
 		}
+	}
+	
+	// Overrides
+	public function render()
+	{
+		// Blackout - 4:03 PM 26/04/2012
+		// TODO: Finish me!
+		// TODO: Need action box to add hosts to groups
+		
+		// Add action-box
+		/*
+		?>
+		<div id="action-box">
+			<input type="hidden" name="frmSub" value="1" />
+			<p>
+			<label for="newgroup"><?php print _('Create new group'); ?></label>
+			<input type="text" name="newgroup" id="newgroup" autocomplete="off" />
+			</p>
+			<?php
+			// Group lookup
+			try
+			{
+				?>				
+				<p class="c">OR</p>
+				<label for="grp"><?php print _('Add to group'); ?></label>
+				<select name="grp" id="grp"><option value="">- <?php print _('Select a group'); ?> -</option>
+				<?php
+				$groupMan = $FOGCore->getClass('GroupManager');
+				$arGroups = $groupMan->getAllGroups();
+				for ($i = 0; $i < count($arGroups); $i++)
+				{
+					$g = $arGroups[$i];
+					if ($g != null)
+					{
+						printf('<option value="%s">%s</option>', $g->getName(), $g->getName());
+					}
+				}
+				?>
+				</select>
+				<?php
+			}
+			catch (Exception $e)
+			{
+				criticalError($e->getMessage(), _("FOG :: Group Lookup Error!"));
+			}
+			?>
+			<p class="c"><input type="submit" value="<?php print _("Process Group Changes"); ?>" /></p>
+		</div>
+		<?php
+		*/
+		
+		// Render
+		parent::render();
 	}
 }
 

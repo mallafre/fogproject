@@ -343,9 +343,9 @@ class ImageManagementPage extends FOGPage
 		
 		// TODO: Put table rows into variables -> Add hooking
 		?>
-		<form method="post" action="<?php print $this->formAction; ?>">
-		<p class="C"><?php printf('%s <b>%s</b>?', _('Are you sure you wish to remove the user'), $Image->get('name')); ?></p>
-		<p class="C"><input type="submit" value="" class="icon icon-kill hand" /></p>
+		<p class="c"><?php printf('%s <b>%s</b>?', _('Are you sure you wish to remove the user'), $Image->get('name')); ?></p>
+		<form method="post" action="<?php print $this->formAction; ?>" class="c">
+		<input type="submit" value="<?php print $this->title; ?>" />
 		</form>
 		<?php
 	}

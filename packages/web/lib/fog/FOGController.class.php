@@ -38,6 +38,8 @@ abstract class FOGController extends FOGBase
 	// Database field to Class relationships
 	public $databaseFieldClassRelationships = array();
 	
+	private $Manager;
+	
 	// Construct
 	public function __construct($data)
 	{
@@ -407,6 +409,17 @@ abstract class FOGController extends FOGBase
 		}
 		
 		return false;
+	}
+	
+	public function getManager()
+	{
+		if (!is_object($this->Manager))
+		{
+			$managerClass = get_class($this) . 'Manager';
+			$this->Manager = new $managerClass();
+		}
+		
+		return $this->Manager;
 	}
 	
 	// isTableDefined 

@@ -155,7 +155,7 @@ abstract class FOGManagerController extends FOGBase
 			));
 			
 			// Return
-			return $this->DB->fetch()->get('total');
+			return (int)$this->DB->fetch()->get('total');
 		}
 		catch (Exception $e)
 		{
@@ -163,6 +163,18 @@ abstract class FOGManagerController extends FOGBase
 		}
 		
 		return false;
+	}
+	
+	// Blackout - 12:09 PM 26/04/2012
+	// NOTE: VERY! powerful... use with care
+	public function destroy($where = array(), $whereOperator = 'AND', $orderBy = 'name', $sort = 'ASC')
+	{
+		foreach ((array)$this->find($where, $whereOperator, $orderBy, $sort) AS $object)
+		{
+			$object->destroy();
+		}
+		
+		return true;
 	}
 	
 	// Blackout - 11:28 AM 22/11/2011

@@ -230,11 +230,11 @@ pre { white-space: pre-wrap; }
 .icon-remove { background: url('../images/icon-remove.png') no-repeat center center; }
 .icon-tick, .icon-complete { background: url('../images/icon-tick.png') no-repeat center center; }
 .icon-download { background: url('../images/icon-download.png') no-repeat center center; }
-.icon-multicast { background: url('../images/icon-multicast.png') no-repeat center center; }
+.icon-multicast, .icon-multi-cast { background: url('../images/icon-multicast.png') no-repeat center center; }
 .icon-upload { background: url('../images/icon-upload.png') no-repeat center center; }
-.icon-inline { background: url('../images/icon-inline.png') no-repeat center center; }
+.icon-inline, .icon-checkedin { background: url('../images/icon-inline.png') no-repeat center center; }
 .icon-queued { background: url('../images/icon-queued.png') no-repeat center center; }
-.icon-inprogress { background: url('../images/icon-inprogress.png') no-repeat center center; }
+.icon-inprogress, .icon-in-progress { background: url('../images/icon-inprogress.png') no-repeat center center; }
 .icon-help { background: url('../images/help.png') no-repeat center center; }
 .icon-allsnapins { background: url('../images/icon-allsnapins.png') no-repeat center center; }
 .icon-debug { background: url('../images/icon-debug.png') no-repeat center center; }
@@ -247,6 +247,7 @@ pre { white-space: pre-wrap; }
 .icon-virusscan { background: url('../images/icon-virusscan.png') no-repeat center center; }
 .icon-wakeup { background: url('../images/icon-wakeup.png') no-repeat center center; }
 .icon-wipe { background: url('../images/icon-wipe.png') no-repeat center center; }
+.icon-loading { background: url('../images/loader.gif') no-repeat center center; }
 .hand { cursor: pointer; }
 
 /* Hosts - Edit */

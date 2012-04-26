@@ -1299,11 +1299,23 @@ $databaseSchema[] = array(
 		(12, 'User Tracker', 'usertracker', 'This setting will enable or disable the user tracker service module on this specific host.  If the module is globally disabled, this setting is ignored.');",
 	// modulestatusbyhost: Create unique with Host ID and Module ID - this prevents duplicate modules per host
 	// TODO: Create function to first remove dups, if not done this query will fail!!
-	"ALTER TABLE `modulestatusbyhost` ADD UNIQUE ( `msHostID` , `msModuleID`)",
+	"ALTER TABLE `" . DATABASE_NAME . "`.`moduleStatusByHost` ADD UNIQUE ( `msHostID` , `msModuleID`)",
 	// snapinassoc: Create unique with Host ID and Snapin ID - this prevents duplicate snapins per host
 	// TODO: Create function to first remove dups, if not done this query will fail!!
-	"ALTER TABLE `snapinassoc` ADD UNIQUE ( `saHostID` , `saSnapinID`)",
+	"ALTER TABLE `" . DATABASE_NAME . "`.`snapinAssoc` ADD UNIQUE ( `saHostID` , `saSnapinID`)",
 
+);
+
+// 35
+// Blackout - 12:35 PM 26/04/2012
+$databaseSchema[] = array(
+	// New Task States
+	"INSERT INTO `taskStates` (`tsID`, `tsName`, `tsDescription`) VALUES
+	(1, 'Queued', 'Task has been created and FOG is waiting for the Host to check-in.'),
+	(2, 'Checked In', 'PC has checked in and is in queue for imaging'),
+	(3, 'In-Progress', 'Host is currently Imaging.'),
+	(4, 'Complete', 'Imaging has been completed.'),
+	(5, 'Cancelled', 'Task was aborted by user');"
 );
 
 

@@ -14,19 +14,18 @@ if ( $mac == null  )
 $host = $mac->getHost();
 if ( $host == null || $host->get('id') <= 0 ) 
 	die( _("Unable to locate host in database, please ensure that mac address is correct.") );
-	
+
 	
 // Clean old task status
 $taskManager = new TaskManager();
-$tasks = $taskManager->find(array('stateID' => 2, 'hostID' => $host->get('id')));
+$tasks = $taskManager->find(array('stateID' => 1, 'hostID' => $host->get('id')));
 foreach ($tasks as $task)
 {
-	$task->set('stateID', '1' )->save();
+	$task->set('stateID', '2')->set('checkInTime', time())->save();
 }
 
 
-$task = new Task( array('hostID' => $host->get('id') ) );
-$task->load('hostID');
+$task = current($taskManager->find(array('stateID' => array(2, 3), 'hostID' => $host->get('id'))));
 if ( $task === false )
 {
 	echo _("No job was found for MAC Address").": $mac";
@@ -34,23 +33,16 @@ if ( $task === false )
 }
 
 $storageGroup = $task->getStorageGroup();
-if ( $storageGroup === null )
+if ( $storageGroup === null || ! $storageGroup->isValid() )
 {
-	echo _("No storage group was associated with this task!");
-	exit;
-}
-	
-// Check the host in	
-if ( $task->set('checkInTime', time())->save() === false )
-{
-	echo _("Error: Checkin Failed.");
+	echo _("No storage group is invalid!");
 	exit;
 }
 
 // Short circuit
 if ( $task->get('isForced') )
 {
-	if ( $task->set('stateID', '2' )->save() )
+	if ( $task->set('stateID', '3' )->save() )
 		echo "##@GO";
 	else
 		echo _("Error attempting to start imaging process");				
@@ -58,14 +50,14 @@ if ( $task->get('isForced') )
 	// log the start of the task
 	//@logImageTask( $conn, "s", $hostid, mysql_real_escape_string( getImageName( $conn, $hostid ) ) );
 	exit;
-}			
+}
 
-$storageGroup->updateStorageNodes();
 // check if there are any open spots in the group's queue
 $totalSlots = $storageGroup->getTotalSupportedClients();
 $taskManager = new TaskManager();
-$usedSlots = $taskManager->getCountQueuedTasksByStorageGroup($storageGroup->get('id'));
-$inFrontOfMe = $taskManager->getCountInFrontOfHost($storageGroup, $task); 
+$usedSlots = $storageGroup->getUsedSlotCount();
+//$inFrontOfMe = $taskManager->getCountInFrontOfHost($storageGroup, $task);
+$inFrontOfMe = $task->getInFrontOfHostCount();
 
 if ( $usedSlots >= $totalSlots )
 {
@@ -83,7 +75,7 @@ if ( $groupOpenSlots <= $inFrontOfMe )
 	exit;
 }
 
-$nodes = $storageGroup->get('storageNodes');
+$nodes = $storageGroup->getStorageNodes();
 
 if ( count( $nodes ) <= 0 )
 {
@@ -100,7 +92,7 @@ $clientsOnBestNode = 999999999;
 $msgs = "";
 foreach ($nodes as $node)
 {
-	$nodeUsedSlots = $taskManager->getCountQueuedTasksByStorageNode( $node );
+	$nodeUsedSlots = $node->getUsedSlotCount();
 	if ( $nodeUsedSlots < $node->get('maxclients') && $nodeUsedSlots < $clientsOnBestNode  )
 	{	
 		if ( $node->getNodeFailure($host) === null )
@@ -115,7 +107,7 @@ foreach ($nodes as $node)
 
 if ( $bestNode != null )
 {
-	if ( $task->set('stateID', '2' )->set('NFSMemberID', $bestNode->get('id'))->save() )
+	if ( $task->set('stateID', '3' )->set('NFSMemberID', $bestNode->get('id'))->save() )
 	{
 		echo "##@GO";
 	//	@logImageTask( $conn, "s", $hostid, mysql_real_escape_string( getImageName( $conn, $hostid ) ) );

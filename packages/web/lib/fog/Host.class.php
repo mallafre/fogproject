@@ -307,7 +307,7 @@ class Host extends FOGController
 	// Custom functions
 	public function getActiveTaskCount()
 	{
-		return $this->FOGCore->getClass('TaskManager')->count(array('stateID' => array(Task::TYPE_UPLOAD, Task::TYPE_DOWNLOAD), 'hostID' => $this->get('id')));
+		return $this->FOGCore->getClass('TaskManager')->count(array('stateID' => array(1, 2, 3), 'hostID' => $this->get('id')));
 	}
 	
 	public function isValidToImage()
@@ -483,8 +483,20 @@ class Host extends FOGController
 				throw new Exception(sprintf(_('Failed to write TMP PXE File. File: %s, Error: %s'), $localPXEFile, $error['message']));
 			}
 			
-			// FTP: Connect -> Upload new PXE file
+			// TODO: Multiple TFTP servers
+			/*
+			$FOGTFTPServers = (preg_match('#,#', $this->FOGCore->getSetting('FOG_TFTP_HOST')) ? explode(',', $this->FOGCore->getSetting('FOG_TFTP_HOST')) : array($this->FOGCore->getSetting('FOG_TFTP_HOST')));
+			foreach ($FOGTFTPServers AS $TFTPServer)
+			{
+				$this->FOGFTP	->set('host', 		$TFTPServer)
+						->set('username',	$this->FOGCore->getSetting('FOG_TFTP_FTP_USERNAME'))
+						->set('password',	$this->FOGCore->getSetting('FOG_TFTP_FTP_PASSWORD'))
+						->connect()
+						->put($remotePXEFile, $localPXEFile);
+			}
+			*/
 			
+			// FTP: Connect -> Upload new PXE file
 			$this->FOGFTP	->set('host', 		$this->FOGCore->getSetting('FOG_TFTP_HOST'))
 					->set('username',	$this->FOGCore->getSetting('FOG_TFTP_FTP_USERNAME'))
 					->set('password',	$this->FOGCore->getSetting('FOG_TFTP_FTP_PASSWORD'))
@@ -511,8 +523,13 @@ class Host extends FOGController
 			if (!$Task->save())
 			{
 				// Task save failed!
-				// FTP: Delete PXE file -> Disconnect
-				$this->FOGFTP->delete($remotePXEFile)->close(($isGroupTask ? false : true));
+				try
+				{
+					// FTP: Delete PXE file -> Disconnect
+					$this->FOGFTP->delete($remotePXEFile);
+				} catch (Exception $e) {}
+				
+				$this->FOGFTP->close(($isGroupTask ? false : true));
 				
 			
 				// Throw error
@@ -799,6 +816,31 @@ class Host extends FOGController
 		
 		// Return
 		return $this;
+	}
+	
+	public function destroy()
+	{
+		// Complete active tasks
+		foreach ((array)$this->FOGCore->getClass('TaskManager')->find(array('hostID' => $this->get('id'))) AS $Task)
+		{
+			$Task	->set('stateID', '5')
+				->save();
+		}
+		
+		// Remove Group associations
+		$this->FOGCore->getClass('GroupMembersManager')->destroy(array('hostID' => $this->get('id')));
+		
+		// Remove Module associations
+		//$this->FOGCore->getClass('GroupMembersManager')->destroy(array('hostID' => $this->get('id')));
+		
+		// Remove Snapin associations
+		//$this->FOGCore->getClass('GroupMembersManager')->destroy(array('hostID' => $this->get('id')));
+		
+		// Remove Printer associations
+		//$this->FOGCore->getClass('GroupMembersManager')->destroy(array('hostID' => $this->get('id')));
+		
+		// Return
+		return parent::destroy();
 	}
 	
 	

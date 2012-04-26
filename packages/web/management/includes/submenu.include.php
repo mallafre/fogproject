@@ -47,7 +47,7 @@ if ($currentUser != null && $currentUser->isLoggedIn())
 									_('Service Settings')	=> "$_SERVER[PHP_SELF]?node=$node&sub=edit&groupid=$groupid#group-service",
 									_('Active Directory')	=> "$_SERVER[PHP_SELF]?node=$node&sub=edit&groupid=$groupid#group-active-directory",
 									_('Printers')		=> "$_SERVER[PHP_SELF]?node=$node&sub=edit&groupid=$groupid#group-printers",
-									_('Delete')		=> "delete",
+									_('Delete')		=> "$_SERVER[PHP_SELF]?node=$node&sub=delete&groupid=$groupid",
 							), 'groupid', 'Group Menu');
 			}
 			else

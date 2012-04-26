@@ -60,16 +60,23 @@ class StorageNode extends FOGController
 		return new StorageGroup($this->get('storageGroupID'));
 	}
 	
-	function getNodeFailure($host)
+	function getNodeFailure($Host)
 	{
-		$nodeFailure = new NodeFailure(array(
-						'storageNodeID' => $this->get('id'), 
-						'hostID' 	=> $this->DB->sanitize($host instanceof Host ? $host->get('id') : $host )
-					    )
-					);
-		if ( $nodeFailure->load(array('storageNodeID', 'hostID')) )
-			return $nodeFailure;
-		return null;
+		$NodeFailures = $this->FOGCore->getClass('NodeFailureManager')->find(array(	'storageNodeID'	=> $this->get('id'), 
+												'hostID'	=> $this->DB->sanitize($Host instanceof Host ? $Host->get('id') : $Host)
+											)
+										);
+
+		return (count($NodeFailures) ? $NodeFailures[0] : null);
+	}
+	
+	public function getUsedSlotCount()
+	{
+		return $this->FOGCore->getClass('TaskManager')->count(array(	'stateID'	=> 3,
+										'typeID'	=> array(1, 8, 15, 2, 16),	// Upload + Download Tasks - TODO: DB lookup on TaskTypes -> Build Array
+										'NFSMemberID'	=> $this->get('id')
+									)
+								);
 	}
 
 	// Legacy functions - remove once updated in other areas

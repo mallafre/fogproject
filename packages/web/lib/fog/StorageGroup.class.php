@@ -104,6 +104,15 @@ class StorageGroup extends FOGController
 		return $this;
 	}
 	
+	public function getUsedSlotCount()
+	{
+		return $this->FOGCore->getClass('TaskManager')->count(array(	'stateID'	=> 3,
+										'typeID'	=> array(1, 8, 15, 2, 16),	// Upload + Download Tasks - TODO: DB lookup on TaskTypes -> Build Array
+										'NFSGroupID'	=> $this->get('id')
+									)
+								);
+	}
+	
 	// Legacy functions - remove once updated in other areas
 	function getID() { return $this->get('id'); }
 	function getName() { return $this->get('name'); }

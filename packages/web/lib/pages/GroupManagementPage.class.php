@@ -35,7 +35,7 @@ class GroupManagementPage extends FOGPage
 			sprintf('<a href="?node=group&sub=edit&%s=${id}" title="${description}">${name}</a>', $this->id),
 			//'${description}',
 			'${count}',
-			sprintf('<a href="?node=group&sub=deploy&%s=${id}"><span class="icon icon-download" title="Deploy"></span></a> <a href="?node=group&sub=deploy&type=8&%s=${id}"><span class="icon icon-multicast" title="%s"></span></a> <a href="?node=group&sub=edit&%s=${id}"><span class="icon icon-edit" title="Edit"></span></a>', $this->id, $this->id, _('Multi-Cast Deploy'), $this->id),
+			sprintf('<a href="?node=group&sub=deploy&type=1&%s=${id}"><span class="icon icon-download" title="Deploy"></span></a> <a href="?node=group&sub=deploy&type=8&%s=${id}"><span class="icon icon-multicast" title="%s"></span></a> <a href="?node=group&sub=edit&%s=${id}"><span class="icon icon-edit" title="Edit"></span></a>', $this->id, $this->id, _('Multi-Cast Deploy'), $this->id),
 		);
 		
 		// Row attributes
@@ -571,8 +571,10 @@ class GroupManagementPage extends FOGPage
 		
 		// TODO: Put table rows into variables -> Add hooking
 		?>
-		<p class="C"><?php printf('%s <b>%s</b>?', _('Click on the icon below to delete this group from the FOG database.'), $Group->get('name')); ?></p>
-		<p class="C"><a href="<?php print $this->formAction . '&confirm=1'; ?>"><span class="icon icon-kill"></span></a></p>
+		<p class="c"><?php printf('%s <b>%s</b>?', _('Click on the icon below to delete this group from the FOG database.'), $Group->get('name')); ?></p>
+		<form method="post" action="<?php print $this->formAction; ?>" class="c">
+		<input type="submit" value="<?php print $this->title; ?>" />
+		</form>
 		<?php
 	}
 	
@@ -587,7 +589,10 @@ class GroupManagementPage extends FOGPage
 		// POST
 		try
 		{
-			// Error checking
+			// Remove Group associations
+			$this->FOGCore->getClass('GroupMembersManager')->destroy(array('groupID' => $Group->get('id')));
+			
+			// Remove Group
 			if (!$Group->destroy())
 			{
 				throw new Exception(_('Failed to destroy Host'));
