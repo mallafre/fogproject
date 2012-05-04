@@ -169,62 +169,19 @@ $FOGCore->getMessages();
 <script type="text/javascript" src="js/fog.js"></script>
 <script type="text/javascript" src="js/fog.main.js"></script>
 <?php
+
 // Auto find javascript based on $node and/or $sub
 foreach (array("js/fog.{$node}.js", "js/fog.{$node}.{$sub}.js") AS $jsFilepath)
 {
 	if (file_exists($jsFilepath))
 	{
-		printf('<script type="text/javascript" src="%s"></script>', $jsFilepath);
+		printf('<script type="text/javascript" src="%s"></script>%s', $jsFilepath, "\n");
 	}
 }
 
 
 // TODO: Move to array
-if ($node == 'tasks' && $sub == 'active')
-{
-	?>
-	<script type="text/javascript" src="js/fog.tasks.active.js"></script>
-	<?php
-}
-else if ($node == 'tasks' && $sub == 'confirm')
-{
-	?>
-	<script type="text/javascript" src="js/fog.tasks.confirm.js"></script>
-	<?php
-}
-else if ($node == 'host' && $sub == 'edit')
-{
-	?>
-	<script type="text/javascript" src="js/fog.hosts.js"></script>
-	<script type="text/javascript" src="js/fog.adpop.js"></script>
-	<?php
-}
-else if ($node == 'group' && $sub == 'edit')
-{
-	?>
-	<script type="text/javascript" src="js/fog.adpop.js"></script>
-	<?php
-}
-else if ($node == 'host' && $sub == 'add')
-{
-	?>
-	<script type="text/javascript" src="js/fog.hosts.add.js"></script>
-	<script type="text/javascript" src="js/fog.adpop.js"></script>
-	<?php
-}
-else if ($node == 'about' && $sub == 'maclist')
-{
-	?>
-	<script type="text/javascript" src="js/fog.about.maclist.js"></script>
-	<?php
-}
-else if ($node == 'about' && $sub == 'kernel')
-{
-	?>
-	<script type="text/javascript" src="js/fog.about.kernel.js"></script>
-	<?php
-}
-else if ($isHomepage)
+if ($isHomepage)
 {
 	?>
 	<script type="text/javascript" src="js/jquery.flot.js"></script>
@@ -233,7 +190,7 @@ else if ($isHomepage)
 	<?php
 	
 	// Include 'excanvas' for HTML5 <canvas> support in IE 6/7/8/9...
-	// I hate IE soooo much, only Microsoft would allow people to still use outdated browsers
+	// I hate IE soooo much, only Microsoft wouldnt fix their own broken software
 	if (preg_match('#MSIE [6|7|8|9]#', $_SERVER['HTTP_USER_AGENT']))
 	{
 		?>

@@ -1,5 +1,5 @@
 /****************************************************
- * FOG Dashboard JS
+ * FOG JavaScript: Active Tasks
  *	Author:		Blackout
  *	Created:	1:48 PM 23/02/2011
  *	Revision:	$Revision: 835 $
@@ -198,6 +198,9 @@ function ActiveTasksButtonHook()
 					
 					// Adjust row colours / check for empty table
 					ActiveTasksTableCheck();
+				
+					// Update tooltips
+					HookTooltips();
 				});
 				
 				// Remove this request from our AJAX request tracking

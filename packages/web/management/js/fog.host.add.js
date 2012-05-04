@@ -2,8 +2,8 @@
  * FOG Dashboard JS
  *	Author:		Blackout
  *	Created:	12:22 PM 9/05/2011
- *	Revision:	$Revision$
- *	Last Update:	$LastChangedDate$
+ *	Revision:	$Revision: 642 $
+ *	Last Update:	$LastChangedDate: 2011-06-03 07:41:37 +1000 (Fri, 03 Jun 2011) $
  ***/
 
 var MACLookupTimer;

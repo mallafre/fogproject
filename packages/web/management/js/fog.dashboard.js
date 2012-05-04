@@ -267,7 +267,8 @@ function UpdateBandwidth()
 {
 	$.ajax(
 	{
-		'url':		'ajax/dashboard.bandwidth.php',
+		'url':		'index.php',
+		'data':		{ 'sub': 'bandwidth' },
 		'cache':	false,
 		'type':		'GET',
 		'dataType':	'json',

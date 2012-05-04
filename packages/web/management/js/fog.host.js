@@ -8,17 +8,10 @@
 
 $(function()
 {
-	// Host Tasks - show advanced tasks on click
-	$('.advanced-tasks-link').click(function(event)
-	{
-		$(this).parents('tr').fadeOut('fast', function()
-		{
-			$('#advanced-tasks').slideDown('slow');
-		});
-		
-		event.preventDefault();
-	});
+	// Host ping
+	$('.host-ping').fogPing({ 'Delay': 0, 'UpdateStatus': 0 }).removeClass('host-ping');
 	
+	// Checkbox toggle
 	$('.toggle-checkbox').click(function()
 	{
 		var $this = $(this);
@@ -27,6 +20,7 @@ $(function()
 		$this.parents('table').find('tbody').find('input[type="checkbox"]').attr('checked', (checked ? 'checked' : ''));
 	});
 	
+	// Action box submit
 	$('#action-box').submit(function()
 	{
 		var checked = $('input.toggle-host:checked');

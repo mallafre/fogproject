@@ -11,7 +11,7 @@ class DashboardPage extends FOGPage
 	// Pages
 	public function index()
 	{
-		$SystemUptime = SystemUptime();
+		$SystemUptime = $this->FOGCore->SystemUptime();
 	
 		?>
 		<ul id="dashboard-boxes">
@@ -49,13 +49,12 @@ class DashboardPage extends FOGPage
 				<div id="diskusage-selector">
 					<select>
 						<?php
-						/*
-						$StorageNodes = mysql_query("SELECT * FROM nfsGroupMembers WHERE ngmIsEnabled = '1' ORDER BY ngmIsMasterNode DESC", $this->DB->getLink()) or die(mysql_error());
-						while ($Node = mysql_fetch_array($StorageNodes))
+						
+						foreach ((array)$this->FOGCore->getClass('StorageNodeManager')->find(array('isEnabled' => 1)) AS $StorageNode)
 						{								
-							printf('<option value="%s"%s>%s</option>', $Node['ngmID'], ($Node['ngmIsMasterNode'] ? ' selected' : ''), $Node['ngmMemberName']);
+							printf('<option value="%s"%s>%s</option>', $StorageNode->get('id'), ($StorageNode->get('isMaster') ? ' selected' : ''), $StorageNode->get('name'));
 						}
-						*/
+						
 						?>
 					</select>
 				</div>
@@ -86,21 +85,18 @@ class DashboardPage extends FOGPage
 		
 		// Build 30 day data for graph
 		// TODO: Rewrite this.... wayyyy too many queries
-		/*
 		for( $i = 30; $i >= 0; $i-- )
 		{
-			$res = mysql_query("SELECT COUNT(*) AS c, DATE(NOW() - INTERVAL $i DAY) AS d FROM tasks WHERE DATE(taskCreateTime) = DATE(NOW()) - INTERVAL $i DAY", $this->DB->getLink()) or die(mysql_error());
-			if ($ar = mysql_fetch_array($res))
+			$this->DB->query("SELECT COUNT(*) AS c, DATE(NOW() - INTERVAL $i DAY) AS d FROM tasks WHERE DATE(taskCreateTime) = DATE(NOW()) - INTERVAL $i DAY");
+			if ($data = $this->DB->fetch()->get())
 			{
 				// NOTE: Must multiply timestamp by 1000 for unix timestamp in MILLISECONDS
-				$Graph30dayData[] = '["' . strtotime($ar['d'])*1000 . '", ' . $ar['c'] . ']';
+				$Graph30dayData[] = '["' . strtotime($data['d'])*1000 . '", ' . $data['c'] . ']';
 			}
 		}
-		*/
 		
 		$ActivityQueued = getNumberOfTasks($this->DB->getLink(), 1);
 		$ActivityActive = (int)getNumberOfTasks($this->DB->getLink(), 2) + (int)getNumberOfTasks($this->DB->getLink(), 3);
-		
 		$ActivitySlots = getGlobalQueueSize($this->DB->getLink()) - $ActivityActive;
 		?>	
 		<!-- Variables -->
@@ -109,6 +105,32 @@ class DashboardPage extends FOGPage
 		<div class="fog-variable" id="ActivitySlots"><?php print ($ActivitySlots < 0 ? 0 : $ActivitySlots); ?></div>	
 		<div class="fog-variable" id="Graph30dayData">[<?php echo implode(', ', (array)$Graph30dayData); ?>]</div>
 		<?php
+	}
+	
+	public function bandwidth()
+	{
+		// Loop each storage node -> grab stats
+		foreach ((array)$this->FOGCore->getClass('StorageNodeManager')->find(array('isEnabled' => 1, 'isGraphEnabled' => 1)) AS $StorageNode)
+		{
+			// TODO: Need to move interface to per storage group server
+			$URL = sprintf('http://%s/%s?dev=%s', rtrim($StorageNode->get('ip'), '/'), ltrim($this->FOGCore->getSetting("FOG_NFS_BANDWIDTHPATH"), '/'), $StorageNode->get('interface'));
+			
+			// Fetch bandwidth stats from remote server
+			if ($fetchedData = $this->FOGCore->fetchURL($URL))
+			{
+				// Legacy client
+				if (preg_match('/(.*)##(.*)/U', $fetchedData, $match))
+				{
+					$data[$StorageNode->get('name')] = array('rx' => $match[1], 'tx' => $match[2]);
+				}
+				else
+				{
+					$data[$StorageNode->get('name')] = json_decode($fetchedData, true);
+				}
+			}
+		}
+
+		print json_encode((array)$data);
 	}
 }
 

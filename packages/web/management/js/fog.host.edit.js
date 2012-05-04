@@ -1,15 +1,37 @@
 /****************************************************
- * FOG Host Management JS
+ * * FOG Host Management - Edit - JavaScript
  *	Author:		Blackout
- *	Created:	2:36 PM 8/05/2011
+ *	Created:	9:34 AM 1/01/2012
  *	Revision:	$Revision$
  *	Last Update:	$LastChangedDate$
  ***/
 
 $(function()
 {
-	// Host ping
-	$('.host-ping').fogPing({ 'Delay': 0, 'UpdateStatus': 0 }).removeClass('host-ping');
+	// Bind to AD Settings checkbox
+	$('#adEnabled').change(function() {
+		
+		if ( $(this).attr('checked') )
+		{	
+			if ( $('#adDomain').val() == '' && $('#adOU').val() == '' && $('#adUsername').val() == '' &&  $('#adPassword').val() == '' )
+			{
+				$.ajax({
+					'type':		'GET',
+					'url':		'ajax/host.adsettings.php',
+					'cache':	false,
+					'dataType':	'json',
+					'success':	function(data)
+					{	
+						$('#adDomain').val(data['domain']);
+						$('#adOU').val(data['ou']);
+						$('#adUsername').val(data['user']);
+						$('#adPassword').val(data['pass']);
+					}
+				});
+			}
+
+		}
+	});
 	
 	// Fetch MAC Manufactors
 	$('.mac-manufactor').each(function()
@@ -49,4 +71,15 @@ $(function()
 	{
 		$('#additionalMACsRow').show();
 	}
+	
+	// Host Tasks - show advanced tasks on click
+	$('.advanced-tasks-link').click(function(event)
+	{
+		$(this).parents('tr').fadeOut('fast', function()
+		{
+			$('#advanced-tasks').slideDown('slow');
+		});
+		
+		event.preventDefault();
+	});
 });

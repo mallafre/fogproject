@@ -506,4 +506,17 @@ class FOGCore extends FOGBase
 		// Long date
 		return date('m-d-Y g:ia', $time);
 	}
+	
+	// Blackout - 2:40 PM 25/05/2011
+	function SystemUptime()
+	{
+		$data = trim(shell_exec('uptime'));
+		
+		$load = end(explode(' load average: ', $data));
+		
+		$uptime = explode(',', end(explode(' up ', $data)));
+		$uptime = (count($uptime) > 1 ? $uptime[0] . ', ' . $uptime[1] : 'uptime not found');
+		
+		return array('uptime' => $uptime, 'load' => $load);
+	}
 }

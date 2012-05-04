@@ -41,7 +41,7 @@ abstract class FOGBase
 	public function fatalError($txt, $data = array())
 	{
 		//if (!$this->isAJAXRequest() && !preg_match('#/service/#', $_SERVER['PHP_SELF']))
-		if (!preg_match('#/service/#', $_SERVER['PHP_SELF']))
+		if (!preg_match('#/service/#', $_SERVER['PHP_SELF']) && !FOGCore::isAJAXRequest())
 		{
 			printf('<div class="debug-error">FOG FATAL ERROR: %s: %s</div>%s', get_class($this), (count($data) ? vsprintf($txt, $data) : $txt), "\n");
 			
@@ -56,7 +56,7 @@ abstract class FOGBase
 	public function error($txt, $data = array())
 	{
 		//if (!$this->isAJAXRequest() && !preg_match('#/service/#', $_SERVER['PHP_SELF']))
-		if (!preg_match('#/service/#', $_SERVER['PHP_SELF']))
+		if (!preg_match('#/service/#', $_SERVER['PHP_SELF']) && !FOGCore::isAJAXRequest())
 		{
 			printf('<div class="debug-error">FOG ERROR: %s: %s</div>%s', get_class($this), (count($data) ? vsprintf($txt, $data) : $txt), "\n");
 			//exit;
