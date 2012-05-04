@@ -2057,7 +2057,7 @@ function createUploadImagePackage( $conn, $member, &$reason, $debug=false, $shut
 										{		
 											$sql = "insert into 
 													tasks(taskName, taskCreateTime, taskCheckIn, taskHostID, taskStateID, taskCreateBy, taskForce, taskType, taskNFSGroupID, taskNFSMemberID ) 
-													values('" . mysql_real_escape_string($taskName) . "', NOW(), NOW(), '" . $member->getID() . "', '0', '" . mysql_real_escape_string( $currentUser->get('name') ) . "', '0', 'U', '$groupid', '$nodeid' )";
+													values('" . mysql_real_escape_string($taskName) . "', NOW(), NOW(), '" . $member->getID() . "', '0', '" . mysql_real_escape_string( $currentUser->get('name') ) . "', '0', 2, '$groupid', '$nodeid' )";
 											if ( mysql_query( $sql, $conn ) )
 											{
 												wakeUp( $member->getMACColon() );																			
@@ -2691,7 +2691,7 @@ function createImagePackage($conn, $member, $taskName, &$reason, $debug=false, $
 			->set('hostID',		$member->getHost()->get('id'))
 			->set('isForced',	'0')
 			->set('state',		'0')
-			->set('type',		'D');
+			->set('type',		1);
 
 		// Save to database
 		if ($member->save())
@@ -2744,7 +2744,7 @@ function cleanIncompleteTasks( $conn, $hostid )
 {
 	if ( $conn != null && $hostid != null )
 	{
-		$sql = "update tasks set taskStateID = '0' where taskHostID = '" . mysql_real_escape_string($hostid) . "' and taskStateID = '1'";	
+		$sql = "update tasks set taskStateID = '1' where taskHostID = '" . mysql_real_escape_string($hostid) . "' and taskStateID IN (2, 3)";	
 		mysql_query( $sql, $conn ) or criticalError( mysql_error(), _("FOG :: Database error!") );
 	}
 }
@@ -2758,14 +2758,16 @@ function queuedTaskExists( $conn, $mac )
 	return false;
 }
 
-function getTaskIDByMac( $conn, $mac, $state=0 )
+function getTaskIDByMac( $conn, $mac, $state=1 )
 {
 	if ( $conn != null && $mac != null )
 	{
+		$state = (is_array($state) ? implode(', ', $state) : $state);
+		
 		$sql = "select 
 				* 
 				from hosts 
-				inner join tasks on ( hosts.hostID = tasks.taskHostID ) where hostMAC = '" . mysql_real_escape_string($mac) . "' and taskStateID = '$state'";
+				inner join tasks on ( hosts.hostID = tasks.taskHostID ) where hostMAC = '" . mysql_real_escape_string($mac) . "' and taskStateID IN ($state)";
 
 		$res = mysql_query( $sql, $conn ) or criticalError( mysql_error(), _("FOG :: Database error!") );
 		while( $ar = mysql_fetch_array( $res ) )
@@ -2781,7 +2783,9 @@ function getNumberInQueue( $conn, $state )
 {
 	if ( $conn != null && $state != null )
 	{
-		$sql = "select count(*) as cnt from tasks where taskStateID = '" . mysql_real_escape_string($state) . "' and taskTypeID in ('" . Task::TYPE_UPLOAD . "', '" . Task::TYPE_DOWNLOAD . "')";
+		$state = (is_array($state) ? implode(', ', $state) : $state);
+		
+		$sql = "select count(*) as cnt from tasks where taskStateID in (" . mysql_real_escape_string($state) . ") and taskTypeID in (1, 8, 15, 2, 16)";
 		$res = mysql_query( $sql, $conn ) or criticalError( mysql_error(), _("FOG :: Database error!") );
 		
 		if ( $ar = mysql_fetch_array( $res ) )
@@ -2807,7 +2811,7 @@ function getNumberInQueueByNFSServer( $conn, $state, $nodeid )
 				tasks
 			WHERE 
 				taskStateID = '" . mysql_real_escape_string( $state ) . "' and
-				taskTypeID in ( 'U', 'D' ) and
+				taskTypeID in ( 1, 8, 15, 2, 16 ) and
 				taskNFSMemberID = '" . mysql_real_escape_string( $nodeid ) . "'";
 		$res = mysql_query( $sql, $conn ) or criticalError( mysql_error(), _("FOG :: Database error!") );
 		

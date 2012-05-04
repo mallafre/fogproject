@@ -18,4 +18,25 @@ $(function()
 		
 		event.preventDefault();
 	});
+	
+	$('.toggle-checkbox').click(function()
+	{
+		var $this = $(this);
+		var checked = $this.attr('checked');
+		
+		$this.parents('table').find('tbody').find('input[type="checkbox"]').attr('checked', (checked ? 'checked' : ''));
+	});
+	
+	$('#action-box').submit(function()
+	{
+		var checked = $('input.toggle-host:checked');
+		var hostIDArray = new Array();
+		
+		for (var i = 0, len = checked.size(); i < len; i++)
+		{
+			hostIDArray[hostIDArray.length] = checked.eq(i).attr('value');
+		}
+		
+		$('#hostIDArray', this).val( hostIDArray.join(',') );
+	});
 });

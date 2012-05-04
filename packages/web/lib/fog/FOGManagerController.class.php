@@ -187,7 +187,7 @@ abstract class FOGManagerController extends FOGBase
 		
 		foreach ($this->find() AS $Object)
 		{
-			$listArray[] = sprintf('<option value="%s"%s>[%s] %s</option>', $Object->get('id'), ($matchID == $Object->get('id') ? ' selected="selected"' : ''), $Object->get('id'), $Object->get('name'));
+			$listArray[] = sprintf('<option value="%s"%s>%s - (%s)</option>', $Object->get('id'), ($matchID == $Object->get('id') ? ' selected="selected"' : ''), $Object->get('name'), $Object->get('id'));
 		}
 		
 		return (isset($listArray) ? sprintf('<select name="%s" autocomplete="off"><option value="">- %s -</option>%s</select>', $elementName, _('Please select an option'), implode("\n", $listArray)) : false);

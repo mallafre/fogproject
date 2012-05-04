@@ -1284,7 +1284,7 @@ $databaseSchema[] = array(
 $databaseSchema[] = array(
 	// modules: Create module table -> Insert module information
 	"CREATE TABLE IF NOT EXISTS `" . DATABASE_NAME . "`.`modules` ( `id` mediumint(9) NOT NULL AUTO_INCREMENT, `name` varchar(50) NOT NULL, `short_name` varchar(30) NOT NULL, `description` text NOT NULL, PRIMARY KEY (`id`) ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=13",
-	"INSERT INTO `modules` (`id`, `name`, `short_name`, `description`) VALUES
+	"INSERT INTO `" . DATABASE_NAME . "`.`modules` (`id`, `name`, `short_name`, `description`) VALUES
 		(1, 'Directory Cleaner', 'dircleanup', 'This setting will enable or disable the directory cleaner service module on this specific host.  If the module is globally disabled, this setting is ignored.'),
 		(2, 'User Cleanup', 'usercleanup', 'This setting will enable or disable the user cleaner service module on this specific host.  If the module is globally disabled, this setting is ignored.  The user clean up service will remove all stale users on the local machine, accept for user accounts that are whitelisted.  This is typically used when dynamic local users is implemented on the workstation.'),
 		(3, 'Display Manager', 'displaymanager', 'This setting will enable or disable the display manager service module on this specific host.  If the module is globally disabled, this setting is ignored.'),
@@ -1310,13 +1310,21 @@ $databaseSchema[] = array(
 // Blackout - 12:35 PM 26/04/2012
 $databaseSchema[] = array(
 	// New Task States
-	"INSERT INTO `taskStates` (`tsID`, `tsName`, `tsDescription`) VALUES
+	"INSERT INTO `" . DATABASE_NAME . "`.`taskStates` (`tsID`, `tsName`, `tsDescription`) VALUES
 	(1, 'Queued', 'Task has been created and FOG is waiting for the Host to check-in.'),
 	(2, 'Checked In', 'PC has checked in and is in queue for imaging'),
 	(3, 'In-Progress', 'Host is currently Imaging.'),
 	(4, 'Complete', 'Imaging has been completed.'),
 	(5, 'Cancelled', 'Task was aborted by user');"
 );
+
+// 36
+// Blackout - 12:18 PM 4/05/2012
+$databaseSchema[] = array(
+	"ALTER TABLE `" . DATABASE_NAME . "`.`groups` ADD UNIQUE ( `groupName` )",
+	"ALTER TABLE `" . DATABASE_NAME . "`.`groupMembers` ADD UNIQUE ( `gmHostID`, `gmGroupID` )"
+);
+
 
 
 ?>

@@ -25,7 +25,7 @@ if ( $mac != null  )
 {
 	
 	$hostid = getHostID( $conn, $mac );	
-	$jobid = getTaskIDByMac( $conn, $mac, 1 );
+	$jobid = getTaskIDByMac( $conn, $mac, 3 );
 
 	$ftp = ftp_connect($GLOBALS['FOGCore']->getSetting( "FOG_TFTP_HOST" )); 
 	$ftp_loginres = ftp_login($ftp, $GLOBALS['FOGCore']->getSetting( "FOG_TFTP_FTP_USERNAME" ), $GLOBALS['FOGCore']->getSetting( "FOG_TFTP_FTP_PASSWORD" )); 				

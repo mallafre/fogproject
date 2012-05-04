@@ -41,6 +41,8 @@ class Group extends FOGController
 		$updateInHost = array('kernel', 'kernelArgs', 'kernelDevice');
 		
 		// Iterate update array -> Update fields -> Save Host
+		// TODO: Fix
+		/*
 		foreach ((array)$this->get('hosts') AS $Host)
 		{
 			foreach ($updateInHost AS $field)
@@ -50,7 +52,12 @@ class Group extends FOGController
 			
 			// Save Host
 			$Host->save();
+			
+			// Group Association
+			$GroupAssociation = new GroupAssociation(array('hostID' => $Host->get('id'), 'groupID' => $this->get('id')));
+			$GroupAssociation->save();
 		}
+		*/
 		
 		// Return		
 		return $this;

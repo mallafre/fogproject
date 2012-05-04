@@ -45,7 +45,7 @@ if ( ! isValidMACAddress( $mac ) )
 if ( $mac != null && $status != null )
 {
 	$hostid = getHostID( $conn, $mac );
-	$jobid = getTaskIDByMac( $conn, $mac, 1 );
+	$jobid = getTaskIDByMac( $conn, $mac, 2 );
 
 	if ( $jobid == "" )
 		$jobid = getTaskIDByMac( $conn, $mac );

@@ -98,8 +98,9 @@ class DashboardPage extends FOGPage
 		}
 		*/
 		
-		$ActivityActive = getNumberOfTasks($this->DB->getLink(), 1);
-		$ActivityQueued = getNumberOfTasks($this->DB->getLink(), 0);
+		$ActivityQueued = getNumberOfTasks($this->DB->getLink(), 1);
+		$ActivityActive = (int)getNumberOfTasks($this->DB->getLink(), 2) + (int)getNumberOfTasks($this->DB->getLink(), 3);
+		
 		$ActivitySlots = getGlobalQueueSize($this->DB->getLink()) - $ActivityActive;
 		?>	
 		<!-- Variables -->

@@ -590,7 +590,7 @@ class GroupManagementPage extends FOGPage
 		try
 		{
 			// Remove Group associations
-			$this->FOGCore->getClass('GroupMembersManager')->destroy(array('groupID' => $Group->get('id')));
+			$this->FOGCore->getClass('GroupAssociationManager')->destroy(array('groupID' => $Group->get('id')));
 			
 			// Remove Group
 			if (!$Group->destroy())

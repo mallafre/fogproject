@@ -828,16 +828,16 @@ class Host extends FOGController
 		}
 		
 		// Remove Group associations
-		$this->FOGCore->getClass('GroupMembersManager')->destroy(array('hostID' => $this->get('id')));
+		$this->FOGCore->getClass('GroupAssociationManager')->destroy(array('hostID' => $this->get('id')));
 		
 		// Remove Module associations
-		//$this->FOGCore->getClass('GroupMembersManager')->destroy(array('hostID' => $this->get('id')));
+		//$this->FOGCore->getClass('GroupAssociationManager')->destroy(array('hostID' => $this->get('id')));
 		
 		// Remove Snapin associations
-		//$this->FOGCore->getClass('GroupMembersManager')->destroy(array('hostID' => $this->get('id')));
+		//$this->FOGCore->getClass('GroupAssociationManager')->destroy(array('hostID' => $this->get('id')));
 		
 		// Remove Printer associations
-		//$this->FOGCore->getClass('GroupMembersManager')->destroy(array('hostID' => $this->get('id')));
+		//$this->FOGCore->getClass('GroupAssociationManager')->destroy(array('hostID' => $this->get('id')));
 		
 		// Return
 		return parent::destroy();

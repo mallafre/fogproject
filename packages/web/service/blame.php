@@ -44,9 +44,9 @@ if ( $mac != null  )
 {
 	//$mac = str_replace( "-", ":", $mac );
 
-	$jobid = getTaskIDByMac( $conn, $mac, 1 );
+	$jobid = getTaskIDByMac( $conn, $mac, 2 );
 	if ( $jobid == "" )
-		$jobid = getTaskIDByMac( $conn, $mac, 0 );	
+		$jobid = getTaskIDByMac( $conn, $mac, 1 );	
 	$hostid = getHostID( $conn, $mac );
 
 	if ( $jobid != null && $hostid != null && is_numeric( $jobid ) && is_numeric( $hostid ) )
@@ -89,7 +89,8 @@ if ( $mac != null  )
 							
 						if ( $blUpdate )
 						{
-							$sql = "UPDATE tasks set taskStateID = '0' WHERE taskID = '$jobid'";
+							// Set state back to 'Queued' 
+							$sql = "UPDATE tasks set taskStateID = '1' WHERE taskID = '$jobid'";
 							if ( mysql_query( $sql, $conn ) )
 								echo "##";
 							else 	

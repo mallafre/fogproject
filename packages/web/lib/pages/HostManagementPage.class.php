@@ -24,7 +24,7 @@ class HostManagementPage extends FOGPage
 		
 		// Header row
 		$this->headerData = array(
-			'<input type="checkbox" name="no" checked="checked" />',
+			'<input type="checkbox" name="toggle-checkbox" class="toggle-checkbox" checked="checked" />',
 			'',
 			_('Host Name'),
 			_('MAC'),
@@ -34,7 +34,7 @@ class HostManagementPage extends FOGPage
 		
 		// Row templates
 		$this->templates = array(
-			'<input type="checkbox" name="HID${id}" checked="checked" />',
+			'<input type="checkbox" name="host[]" value="${id}" class="toggle-host" checked="checked" />',
 			'<span class="icon ping"></span>',
 			'<a href="?node=host&sub=edit&id=${id}" title="Edit">${name}</a>',
 			'${mac}',
@@ -1362,54 +1362,84 @@ class HostManagementPage extends FOGPage
 	// Overrides
 	public function render()
 	{
-		// Blackout - 4:03 PM 26/04/2012
-		// TODO: Finish me!
-		// TODO: Need action box to add hosts to groups
-		
-		// Add action-box
-		/*
-		?>
-		<div id="action-box">
-			<input type="hidden" name="frmSub" value="1" />
-			<p>
-			<label for="newgroup"><?php print _('Create new group'); ?></label>
-			<input type="text" name="newgroup" id="newgroup" autocomplete="off" />
-			</p>
-			<?php
-			// Group lookup
-			try
-			{
-				?>				
-				<p class="c">OR</p>
-				<label for="grp"><?php print _('Add to group'); ?></label>
-				<select name="grp" id="grp"><option value="">- <?php print _('Select a group'); ?> -</option>
-				<?php
-				$groupMan = $FOGCore->getClass('GroupManager');
-				$arGroups = $groupMan->getAllGroups();
-				for ($i = 0; $i < count($arGroups); $i++)
-				{
-					$g = $arGroups[$i];
-					if ($g != null)
-					{
-						printf('<option value="%s">%s</option>', $g->getName(), $g->getName());
-					}
-				}
-				?>
-				</select>
-				<?php
-			}
-			catch (Exception $e)
-			{
-				criticalError($e->getMessage(), _("FOG :: Group Lookup Error!"));
-			}
-			?>
-			<p class="c"><input type="submit" value="<?php print _("Process Group Changes"); ?>" /></p>
-		</div>
-		<?php
-		*/
-		
 		// Render
 		parent::render();
+		
+		// Add action-box
+		if (($this->sub == '' || in_array($this->sub, array('list', 'search'))) && !$this->FOGCore->isAJAXRequest() && !$this->FOGCore->isPOSTRequest())
+		{	
+			?>
+			<form method="POST" action="<?php print sprintf('%s?node=%s&sub=save_group', $_SERVER['PHP_SELF'], $this->node); ?>" id="action-box">
+				<input type="hidden" name="hostIDArray" id="hostIDArray" value="" autocomplete="off" />
+				<p><label for="group_new"><?php print _('Create new group'); ?></label><input type="text" name="group_new" id="group_new" autocomplete="off" /></p>
+				<p class="c">OR</p>
+				<p><label for="group"><?php print _('Add to group'); ?></label> <?php print $this->FOGCore->getClass('GroupManager')->buildSelectBox(); ?></p>
+				<p class="c"><input type="submit" value="<?php print _("Process Group Changes"); ?>" /></p>
+			</form>
+			<?php
+		}
+	}
+	
+	public function save_group()
+	{
+		try
+		{
+			// Error checking
+			if (empty($this->REQUEST['hostIDArray']))
+			{
+				throw new Exception( _('No Hosts were selected') );
+			}
+		
+			if (empty($this->REQUEST['group_new']) && empty($this->REQUEST['group']))
+			{
+				throw new Exception( _('No Group selected and no new Group name entered') );
+			}
+			
+			// Determine which method to use
+			// New group
+			if (!empty($this->REQUEST['group_new']))
+			{
+				if (!$Group = current($this->FOGCore->getClass('GroupManager')->find(array('name' => $this->REQUEST['group_new']))))
+				{
+					$Group = new Group(array('name' => $this->REQUEST['group_new']));
+					
+					if (!$Group->save())
+					{
+						throw new Exception( _('Failed to create new Group') );
+					}
+				}
+			}
+			else
+			// Existing group
+			{
+				if (!$Group = current($this->FOGCore->getClass('GroupManager')->find(array('id' => $this->REQUEST['group']))))
+				{
+					throw new Exception( _('Invalid Group ID') );
+				}
+			}
+			
+			// Valid
+			if (!$Group->isValid())
+			{
+				throw new Exception( _('Group is Invalid') );
+			}
+			
+			// Main
+			foreach ((array)explode(',', $this->REQUEST['hostIDArray']) AS $hostID)
+			{
+				//$Group->add('hosts', $hostID);
+				$GroupAssociation = new GroupAssociation(array('hostID' => $hostID, 'groupID' => $Group->get('id')));
+				$GroupAssociation->save();
+			}
+			
+			// Success
+			printf('<div class="task-start-ok"><p>%s</p></div>', sprintf(_('Successfully associated Hosts with Group <u>%s</u>'), $Group->get('name')));
+		}
+		catch (Exception $e)
+		{
+			// Failure
+			printf('<div class="task-start-failed"><p>%s</p><p>%s</p></div>', _('Failed to Associate Hosts with Group'), $e->getMessage());
+		}
 	}
 }
 

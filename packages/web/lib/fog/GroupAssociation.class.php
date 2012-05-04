@@ -1,7 +1,7 @@
 <?php
 
 // Blackout - 12:06 PM 26/04/2012
-class GroupMembers extends FOGController
+class GroupAssociation extends FOGController
 {
 	// Table
 	public $databaseTable = 'groupmembers';
