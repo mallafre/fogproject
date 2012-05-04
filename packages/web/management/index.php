@@ -145,8 +145,8 @@ if (!$isHomepage) {
 ?>
 </div>
 
-<!-- Footer -->
-<div id="footer">FOG: Chuck Syperski &amp; Jian Zhang, FOG WEB UI: Peter Gilchrist</div>
+<!-- Footer: Be nice, give us some credit -->
+<div id="footer">FOG Project: Chuck Syperski, Jian Zhang &amp; Peter Gilchrist</div>
 
 <?php
 

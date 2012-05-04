@@ -24,18 +24,30 @@ class PrinterManagementPage extends FOGPage
 		
 		// Header row
 		$this->headerData = array(
-			_('Username'),
+			_('Printer Name'),
+			_('Model'),
+			_('Port'),
+			_('File'),
+			_('IP'),
 			_('Edit')
 		);
 		
 		// Row templates
 		$this->templates = array(
-			sprintf('<a href="?node=%s&sub=edit&%s=${id}">${name}</a>', $this->node, $this->id),
+			sprintf('<a href="?node=%s&sub=edit&%s=${id}" title="Edit">${name}</a>', $this->node, $this->id),
+			'${model}',
+			'${port}',
+			'${file}',
+			'${ip}',
 			sprintf('<a href="?node=%s&sub=edit&%s=${id}"><span class="icon icon-edit"></span></a>', $this->node, $this->id)
 		);
 		
 		// Row attributes
 		$this->attributes = array(
+			array(),
+			array(),
+			array(),
+			array(),
 			array(),
 			array('class' => 'c', 'width' => '55'),
 		);
@@ -54,8 +66,12 @@ class PrinterManagementPage extends FOGPage
 		foreach ($Printers AS $Printer)
 		{
 			$this->data[] = array(
-				'id'	=> $Printer->get('id'),
-				'name'	=> $Printer->get('name')
+				'id'		=> $Printer->get('id'),
+				'name'		=> $Printer->get('name'),
+				'model'		=> $Printer->get('model'),
+				'port'		=> $Printer->get('port'),
+				'file'		=> $Printer->get('file'),
+				'ip'		=> $Printer->get('ip')
 			);
 		}
 		
@@ -72,10 +88,43 @@ class PrinterManagementPage extends FOGPage
 		$this->title = _('Search');
 		
 		// Set search form
-		$this->searchFormURL = dirname($_SERVER['PHP_SELF']) . '/ajax/printer.search.php';
+		$this->searchFormURL = sprintf('%s?node=%s&sub=search', $_SERVER['PHP_SELF'], $this->node);
 		
 		// Hook
 		$this->HookManager->processEvent('PRINTER_SEARCH');
+
+		// Output
+		$this->render();
+	}
+	
+	public function search_post()
+	{
+		// Variables
+		$keyword = preg_replace('#%+#', '%', '%' . preg_replace('#[[:space:]]#', '%', $this->REQUEST['crit']) . '%');
+		$where = array(
+			'id'		=> $keyword,
+			'name'		=> $keyword,
+			'model'		=> $keyword,
+			'port'		=> $keyword,
+			'file'		=> $keyword,
+			'ip'		=> $keyword
+		);
+	
+		// Find data -> Push data
+		foreach ($this->FOGCore->getClass('PrinterManager')->find($where, 'OR') AS $Printer)
+		{
+			$this->data[] = array(
+				'id'		=> $Printer->get('id'),
+				'name'		=> $Printer->get('name'),
+				'model'		=> $Printer->get('model'),
+				'port'		=> $Printer->get('port'),
+				'file'		=> $Printer->get('file'),
+				'ip'		=> $Printer->get('ip')
+			);
+		}
+		
+		// Hook
+		$this->HookManager->processEvent('PRINTER_DATA', array('headerData' => &$this->headerData, 'data' => &$this->data, 'templates' => &$this->templates, 'attributes' => &$this->attributes));
 
 		// Output
 		$this->render();
@@ -212,10 +261,6 @@ class PrinterManagementPage extends FOGPage
 			if ($PrinterManager->exists($_POST['name']))
 			{
 				throw new Exception(_('Username already exists'));
-			}
-			if (!$PrinterManager->isPasswordValid($_POST['password'], $_POST['password_confirm']))
-			{
-				throw new Exception(_('Password is invalid'));
 			}
 			
 			// Create new Object

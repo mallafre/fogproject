@@ -30,7 +30,7 @@ class SnapinManagementPage extends FOGPage
 		
 		// Row templates
 		$this->templates = array(
-			sprintf('<a href="?node=%s&sub=edit&%s=${id}">${name}</a>', $this->node, $this->id),
+			sprintf('<a href="?node=%s&sub=edit&%s=${id}" title="Edit">${name}</a>', $this->node, $this->id),
 			sprintf('<a href="?node=%s&sub=edit&%s=${id}"><span class="icon icon-edit"></span></a>', $this->node, $this->id)
 		);
 		
@@ -45,7 +45,7 @@ class SnapinManagementPage extends FOGPage
 	public function index()
 	{
 		// Set title
-		$this->title = _("All Snap-in's");
+		$this->title = _('All Snap-ins');
 		
 		// Find data
 		$Snapins = $this->FOGCore->getClass('SnapinManager')->find();
@@ -54,8 +54,10 @@ class SnapinManagementPage extends FOGPage
 		foreach ($Snapins AS $Snapin)
 		{
 			$this->data[] = array(
-				'id'	=> $Snapin->get('id'),
-				'name'	=> $Snapin->get('name')
+				'id'		=> $Snapin->get('id'),
+				'name'		=> $Snapin->get('name'),
+				'description'	=> $Snapin->get('description'),
+				'file'		=> $Snapin->get('file')
 			);
 		}
 		
@@ -73,10 +75,38 @@ class SnapinManagementPage extends FOGPage
 		$this->title = _('Search');
 		
 		// Set search form
-		$this->searchFormURL = 'ajax/snapin.search.php';
+		$this->searchFormURL = sprintf('%s?node=%s&sub=search', $_SERVER['PHP_SELF'], $this->node);
 		
 		// Hook
 		$this->HookManager->processEvent('SNAPIN_SEARCH');
+
+		// Output
+		$this->render();
+	}
+	
+	public function search_post()
+	{
+		// Variables
+		$keyword = preg_replace('#%+#', '%', '%' . preg_replace('#[[:space:]]#', '%', $this->REQUEST['crit']) . '%');
+		$where = array(
+			'name'		=> $keyword,
+			'description'	=> $keyword,
+			'file'		=> $keyword
+		);
+	
+		// Find data -> Push data
+		foreach ($this->FOGCore->getClass('SnapinManager')->find($where, 'OR') AS $Snapin)
+		{
+			$this->data[] = array(
+				'id'		=> $Snapin->get('id'),
+				'name'		=> $Snapin->get('name'),
+				'description'	=> $Snapin->get('description'),
+				'file'		=> $Snapin->get('file')
+			);
+		}
+		
+		// Hook
+		$this->HookManager->processEvent('SNAPIN_DATA', array('headerData' => &$this->headerData, 'data' => &$this->data, 'templates' => &$this->templates, 'attributes' => &$this->attributes));
 
 		// Output
 		$this->render();
@@ -142,8 +172,8 @@ class SnapinManagementPage extends FOGPage
 										$blReboot = "1";
 									}
 									
-									$user = mysql_real_escape_string( $currentUser->get('name') );
-									$sql = "insert into snapins(sName, sDesc, sFilePath, sArgs, sCreateDate, sCreator, sReboot, sRunWith, sRunWithArgs) values('$name', '$description', '$file', '$args', NOW(), '$user', '$blReboot', '$rw', '$rwa' )";
+									$Snapin = mysql_real_escape_string( $currentUser->get('name') );
+									$sql = "insert into snapins(sName, sDesc, sFilePath, sArgs, sCreateDate, sCreator, sReboot, sRunWith, sRunWithArgs) values('$name', '$description', '$file', '$args', NOW(), '$Snapin', '$blReboot', '$rw', '$rwa' )";
 									if ( mysql_query( $sql, $conn ) )
 									{
 										msgBox( _("Snapin Added, you may now add another.") );
@@ -189,41 +219,40 @@ class SnapinManagementPage extends FOGPage
 		
 		
 		
-			// UserManager
-			$UserManager = $this->FOGCore->getClass('UserManager');
+			// SnapinManager
+			$SnapinManager = $this->FOGCore->getClass('SnapinManager');
 			
 			// Error checking
-			if (count($UserManager->find(array('name' => $_POST['name']))))
+			if (count($SnapinManager->find(array('name' => $_POST['name']))))
 			{
 				throw new Exception(_('Username already exists'));
 			}
-			if (!$UserManager->isPasswordValid($_POST['password'], $_POST['password_confirm']))
+			if (!$SnapinManager->isPasswordValid($_POST['password'], $_POST['password_confirm']))
 			{
 				throw new Exception(_('Password is invalid'));
 			}
 			
 			// Create new Object
-			$User = new User(array(
+			$Snapin = new Snapin(array(
 				'name'		=> $_POST['name'],
 				'type'		=> ($_POST['isGuest'] == 'on' ? '1' : '0'),
-				'password'	=> $_POST['password'],
-				'createdBy'	=> $_SESSION['FOG_USERNAME']
+				'password'	=> $_POST['password']
 			));
 			
 			// Save
-			if ($User->save())
+			if ($Snapin->save())
 			{
 				// Hook
-				$this->HookManager->processEvent('SNAPIN_ADD_SUCCESS', array('StorageNode' => &$StorageNode));
+				$this->HookManager->processEvent('SNAPIN_ADD_SUCCESS', array('Snapin' => &$Snapin));
 				
 				// Log History event
-				$this->FOGCore->logHistory(sprintf('%s: ID: %s, Name: %s', _('User created'), $User->get('id'), $Snapin->get('name')));
+				$this->FOGCore->logHistory(sprintf('%s: ID: %s, Name: %s', _('User created'), $Snapin->get('id'), $Snapin->get('name')));
 				
 				// Set session message
 				$this->FOGCore->setMessage(_('User created'));
 				
 				// Redirect to new entry
-				$this->FOGCore->redirect(sprintf('?node=%s&sub=edit&%s=%s', $this->request['node'], $this->id, $User->get('id')));
+				$this->FOGCore->redirect(sprintf('?node=%s&sub=edit&%s=%s', $this->request['node'], $this->id, $Snapin->get('id')));
 			}
 			else
 			{
@@ -234,7 +263,7 @@ class SnapinManagementPage extends FOGPage
 		catch (Exception $e)
 		{
 			// Hook
-			$this->HookManager->processEvent('SNAPIN_ADD_FAIL', array('StorageNode' => &$StorageNode));
+			$this->HookManager->processEvent('SNAPIN_ADD_FAIL', array('Snapin' => &$Snapin));
 			
 			// Log History event
 			$this->FOGCore->logHistory(sprintf('%s add failed: Name: %s, Error: %s', _('Storage'), $_POST['name'], $e->getMessage()));
@@ -256,7 +285,7 @@ class SnapinManagementPage extends FOGPage
 		$this->title = sprintf('%s: %s', _('Edit'), $Snapin->get('name'));
 		
 		// Hook
-		$this->HookManager->processEvent('SNAPIN_ADD', array('StorageNode' => &$StorageNode));
+		$this->HookManager->processEvent('SNAPIN_ADD', array('Snapin' => &$Snapin));
 		
 		// TODO: Put table rows into variables -> Add hooking
 		?>
@@ -283,7 +312,7 @@ class SnapinManagementPage extends FOGPage
 		$Snapin = new Snapin($this->request['id']);
 		
 		// Hook
-		$this->HookManager->processEvent('SNAPIN_EDIT_POST', array('StorageNode' => &$StorageNode));
+		$this->HookManager->processEvent('SNAPIN_EDIT_POST', array('Snapin' => &$Snapin));
 		
 		// POST
 		try
@@ -355,46 +384,33 @@ class SnapinManagementPage extends FOGPage
 			}
 			*/
 			
-			// UserManager
-			$UserManager = $this->FOGCore->getClass('UserManager');
+			// SnapinManager
+			$SnapinManager = $this->FOGCore->getClass('SnapinManager');
 			
 			// Error checking
-			if ($UserManager->exists($_POST['name'], $User->get('id')))
+			if ($SnapinManager->exists($_POST['name'], $Snapin->get('id')))
 			{
 				throw new Exception(_('Username already exists'));
 			}
-			if ($_POST['password'] && $_POST['password_confirm'])
-			{
-				if (!$UserManager->isPasswordValid($_POST['password'], $_POST['password_confirm']))
-				{
-					throw new Exception(_('Password is invalid'));
-				}
-			}
 			
-			// Update User Object
-			$User	->set('name',		$_POST['name'])
+			// Update Object
+			$Snapin	->set('name',		$_POST['name'])
 				->set('type',		($_POST['isGuest'] == 'on' ? '1' : '0'));
 			
-			// Set new password if password was passed
-			if ($_POST['password'] && $_POST['password_confirm'])
-			{
-				$User->set('password',	$_POST['password']);
-			}
-			
 			// Save
-			if ($User->save())
+			if ($Snapin->save())
 			{
 				// Hook
-				$this->HookManager->processEvent('SNAPIN_UPDATE_SUCCESS', array('StorageNode' => &$StorageNode));
+				$this->HookManager->processEvent('SNAPIN_UPDATE_SUCCESS', array('Snapin' => &$Snapin));
 				
 				// Log History event
-				$this->FOGCore->logHistory(sprintf('%s: ID: %s, Name: %s', _('User updated'), $User->get('id'), $Snapin->get('name')));
+				$this->FOGCore->logHistory(sprintf('%s: ID: %s, Name: %s', _('User updated'), $Snapin->get('id'), $Snapin->get('name')));
 				
 				// Set session message
 				$this->FOGCore->setMessage(_('User updated'));
 				
 				// Redirect to new entry
-				$this->FOGCore->redirect(sprintf('?node=%s&sub=edit&%s=%s', $this->request['node'], $this->id, $User->get('id')));
+				$this->FOGCore->redirect(sprintf('?node=%s&sub=edit&%s=%s', $this->request['node'], $this->id, $Snapin->get('id')));
 			}
 			else
 			{
@@ -405,10 +421,10 @@ class SnapinManagementPage extends FOGPage
 		catch (Exception $e)
 		{
 			// Hook
-			$this->HookManager->processEvent('SNAPIN_UPDATE_FAIL', array('StorageNode' => &$StorageNode));
+			$this->HookManager->processEvent('SNAPIN_UPDATE_FAIL', array('Snapin' => &$Snapin));
 			
 			// Log History event
-			$this->FOGCore->logHistory(sprintf('%s update failed: Name: %s, Error: %s', _('User'), $_POST['name'], $e->getMessage()));
+			$this->FOGCore->logHistory(sprintf('%s update failed: Name: %s, Error: %s', _('Snapin'), $_POST['name'], $e->getMessage()));
 			
 			// Set session message
 			$this->FOGCore->setMessage($e->getMessage());
@@ -427,18 +443,20 @@ class SnapinManagementPage extends FOGPage
 		$this->title = sprintf('%s: %s', _('Remove'), $Snapin->get('name'));
 		
 		// Hook
-		$this->HookManager->processEvent('SNAPIN_DELETE', array('StorageNode' => &$StorageNode));
+		$this->HookManager->processEvent('SNAPIN_DELETE', array('Snapin' => &$Snapin));
 		
 		// TODO: Put table rows into variables -> Add hooking
 		?>
-		<center><table cellpadding=0 cellspacing=0 border=0 width=100%>
-		<tr><td><?php print _("Snapin Name"); ?></td><td><?php print $Snapin->get('name'); ?></td></tr>
-		<tr><td><?php print _("Snapin Description"); ?></td><td><?php print $Snapin->get('description'); ?></td></tr>
-		<tr><td><?php print _("Snapin File"); ?></td><td><?php print $Snapin->get('file'); ?></td></tr>
-		<tr><td><?php print _("Snapin Arguments"); ?></td><td><?php print $Snapin->get('args'); ?></td></tr>
-		<tr><td><?php print _("Reboot after install"); ?></td><td><?php print ($Snapin->get('reboot') ? 'Yes' : 'No'); ?></td></tr>
-		<tr><td colspan=2><center><br /><form method="POST" action="?node=$_GET[node]&sub=$_GET[sub]&rmsnapinid=$_GET[rmsnapinid]&confirm=1&killfile=1"><input type="submit" value="<?php print _("Delete snapin definition, and snapin file."); ?>" /></form></center></td></tr>
-		</table></center>
+		<form method="POST" action="<?php print $this->formAction; ?>">
+			<center><table cellpadding=0 cellspacing=0 border=0 width=100%>
+			<tr><td><?php print _("Snapin Name"); ?></td><td><?php print $Snapin->get('name'); ?></td></tr>
+			<tr><td><?php print _("Snapin Description"); ?></td><td><?php print $Snapin->get('description'); ?></td></tr>
+			<tr><td><?php print _("Snapin File"); ?></td><td><?php print $Snapin->get('file'); ?></td></tr>
+			<tr><td><?php print _("Snapin Arguments"); ?></td><td><?php print $Snapin->get('args'); ?></td></tr>
+			<tr><td><?php print _("Reboot after install"); ?></td><td><?php print ($Snapin->get('reboot') ? 'Yes' : 'No'); ?></td></tr>
+			<tr><td colspan=2><center><br /><form method="POST" action="?node=$_GET[node]&sub=$_GET[sub]&rmsnapinid=$_GET[rmsnapinid]&confirm=1&killfile=1"><input type="submit" value="<?php print _("Delete snapin definition, and snapin file."); ?>" /></form></center></td></tr>
+			</table></center>
+		</form>
 		<?php
 	}
 	
@@ -448,66 +466,28 @@ class SnapinManagementPage extends FOGPage
 		$Snapin = new Snapin($this->request['id']);
 		
 		// Hook
-		$this->HookManager->processEvent('SNAPIN_DELETE_POST', array('StorageNode' => &$StorageNode));
+		$this->HookManager->processEvent('SNAPIN_DELETE_POST', array('Snapin' => &$Snapin));
 		
 		// POST
 		try
 		{
-			/*
-			$output = "";
-			?>
-			<h2><?php print _("Snapin Removal Results"); ?></h2>
-			<?php
-			if ( $_GET["killfile"] == "1" )
-			{
-				$sql = "select sFilePath from snapins where sID = '" . $rmid . "'";
-				$res = mysql_query( $sql, $conn ) or die( mysql_error() );
-				$file = null;
-				while( $ar = mysql_fetch_array( $res ) )
-				{
-					$file = $ar["sFilePath"];
-				}
-				
-				if ( file_exists( $file ) )
-				{
-					if ( unlink( $file ) )
-					{
-						$output .= _("snapin file has been deleted."); ?><br />";
-					}
-					else
-					{	
-						$output .= _("Failed to delete snapin file."); ?><br />";
-					}
-				}
-				else
-					$output .= _("Failed to locate snapin file."); ?><br />";
-			}
-			$sql = "delete from snapins where sID = '" . $rmid . "'";
-			if ( mysql_query( $sql, $conn ) )
-			{
-				$output .= _("Snapin definition has been removed."); ?><br />";
-				lg( _("Snapin deleted"); ?> :: $_GET[delid]
-			}
-			else
-				$output .= mysql_error();
-				
-			echo $output;
-			*/
-		
 			// Error checking
-			if (!$User->destroy())
+			if (!$Snapin->destroy())
 			{
-				throw new Exception(_('Failed to destroy User'));
+				throw new Exception(_('Failed to destroy Snapin'));
 			}
+			
+			// Remove associations
+			$this->FOGCore->getClass('SnapinAssociationManager')->destroy(array('snapinID' => $Snapin->get('id')));
 			
 			// Hook
-			$this->HookManager->processEvent('SNAPIN_DELETE_SUCCESS', array('StorageNode' => &$StorageNode));
+			$this->HookManager->processEvent('SNAPIN_DELETE_SUCCESS', array('Snapin' => &$Snapin));
 			
 			// Log History event
-			$this->FOGCore->logHistory(sprintf('%s: ID: %s, Name: %s', _('User deleted'), $User->get('id'), $Snapin->get('name')));
+			$this->FOGCore->logHistory(sprintf('%s: ID: %s, Name: %s', _('Snapin deleted'), $Snapin->get('id'), $Snapin->get('name')));
 			
 			// Set session message
-			$this->FOGCore->setMessage(sprintf('%s: %s', _('User deleted'), $Snapin->get('name')));
+			$this->FOGCore->setMessage(sprintf('%s: %s', _('Snapin deleted'), $Snapin->get('name')));
 			
 			// Redirect
 			$this->FOGCore->redirect(sprintf('?node=%s', $this->request['node']));
@@ -515,10 +495,10 @@ class SnapinManagementPage extends FOGPage
 		catch (Exception $e)
 		{
 			// Hook
-			$this->HookManager->processEvent('SNAPIN_DELETE_FAIL', array('StorageNode' => &$StorageNode));
+			$this->HookManager->processEvent('SNAPIN_DELETE_FAIL', array('Snapin' => &$Snapin));
 			
 			// Log History event
-			$this->FOGCore->logHistory(sprintf('%s %s: ID: %s, Name: %s', _('User'), _('deleted'), $User->get('id'), $Snapin->get('name')));
+			$this->FOGCore->logHistory(sprintf('%s %s: ID: %s, Name: %s', _('Snapin'), _('deleted'), $Snapin->get('id'), $Snapin->get('name')));
 			
 			// Set session message
 			$this->FOGCore->setMessage($e->getMessage());

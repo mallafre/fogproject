@@ -32,7 +32,7 @@ class ImageManagementPage extends FOGPage
 		
 		// Row templates
 		$this->templates = array(
-			sprintf('<a href="?node=%s&sub=edit&%s=${id}">${name}</a>', $this->node, $this->id),
+			sprintf('<a href="?node=%s&sub=edit&%s=${id}" title="Edit">${name}</a>', $this->node, $this->id),
 			sprintf('${storageGroup}'),
 			sprintf('${os}'),
 			sprintf('<a href="?node=%s&sub=edit&%s=${id}"><span class="icon icon-edit"></span></a>', $this->node, $this->id)

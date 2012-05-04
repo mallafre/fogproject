@@ -292,35 +292,12 @@ if ($currentUser != null && $currentUser->isLoggedIn())
 							_('New Snapin')		=> 'add',
 					));
 		
-		// LEGACY
-		$FOGSubMenu->addItems('snap', array(	_('New Search')		=> 'search',
-							_('List All Snap-ins')	=> 'list',
-							_('New Snapin')		=> 'add',
-					));
-		
-		if ($snapinid)
+		if ($id)
 		{
 			// Snapin Management: Per Snapin
-			
-			if (!preg_match('#indexold#', $_SERVER['PHP_SELF']))
-			{
-				$FOGSubMenu->addItems('snapin', array(	_('General')		=> "$_SERVER[PHP_SELF]?node=$node&sub=edit&id=$snapinid",
-									_('Delete')		=> "$_SERVER[PHP_SELF]?node=$node&sub=delete&id=$snapinid",
-							), 'id', 'Snapin Menu');
-			}
-			else
-			{
-				$FOGSubMenu->addItems('snap', array(	_('General')		=> "$_SERVER[PHP_SELF]?node=$node&sub=edit&snapinid=$snapinid&tab=gen",
-									_('Delete')		=> "$_SERVER[PHP_SELF]?node=$node&sub=edit&snapinid=$snapinid&tab=delete",
-							), 'snapinid', 'Snapin Menu');
-			}
-
-			// Snapin Management: Notes
-			$res = mysql_query( "select * from snapins where sID = '$snapinid'", $conn ) or die( mysql_error() );
-			if ( $ar = mysql_fetch_array( $res ) )
-			{
-				$FOGSubMenu->addNotes('snap', array('Name' => stripslashes($ar["sName"])));
-			}
+			$FOGSubMenu->addItems('snapin', array(	_('General')		=> "$_SERVER[PHP_SELF]?node=$node&sub=edit&id=$id",
+								_('Delete')		=> "$_SERVER[PHP_SELF]?node=$node&sub=delete&id=$id",
+			), 'id', 'Snapin Menu');
 		}
 	}
 	
