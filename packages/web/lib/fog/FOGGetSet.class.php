@@ -28,7 +28,7 @@ class FOGGetSet extends FOGBase
 		}
 		catch (Exception $e)
 		{
-			$this->debug('Set Failed: Class: %s, Key: %s, Value: %s, Error: %s', array(get_class($this), $key, $value, $e->getMessage()));
+			$this->debug('Set Failed: Key: %s, Value: %s, Error: %s', array($key, $value, $e->getMessage()));
 		}
 		
 		return $this;

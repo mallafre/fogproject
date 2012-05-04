@@ -32,7 +32,7 @@ class GroupManagementPage extends FOGPage
 		
 		// Row templates
 		$this->templates = array(
-			sprintf('<a href="?node=group&sub=edit&%s=${id}" title="${description}">${name}</a>', $this->id),
+			sprintf('<a href="?node=group&sub=edit&%s=${id}" title="Edit">${name}</a>', $this->id),
 			//'${description}',
 			'${count}',
 			sprintf('<a href="?node=group&sub=deploy&type=1&%s=${id}"><span class="icon icon-download" title="Deploy"></span></a> <a href="?node=group&sub=deploy&type=8&%s=${id}"><span class="icon icon-multicast" title="%s"></span></a> <a href="?node=group&sub=edit&%s=${id}"><span class="icon icon-edit" title="Edit"></span></a>', $this->id, $this->id, _('Multi-Cast Deploy'), $this->id),
@@ -669,7 +669,7 @@ class GroupManagementPage extends FOGPage
 					{
 						?>
 						<tr>
-							<td><?php print $Host->get('name'); ?></td>
+							<td><a href="<?php print $_SERVER['PHP_SELF']; ?>?node=host&sub=edit&id=<?php print $Host->get('id'); ?>" title="<?php print _('Edit'); ?>"><?php print $Host->get('name'); ?></a></td>
 							<td><?php print $Host->get('mac') . ($Host->get('ip') ? sprintf('(%s)', $Host->get('ip')) : ''); ?></td>
 							<td><?php print $Host->getImage()->get('name'); ?></td>
 						</tr>

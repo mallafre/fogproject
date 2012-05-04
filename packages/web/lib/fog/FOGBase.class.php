@@ -43,7 +43,7 @@ abstract class FOGBase
 		//if (!$this->isAJAXRequest() && !preg_match('#/service/#', $_SERVER['PHP_SELF']))
 		if (!preg_match('#/service/#', $_SERVER['PHP_SELF']))
 		{
-			printf('<div class="debug-error">FOG FATAL ERROR: %s: %s</div>%s', get_clasS($this), (count($data) ? vsprintf($txt, $data) : $txt), "\n");
+			printf('<div class="debug-error">FOG FATAL ERROR: %s: %s</div>%s', get_class($this), (count($data) ? vsprintf($txt, $data) : $txt), "\n");
 			
 			flush();
 			exit;
@@ -58,7 +58,7 @@ abstract class FOGBase
 		//if (!$this->isAJAXRequest() && !preg_match('#/service/#', $_SERVER['PHP_SELF']))
 		if (!preg_match('#/service/#', $_SERVER['PHP_SELF']))
 		{
-			printf('<div class="debug-error">FOG ERROR: %s: %s</div>%s', get_clasS($this), (count($data) ? vsprintf($txt, $data) : $txt), "\n");
+			printf('<div class="debug-error">FOG ERROR: %s: %s</div>%s', get_class($this), (count($data) ? vsprintf($txt, $data) : $txt), "\n");
 			//exit;
 			
 			flush();
@@ -73,7 +73,7 @@ abstract class FOGBase
 	{
 		if ((!isset($this) || (isset($this->debug) && $this->debug === true)) && !FOGCore::isAJAXRequest() && !preg_match('#/service/#', $_SERVER['PHP_SELF']))
 		{
-			printf('<div class="debug-error">FOG DEBUG: %s: %s</div>%s', get_clasS($this), (count($data) ? vsprintf($txt, $data) : $txt), "\n");
+			printf('<div class="debug-error">FOG DEBUG: %s: %s</div>%s', get_class($this), (count($data) ? vsprintf($txt, $data) : $txt), "\n");
 			
 			flush();
 			//ob_flush();
@@ -85,14 +85,14 @@ abstract class FOGBase
 	// Info - message is shown if info is enabled for that class
 	public function info($txt, $data = array())
 	{
-		//printf('Class: %s, Info: %s', get_class($this), ($this->info === true ? 'true' : 'false'));
+		//printf('Info: %s', ($this->info === true ? 'true' : 'false'));
 		
-		// !isset gets used when a call is made without a class context. i.e. FOGCore::info('foo bah');
+		// !isset gets used when a call is made statically. i.e. FOGCore::info('foo bah');
 		if ((!isset($this) || (isset($this->info) && $this->info === true)) && !FOGCore::isAJAXRequest() && !preg_match('#/service/#', $_SERVER['PHP_SELF']))
 		//if ($this->info === true && !FOGCore::isAJAXRequest() && !preg_match('#/service/#', $_SERVER['PHP_SELF']))
 		//if ($this->info === true)
 		{
-			printf('<div class="debug-info">FOG INFO: %s: %s</div>%s', get_clasS($this), (count($data) ? vsprintf($txt, $data) : $txt), "\n");
+			printf('<div class="debug-info">FOG INFO: %s: %s</div>%s', get_class($this), (count($data) ? vsprintf($txt, $data) : $txt), "\n");
 			
 			flush();
 			//ob_flush();

@@ -33,7 +33,7 @@ abstract class FOGController extends FOGBase
 	
 	// Debug & Info
 	public $debug = true;
-	public $info = false;
+	public $info = true;
 	
 	// Database field to Class relationships
 	public $databaseFieldClassRelationships = array();
@@ -75,9 +75,9 @@ abstract class FOGController extends FOGBase
 			// If incoming data is an INT -> Set as ID -> Load from database
 			elseif (is_numeric($data))
 			{
-				if ($data <= 0)
+				if ($data === 0 || $data < 0)
 				{
-					throw new Exception(sprintf('ID less than or equal to 0: Data: %s', $data));
+					throw new Exception(sprintf('No data passed, or less than zero, Value: %s', $data));
 					//return false;
 				}
 				
@@ -91,7 +91,7 @@ abstract class FOGController extends FOGBase
 		}
 		catch (Exception $e)
 		{
-			$this->debug('Create Class Failed: Class: %s, Error: %s', array(get_class($this), $e->getMessage()));
+			$this->error('Record not found, Error: %s', array($e->getMessage()));
 		}
 		
 		return $this;
@@ -126,7 +126,7 @@ abstract class FOGController extends FOGBase
 		}
 		catch (Exception $e)
 		{
-			$this->debug('Set Failed: Class: %s, Key: %s, Value: %s, Error: %s', array(get_class($this), $key, $value, $e->getMessage()));
+			$this->debug('Set Failed: Key: %s, Value: %s, Error: %s', array($key, $value, $e->getMessage()));
 		}
 		
 		return $this;
@@ -157,7 +157,7 @@ abstract class FOGController extends FOGBase
 		}
 		catch (Exception $e)
 		{
-			$this->debug('Add Failed: Class: %s, Key: %s, Value: %s, Error: %s', array(get_class($this), $key, $value, $e->getMessage()));
+			$this->debug('Add Failed: Key: %s, Value: %s, Error: %s', array($key, $value, $e->getMessage()));
 		}
 		
 		return $this;
@@ -190,7 +190,7 @@ abstract class FOGController extends FOGBase
 		}
 		catch (Exception $e)
 		{
-			$this->debug('Remove Failed: Class: %s, Key: %s, Object: %s, Error: %s', array(get_class($this), $key, $object, $e->getMessage()));
+			$this->debug('Remove Failed: Key: %s, Object: %s, Error: %s', array($key, $object, $e->getMessage()));
 		}
 		
 		return $this;
@@ -263,7 +263,7 @@ abstract class FOGController extends FOGBase
 		}
 		catch (Exception $e)
 		{
-			$this->debug('Database Save Failed: Class: %s, ID: %s, Error: %s', array(get_class($this), $this->get('id'), $e->getMessage()));
+			$this->debug('Database Save Failed: ID: %s, Error: %s', array($this->get('id'), $e->getMessage()));
 		}
 	
 		// Fail
@@ -327,7 +327,7 @@ abstract class FOGController extends FOGBase
 		catch (Exception $e)
 		{
 			// Unset ID -> Error
-			$this->set('id', 0)->debug('Database Load Failed: Class: %s, ID: %s, Error: %s', array(get_class($this), $this->get('id'), $e->getMessage()));
+			$this->set('id', 0)->debug('Database Load Failed: ID: %s, Error: %s', array($this->get('id'), $e->getMessage()));
 		}
 	
 		// Fail
@@ -367,7 +367,7 @@ abstract class FOGController extends FOGBase
 		}
 		catch (Exception $e)
 		{
-			$this->debug('Database Destroy Failed: Class: %s, ID: %s, Error: %s', array(get_class($this), $this->get('id'), $e->getMessage()));
+			$this->debug('Database Destroy Failed: ID: %s, Error: %s', array($this->get('id'), $e->getMessage()));
 		}
 	
 		// Fail
@@ -405,7 +405,7 @@ abstract class FOGController extends FOGBase
 		}
 		catch (Exception $e)
 		{
-			$this->debug('isValid Failed: Class: %s, Error: %s', array(get_class($this), $e->getMessage()));
+			$this->debug('isValid Failed: Error: %s', array($e->getMessage()));
 		}
 		
 		return false;

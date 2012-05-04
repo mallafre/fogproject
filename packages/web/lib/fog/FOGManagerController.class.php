@@ -66,7 +66,7 @@ abstract class FOGManagerController extends FOGBase
 		}
 		catch (Exception $e)
 		{
-			$this->debug('Search failed! Class: %s, Error: %s', array(get_class($this), $e->getMessage()));
+			$this->debug('Search failed! Error: %s', array($e->getMessage()));
 		}
 		
 		return false;
@@ -116,7 +116,7 @@ abstract class FOGManagerController extends FOGBase
 		}
 		catch (Exception $e)
 		{
-			$this->debug('Find all failed! Class: %s, Error: %s', array(get_class($this), $e->getMessage()));
+			$this->debug('Find all failed! Error: %s', array($e->getMessage()));
 		}
 		
 		return false;
@@ -159,7 +159,7 @@ abstract class FOGManagerController extends FOGBase
 		}
 		catch (Exception $e)
 		{
-			$this->debug('Find all failed! Class: %s, Error: %s', array(get_class($this), $e->getMessage()));
+			$this->debug('Find all failed! Error: %s', array($e->getMessage()));
 		}
 		
 		return false;
