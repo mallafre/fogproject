@@ -39,7 +39,7 @@ class HostManagementPage extends FOGPage
 			'<a href="?node=host&sub=edit&id=${id}" title="Edit">${name}</a>',
 			'${mac}',
 			'${ip}',
-			'<a href="?node=host&sub=deploy&sub=deploy&type=1&id=${id}"><span class="icon icon-download" title="Deploy"></span></a> <a href="?node=host&sub=deploy&type=8&id=${id}"><span class="icon icon-multicast" title="Multi-cast Deploy"></span></a> <a href="?node=host&sub=edit&id=${id}"><span class="icon icon-edit" title="Edit"></span></a>'
+			'<a href="?node=host&sub=deploy&sub=deploy&type=1&id=${id}"><span class="icon icon-download" title="Download"></span></a> <a href="?node=host&sub=deploy&type=8&id=${id}"><span class="icon icon-multicast" title="Multi-cast"></span></a> <a href="?node=host&sub=deploy&sub=edit&id=${id}#host-tasks"><span class="icon icon-deploy" title="Deploy"></span></a> <a href="?node=host&sub=edit&id=${id}"><span class="icon icon-edit" title="Edit"></span></a>'
 		);
 		
 		// Row attributes
@@ -47,9 +47,9 @@ class HostManagementPage extends FOGPage
 			array('width' => 22),
 			array('width' => 20),
 			array(),
-			array('width' => 110),
-			array('width' => 110),
-			array('width' => 80, 'class' => 'c')
+			array('width' => 100, 'class' => 'small'),
+			array('width' => 90, 'class' => 'small'),
+			array('width' => 110, 'class' => 'c')
 		);
 	}
 	
@@ -1256,7 +1256,7 @@ class HostManagementPage extends FOGPage
 		$TaskType = new TaskType(($this->REQUEST['type'] ? $this->REQUEST['type'] : '1'));
 		
 		// Title
-		$this->title = sprintf('%s: %s', _('Deploy Task'), $TaskType->get('name'));
+		$this->title = sprintf("%s '%s' %s '%s'", _('Deploy Task'), $TaskType->get('name'), _('to Host'), $Host->get('name'));
 		
 		// Deploy
 		?>
@@ -1298,7 +1298,7 @@ class HostManagementPage extends FOGPage
 				</tbody>
 			</table>
 			
-			<p class="c"><input type="submit" value="<?php print _('Deploy to') . ' ' . $Host->get('name'); ?>" /></p>
+			<p class="c"><input type="submit" value="<?php print $this->title; ?>" /></p>
 		</form>
 		<?php
 	}

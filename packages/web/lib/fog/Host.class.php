@@ -393,7 +393,7 @@ class Host extends FOGController
 				'dns=' . $this->FOGCore->getSetting('FOG_PXE_IMAGE_DNSADDRESS'),
 				'mac=' . $mac,
 				'ftp=' . $this->FOGCore->resolveHostname($this->FOGCore->getSetting('FOG_TFTP_HOST')),
-				'storage=' . $StorageNode->get('ip') . ':' . $StorageNode->get('path'),
+				'storage=' . sprintf('%s:/%s/%s', trim($StorageNode->get('ip')), trim($StorageNode->get('path'), '/'), ($isUpload ? 'dev/' : '')),
 				'storageip=' . $StorageNode->get('ip'),
 				'web=' . $this->FOGCore->resolveHostname($this->FOGCore->getSetting('FOG_WEB_HOST')) . '/' . ltrim($this->FOGCore->getSetting('FOG_WEB_ROOT'), '/'),
 				'osid=' . $Image->get('osID'),

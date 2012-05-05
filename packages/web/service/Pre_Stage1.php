@@ -1,5 +1,16 @@
 <?php
 
+//
+// Blackout - 5:26 PM 5/05/2012
+//
+// Pre_Stage1.php
+// Triggered:	On non multicast download (every 5 seconds)
+// Actions:	Checks queue
+//		Determines if Host is allowed to start imaging
+//		Echos '##' when host is allowed to image
+//
+
+
 require('../commons/config.php');
 require(BASEPATH . '/commons/init.php');
 require(BASEPATH . '/commons/init.database.php');

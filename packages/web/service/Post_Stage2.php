@@ -19,6 +19,18 @@
  *
  */
 
+
+//
+// Blackout - 5:26 PM 5/05/2012
+//
+// Post_Stage2.php
+// Triggered:	After successful image upload
+// Actions:	Moves uploaded image to final location via FTP
+//
+
+
+
+
 require('../commons/config.php');
 require(BASEPATH . '/commons/init.php');
 require(BASEPATH . '/commons/init.database.php');
@@ -78,12 +90,6 @@ if ( $mac != null  )
 					$nodeuser = trim(mysql_real_escape_string($ar["ngmUser"]));
 					$nodepass = trim(mysql_real_escape_string($ar["ngmPass"]));
 				
-					$nodedevpath = $noderoot;
-					if ( endsWith( $nodedevpath, "/" )  )
-						$nodedevpath .= "dev/";
-					else 
-						$nodedevpath .= "/dev/";					
-				
 					$ftp = ftp_connect( $GLOBALS['FOGCore']->getSetting( "FOG_TFTP_HOST")); 
 					$ftp_loginres = ftp_login($ftp, $GLOBALS['FOGCore']->getSetting( "FOG_TFTP_FTP_USERNAME"), $GLOBALS['FOGCore']->getSetting( "FOG_TFTP_FTP_PASSWORD") ); 			
 					if ((!$ftp) || (!$ftp_loginres )) 
@@ -104,18 +110,16 @@ if ( $mac != null  )
 				 	}	
 					$mac = str_replace( "-", ":", $mac );
 					
-
-					$src = "";
-					$uploaddir = $nodedevpath;
+					$uploaddir = rtrim($noderoot, '/') . '/' . 'dev';
 					
 					$mac = str_replace( ":", "", $mac );
 					
 					if ( $type == "mpa" || $type == "mps" )
-						$src = $uploaddir . $mac;
+						$src = $uploaddir . '/' . $mac;
 					else
-						$src = $uploaddir . $mac . ".000";
+						$src = $uploaddir . '/' . $mac . '.000';
 		
-					$srcdd = $uploaddir . $mac;
+					$srcdd = $uploaddir . '/' . $mac;
 					$dest = $noderoot . $_GET["to"];
 	
 					// if the destination is a directory, we must delete the old

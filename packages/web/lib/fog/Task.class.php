@@ -84,20 +84,7 @@ class Task extends FOGController
 
 	}
 	
-	// Overrides
-	public function set($key, $value)
-	{
-		// Check in time: Convert Unix time to MySQL datetime
-		if ($this->key($key) == 'checkInTime' && is_numeric($value) && strlen($value) == 10)
-		{
-			$value = date('Y-m-d H:i:s', $value);
-		}
-		
-		// Return
-		return parent::set($key, $value);
-	}
-	
-	public function destroy()
+	public function removePXEFile()
 	{
 		// Remove PXE file
 		if ($this->getHost()->isValid())
@@ -113,6 +100,35 @@ class Task extends FOGController
 					->close();
 		}
 		
+		return $this;
+	}
+	
+	public function cancel()
+	{
+		// Set State to User Cancelled
+		$this->set('stateID', '5')->save();
+		
+		// Remove PXE File -> Return
+		return $this->removePXEFile();
+	}
+	
+	// Overrides
+	public function set($key, $value)
+	{
+		// Check in time: Convert Unix time to MySQL datetime
+		if ($this->key($key) == 'checkInTime' && is_numeric($value) && strlen($value) == 10)
+		{
+			$value = date('Y-m-d H:i:s', $value);
+		}
+		
+		// Return
+		return parent::set($key, $value);
+	}
+	
+	public function destroy()
+	{
+		// Remvoe PXE File
+		$this->removePXEFile();
 
 		// TODO 
 		// Snapins: Cancel snapin tasks

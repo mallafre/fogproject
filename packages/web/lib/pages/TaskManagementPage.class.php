@@ -41,7 +41,7 @@ class TaskManagementPage extends FOGPage
 			'${details_taskname}<p><a href="?node=host&sub=edit&id=${host_id}" title="' . _('Edit Host') . '">${host_name}</a></p><small>${host_mac}</small>',
 			'<small>${task_time}</small>',
 			'<span class="icon icon-${icon_state}" title="${task_state}"></span> <span class="icon icon-${icon_type}" title="${task_type}"></span>',
-			'${details_taskforce} <a href="?node=tasks&sub=remove-task&id=${task_id}"><span class="icon icon-kill" title="' . _('Cancel Task') . '"></span></a>',
+			'${details_taskforce} <a href="?node=tasks&sub=cancel-task&id=${task_id}"><span class="icon icon-kill" title="' . _('Cancel Task') . '"></span></a>',
 		);
 		
 		// Row attributes
@@ -120,22 +120,27 @@ class TaskManagementPage extends FOGPage
 		}
 	}
 	
-	// Active Tasks - Remove Task
-	public function remove_task()
+	// Active Tasks - Cancel Task
+	public function cancel_task()
 	{
 		// Find
 		$Task = new Task($this->REQUEST['id']);
 		
 		// Hook
-		$this->HookManager->processEvent('TASK_REMOVE', array('Task' => &$Task));
+		$this->HookManager->processEvent('TASK_CANCEL', array('Task' => &$Task));
 		
 		// Force
 		try
 		{
-			$result['success'] = $Task->destroy();
+			// Cencel task - will throw Exception on error
+			$Task->cancel();
+		
+			// Success
+			$result['success'] = true;
 		}
 		catch (Exception $e)
 		{
+			// Failure
 			$result['error'] = $e->getMessage();
 		}
 		

@@ -1,5 +1,14 @@
 <?php
 
+//
+// Blackout - 6:59 PM 5/05/2012
+//
+// Post_Stage3.php
+// Purpose:	Host Inventory
+// Triggered:	After image complete
+// Actions:	Saves host inventory to database
+//
+
 require('../commons/config.php');
 require(BASEPATH . '/commons/init.php');
 require(BASEPATH . '/commons/init.database.php');

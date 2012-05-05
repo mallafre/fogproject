@@ -1,5 +1,15 @@
 <?php
 
+//
+// Blackout - 6:57 PM 5/05/2012
+//
+// mc_checkin.php
+// Triggered:	On multicast download (every 5 seconds)
+// Actions:	Checks queue
+//		Determines if Host is allowed to start imaging
+//		Echos '##' when host is allowed to image
+//
+
 require('../commons/config.php');
 require(BASEPATH . '/commons/init.php');
 require(BASEPATH . '/commons/init.database.php');

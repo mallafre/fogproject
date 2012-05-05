@@ -86,10 +86,12 @@ var Loader;
 		if ($('tbody > tr', Container).filter('.no-active-tasks').size() > 0)
 		{
 			Container.show();
+			ActionBox.show();
 		}
 		else
 		{
 			Container.hide();
+			ActionBox.hide();
 		}
 		
 		// Iterate each element

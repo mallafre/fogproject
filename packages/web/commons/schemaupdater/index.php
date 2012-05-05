@@ -1325,6 +1325,22 @@ $databaseSchema[] = array(
 	"ALTER TABLE `" . DATABASE_NAME . "`.`groupMembers` ADD UNIQUE ( `gmHostID`, `gmGroupID` )"
 );
 
+// 37
+// Blackout - 6:12 PM 5/05/2012
+$databaseSchema[] = array(
+	"CREATE TABLE IF NOT EXISTS `" . DATABASE_NAME . "`.`taskLog` (
+	`id` mediumint(9) NOT NULL AUTO_INCREMENT,
+	`taskID` mediumtext NOT NULL,
+	`taskStateID` mediumint(9) NOT NULL,
+	`ip` varchar(15) NOT NULL,
+	`createTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	`createdBy` VARCHAR( 30 ) NOT NULL,
+	PRIMARY KEY (`id`)
+	) ENGINE=InnoDB  DEFAULT CHARSET=latin1 ;"
+);
+
+
+
 
 
 ?>

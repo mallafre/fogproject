@@ -35,7 +35,7 @@ class GroupManagementPage extends FOGPage
 			sprintf('<a href="?node=group&sub=edit&%s=${id}" title="Edit">${name}</a>', $this->id),
 			//'${description}',
 			'${count}',
-			sprintf('<a href="?node=group&sub=deploy&type=1&%s=${id}"><span class="icon icon-download" title="Deploy"></span></a> <a href="?node=group&sub=deploy&type=8&%s=${id}"><span class="icon icon-multicast" title="%s"></span></a> <a href="?node=group&sub=edit&%s=${id}"><span class="icon icon-edit" title="Edit"></span></a>', $this->id, $this->id, _('Multi-Cast Deploy'), $this->id),
+			sprintf('<a href="?node=group&sub=deploy&type=1&%s=${id}"><span class="icon icon-download" title="Download"></span></a> <a href="?node=group&sub=deploy&type=8&%s=${id}"><span class="icon icon-multicast" title="Mutli-cast"></span></a> <a href="?node=group&sub=edit&%s=${id}#group-tasks"><span class="icon icon-deploy" title="Deploy"></span></a> <a href="?node=group&sub=edit&%s=${id}"><span class="icon icon-edit" title="Edit"></span></a>', $this->id, $this->id, $this->id, $this->id),
 		);
 		
 		// Row attributes
@@ -43,7 +43,7 @@ class GroupManagementPage extends FOGPage
 			array(),
 			//array('width' => 150),
 			array('width' => 40, 'class' => 'c'),
-			array('width' => 80, 'class' => 'c')
+			array('width' => 110, 'class' => 'c')
 		);
 	}
 	
@@ -630,7 +630,7 @@ class GroupManagementPage extends FOGPage
 		$TaskType = new TaskType(($this->REQUEST['type'] ? $this->REQUEST['type'] : '1'));
 		
 		// Title
-		$this->title = sprintf('%s: %s', _('Deploy Task'), $TaskType->get('name'));
+		$this->title = sprintf("%s '%s' %s '%s'", _('Deploy Task'), $TaskType->get('name'), _('to Group'), $Group->get('name'));
 		
 		// Deploy
 		?>
@@ -679,7 +679,7 @@ class GroupManagementPage extends FOGPage
 				</tbody>
 			</table>
 			
-			<p class="c"><input type="submit" value="<?php print _('Deploy to Group') . ' ' . $Group->get('name'); ?>" /></p>
+			<p class="c"><input type="submit" value="<?php print $this->title; ?>" /></p>
 		</form>
 		<?php
 	}

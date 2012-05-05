@@ -248,6 +248,7 @@ pre { white-space: pre-wrap; }
 .icon-wakeup { background: url('../images/icon-wakeup.png') no-repeat center center; }
 .icon-wipe { background: url('../images/icon-wipe.png') no-repeat center center; }
 .icon-loading { background: url('../images/loader.gif') no-repeat center center; }
+.icon-deploy { background: url('../images/icon-deploy.png') no-repeat center center; }
 .hand { cursor: pointer; }
 
 /* Hosts - Edit */
@@ -322,3 +323,5 @@ pre { white-space: pre-wrap; }
 
 .task-action { text-align: center; width: 100px; }
 .task-action a { display: block; }
+
+tbody td.small { font-size: 10px; }
