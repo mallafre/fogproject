@@ -227,7 +227,7 @@ pre { white-space: pre-wrap; }
 .icon-ping-up { background: url('../images/host-up.png') no-repeat center center; }
 .icon-ping-down { background: url('../images/host-down.png') no-repeat center center; }
 .icon-add { background: url('../images/icon-add.png') no-repeat center center; }
-.icon-remove { background: url('../images/icon-remove.png') no-repeat center center; }
+.icon-remove, .icon-delete { background: url('../images/icon-remove.png') no-repeat center center; }
 .icon-tick, .icon-complete { background: url('../images/icon-tick.png') no-repeat center center; }
 .icon-download { background: url('../images/icon-download.png') no-repeat center center; }
 .icon-multicast, .icon-multi-cast { background: url('../images/icon-multicast.png') no-repeat center center; }
@@ -279,7 +279,7 @@ pre { white-space: pre-wrap; }
 
 /* Dashboard - Disk usage graph */
 #diskusage-selector { width: 240px; position: absolute; z-index: 1; text-align: right; margin-top: 3px; } /* margin-top: -22px to move the select box into the header */
-#diskusage-selector select { font-size: 10px; border: 1px solid #666; }
+#diskusage-selector select { font-size: 10px; border: 1px solid #666; padding: 0; }
 
 /* Dashboard - Bandwidth Graph */
 #graph-bandwidth { margin-top: 20px; }

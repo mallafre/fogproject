@@ -104,7 +104,7 @@ $msgs = "";
 foreach ($nodes as $node)
 {
 	$nodeUsedSlots = $node->getUsedSlotCount();
-	if ( $nodeUsedSlots < $node->get('maxclients') && $nodeUsedSlots < $clientsOnBestNode  )
+	if ( $nodeUsedSlots < $node->get('maxClients') && $nodeUsedSlots < $clientsOnBestNode  )
 	{	
 		if ( $node->getNodeFailure($host) === null )
 		{

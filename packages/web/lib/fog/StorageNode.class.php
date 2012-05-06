@@ -17,11 +17,10 @@ class StorageNode extends FOGController
 		'isGraphEnabled'=> 'ngmGraphEnabled',
 		'path'		=> 'ngmRootPath',
 		'ip'		=> 'ngmHostname',
-		'maxclients'	=> 'ngmMaxClients',
+		'maxClients'	=> 'ngmMaxClients',
 		'user'		=> 'ngmUser',
 		'pass'		=> 'ngmPass',
 		'key'		=> 'ngmKey',
-		// TODO: Add interface
 		'interface'	=> 'ngmInterface'
 	);
 	
@@ -85,7 +84,7 @@ class StorageNode extends FOGController
 	function getDescription() { return $this->get('description'); }
 	function getRoot() { return $this->get('path'); }
 	function getHostIP() { return $this->get('ip'); }
-	function getMaxClients() { return $this->get('maxclients'); }	
+	function getMaxClients() { return $this->get('maxClients'); }	
 	function getUser() { return $this->get('user'); }
 	function getPass() { return $this->get('pass'); }	
 }

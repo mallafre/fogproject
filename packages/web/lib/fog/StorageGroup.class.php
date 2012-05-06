@@ -29,7 +29,7 @@ class StorageGroup extends FOGController
 		parent::__construct($data);
 		
 		// Update StorageNodes in StorageGroup
-		$this->updateStorageNodes();
+		//$this->updateStorageNodes();
 	}
 	
 	function updateStorageNodes()
@@ -61,7 +61,7 @@ class StorageGroup extends FOGController
 		$clients = 0;
 		foreach( $this->getStorageNodes() AS $node )
 		{
-			$clients += $node->get('maxclients');
+			$clients += $node->get('maxClients');
 		}
 		return $clients;
 	}

@@ -12,7 +12,7 @@
 
 define('IS_INCLUDED', true);
 define('FOG_VERSION', '0.33B');
-define('FOG_SCHEMA', 37);
+define('FOG_SCHEMA', 38);
 define('FOG_SVN_REVISION', '$Revision$');
 define('FOG_SVN_LAST_UPDATE', '$LastChangedDate$');
 define('PHP_VERSION_REQUIRED', '5.2.1');

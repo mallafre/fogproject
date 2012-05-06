@@ -308,7 +308,7 @@ if ($currentUser != null && $currentUser->isLoggedIn())
 		{
 			$FOGSubMenu->addItems('storage', array(	_('All Storage Nodes')		=> "$_SERVER[PHP_SELF]?node=$node",
 								_('Add Storage Nodes')		=> "$_SERVER[PHP_SELF]?node=$node&sub=add-storage-node",
-								_('All Storage Groups')		=> "$_SERVER[PHP_SELF]?node=$node&sub=storage-groups",
+								_('All Storage Groups')		=> "$_SERVER[PHP_SELF]?node=$node&sub=storage-group",
 								_('Add Storage Group')		=> "$_SERVER[PHP_SELF]?node=$node&sub=add-storage-group",
 						));
 		}
@@ -334,13 +334,13 @@ if ($currentUser != null && $currentUser->isLoggedIn())
 			}
 		}
 		
-		if ($storagenodeid)
+		if ($id)
 		{
-			$FOGSubMenu->addItems('storage', array(	_('General')			=> "$_SERVER[PHP_SELF]?node=$node&sub=editnode&storagenodeid=$storagenodeid&tab=gen",
-								_('Delete')			=> "$_SERVER[PHP_SELF]?node=$node&sub=editnode&storagenodeid=$storagenodeid&tab=delete"
-						), 'storagenodeid', _("Storage Node Menu"));
+			$FOGSubMenu->addItems('storage', array(	_('General')			=> "$_SERVER[PHP_SELF]?node=$node&sub=edit-storage-node&id=$id",
+								_('Delete')			=> "$_SERVER[PHP_SELF]?node=$node&sub=delete-storage-node&id=$id"
+						), 'id', _("Storage Node Menu"));
 
-			$res = mysql_query( "select * from nfsGroupMembers where ngmID = '$storagenodeid'", $conn ) or die( mysql_error() );
+			$res = mysql_query( "select * from nfsGroupMembers where ngmID = '$id'", $conn ) or die( mysql_error() );
 			if ( $ar = mysql_fetch_array( $res ) )
 			{
 				$FOGSubMenu->addNotes('storage', array(_("Node Name") => stripslashes($ar["ngmMemberName"])));

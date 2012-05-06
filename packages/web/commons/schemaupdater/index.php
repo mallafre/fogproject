@@ -1339,6 +1339,15 @@ $databaseSchema[] = array(
 	) ENGINE=InnoDB  DEFAULT CHARSET=latin1 ;"
 );
 
+// 38
+// Blackout - 12:52 PM 6/05/2012
+$databaseSchema[] = array(
+	"ALTER TABLE `" . DATABASE_NAME . "`.`nfsGroupMembers` ADD UNIQUE ( `ngmMemberName` )",
+	"ALTER TABLE `" . DATABASE_NAME . "`.`nfsGroups` ADD UNIQUE ( `ngName` )"
+);
+
+
+
 
 
 
