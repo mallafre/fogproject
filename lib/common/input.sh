@@ -285,7 +285,7 @@ fi
 	do
 		echo 
 		echo "  This version of FOG has internationalization support, would  "
-		echo -n "  you like to install the additional language packs? [Y/n] "
+		echo -n "  you like to install the additional language packs? [y/N] "
 		read installlang;
 		case "$installlang" in
 			Y | yes | y | Yes | YES )
@@ -295,7 +295,7 @@ fi
 				installlang="0";
 				;;
 			*)
-				installlang="1";
+				installlang="0";
 				;;	
 		esac	
 	done

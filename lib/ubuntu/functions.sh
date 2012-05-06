@@ -180,9 +180,9 @@ configureTFTPandPXE()
 MENU TITLE FOG Computer Cloning Solution
 MENU BACKGROUND fog/bg.png
 MENU MASTER PASSWD \$1\$0123456789
-\n
+
 menu color title	1;36;44    #ffffffff #00000000 std
-\n
+
 LABEL fog.local
 	localboot 0
 	MENU DEFAULT
@@ -191,14 +191,14 @@ LABEL fog.local
 	Boot from the local hard drive.  
 	If you are unsure, select this option.
 	ENDTEXT
-\n
+
 LABEL fog.memtest
 	kernel fog/memtest/memtest
 	MENU LABEL Run Memtest86+
 	TEXT HELP
 	Run Memtest86+ on the client computer.
 	ENDTEXT
-\n
+
 LABEL fog.reg
 	kernel fog/kernel/bzImage
 	append initrd=fog/images/init.gz root=/dev/ram0 rw ramdisk_size=127000 ip=dhcp dns=${dnsbootimage} mode=autoreg web=${ipaddress}/fog/ loglevel=4
@@ -207,7 +207,7 @@ LABEL fog.reg
 	Automatically register the client computer,
 	and perform a hardware inventory.
 	ENDTEXT
-\n
+
 LABEL fog.reginput
 	kernel fog/kernel/bzImage
 	append initrd=fog/images/init.gz root=/dev/ram0 rw ramdisk_size=127000 ip=dhcp dns=${dnsbootimage} mode=manreg web=${ipaddress}/fog/ loglevel=4
@@ -217,7 +217,7 @@ LABEL fog.reginput
 	computer, perform a hardware inventory, and 
 	optionally image the host.
 	ENDTEXT
-\n
+
 LABEL fog.quickimage
 	MENU PASSWD \$1\$0123456789
 	kernel fog/kernel/bzImage
@@ -227,7 +227,7 @@ LABEL fog.quickimage
 	This mode will allow you to image this host quickly with
 	it's default assigned image.
 	ENDTEXT		
-\n
+
 LABEL fog.sysinfo
 	kernel fog/kernel/bzImage
 	append initrd=fog/images/init.gz  root=/dev/ram0 rw ramdisk_size=127000 ip=dhcp dns=${dnsbootimage} mode=sysinfo loglevel=4
@@ -246,18 +246,19 @@ LABEL fog.debug
 	Debug mode will load the boot image and load a prompt so
 	you can run any commands you wish.
 	ENDTEXT
-\n
+
 PROMPT 0
-TIMEOUT 30\n" > "${tftpdirdst}/pxelinux.cfg/default";
+TIMEOUT 30
+" > "${tftpdirdst}/pxelinux.cfg/default";
 
 	if [ -f "$tftpconfig" ]
 	then
 		mv "$tftpconfig" "${tftpconfig}.fogbackup";
 	fi
 
-	# check if this is upstart based
+	# if TFTP defaults file exists
 	blUpstart="0";
-	if [ -f "$tftpconfigupstartconf" ]
+	if [ -f "$tftpconfigupstartdefaults" ]
 	then
 		blUpstart="1";
 	fi
