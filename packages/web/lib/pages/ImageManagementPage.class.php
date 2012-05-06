@@ -27,15 +27,15 @@ class ImageManagementPage extends FOGPage
 			_('Image Name'),
 			_('Storage Group'),
 			_('O/S'),
-			_('Edit')
+			''
 		);
 		
 		// Row templates
 		$this->templates = array(
-			sprintf('<a href="?node=%s&sub=edit&%s=${id}" title="Edit">${name}</a>', $this->node, $this->id),
+			sprintf('<a href="?node=%s&sub=edit&%s=${id}" title="%s">${name}</a>', $this->node, $this->id, _('Edit')),
 			sprintf('${storageGroup}'),
 			sprintf('${os}'),
-			sprintf('<a href="?node=%s&sub=edit&%s=${id}"><span class="icon icon-edit"></span></a>', $this->node, $this->id)
+			sprintf('<a href="?node=%s&sub=edit&%s=${id}" title="%s"><span class="icon icon-edit"></span></a> <a href="?node=%s&sub=delete&%s=${id}" title="%s"><span class="icon icon-delete"></span></a>', $this->node, $this->id, _('Edit'), $this->node, $this->id, _('Delete'))
 		);
 		
 		// Row attributes
@@ -43,7 +43,7 @@ class ImageManagementPage extends FOGPage
 			array(),
 			array('width' => '100'),
 			array('width' => '100'),
-			array('class' => 'c', 'width' => '55'),
+			array('class' => 'c', 'width' => '50'),
 		);
 	}
 	
@@ -169,6 +169,10 @@ class ImageManagementPage extends FOGPage
 			{
 				throw new Exception('A Storage Group is required!');
 			}
+			if (empty($_POST['os']))
+			{
+				throw new Exception('An Operating System is required!');
+			}
 			if (empty($_POST['imagetype']) && $_POST['imagetype'] != '0')
 			{
 				throw new Exception('An image type is required!');
@@ -280,6 +284,10 @@ class ImageManagementPage extends FOGPage
 			{
 				throw new Exception('A Storage Group is required!');
 			}
+			if (empty($_POST['os']))
+			{
+				throw new Exception('An Operating System is required!');
+			}
 			if (empty($_POST['imagetype']) && $_POST['imagetype'] != '0')
 			{
 				throw new Exception('An image type is required!');
@@ -343,9 +351,9 @@ class ImageManagementPage extends FOGPage
 		
 		// TODO: Put table rows into variables -> Add hooking
 		?>
-		<p class="c"><?php printf('%s <b>%s</b>?', _('Are you sure you wish to remove the user'), $Image->get('name')); ?></p>
+		<p class="c"><?php printf('%s <b>%s</b>?', _('Please confirm you want to delete'), $Image->get('name')); ?></p>
 		<form method="post" action="<?php print $this->formAction; ?>" class="c">
-		<input type="submit" value="<?php print $this->title; ?>" />
+			<input type="submit" value="<?php print $this->title; ?>" />
 		</form>
 		<?php
 	}

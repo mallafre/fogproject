@@ -29,7 +29,7 @@ class StorageGroup extends FOGController
 		parent::__construct($data);
 		
 		// Update StorageNodes in StorageGroup
-		//$this->updateStorageNodes();
+		$this->updateStorageNodes();
 	}
 	
 	function updateStorageNodes()
@@ -42,6 +42,8 @@ class StorageGroup extends FOGController
 		{
 			$this->add('storageNodes', $StorageNode);
 		}
+		
+		//var_dump($this->FOGCore->getClass('StorageNodeManager')->find(array('isEnabled' => '1', 'storageGroupID' => $this->get('id'))));exit;
 	}
 	
 	function getStorageNodes($index = null)

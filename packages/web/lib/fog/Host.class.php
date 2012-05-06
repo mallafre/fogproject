@@ -371,6 +371,10 @@ class Host extends FOGController
 			$StorageNode = ($isUpload ? $Image->getStorageGroup()->getMasterStorageNode() : $this->getOptimalStorageNode());
 			
 			// Storage Node: Error Checking
+			if (!$StorageNode || !($StorageNode instanceof StorageNode))
+			{
+				throw new Exception(_('Could not find a Storage Node. Is one enabled?'));
+			}
 			if (!$StorageNode->isValid())
 			{
 				throw new Exception(_('The Storage Group\'s associated Storage Node is not valid'));

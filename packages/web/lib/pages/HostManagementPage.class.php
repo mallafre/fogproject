@@ -27,8 +27,9 @@ class HostManagementPage extends FOGPage
 			'<input type="checkbox" name="toggle-checkbox" class="toggle-checkbox" checked="checked" />',
 			'',
 			_('Host Name'),
-			_('MAC'),
+			//_('MAC'),
 			_('IP Address'),
+			'',
 			''
 		);
 		
@@ -36,10 +37,11 @@ class HostManagementPage extends FOGPage
 		$this->templates = array(
 			'<input type="checkbox" name="host[]" value="${id}" class="toggle-host" checked="checked" />',
 			'<span class="icon ping"></span>',
-			'<a href="?node=host&sub=edit&id=${id}" title="Edit">${name}</a>',
-			'${mac}',
+			'<a href="?node=host&sub=edit&id=${id}" title="Edit">${name}</a><br /><small>${mac}</small>',
+			//'${mac}',
 			'${ip}',
-			'<a href="?node=host&sub=deploy&sub=deploy&type=1&id=${id}"><span class="icon icon-download" title="Download"></span></a> <a href="?node=host&sub=deploy&type=8&id=${id}"><span class="icon icon-multicast" title="Multi-cast"></span></a> <a href="?node=host&sub=deploy&sub=edit&id=${id}#host-tasks"><span class="icon icon-deploy" title="Deploy"></span></a> <a href="?node=host&sub=edit&id=${id}"><span class="icon icon-edit" title="Edit"></span></a>'
+			'<a href="?node=host&sub=deploy&sub=deploy&type=1&id=${id}"><span class="icon icon-download" title="Download"></span></a> <a href="?node=host&sub=deploy&sub=deploy&type=2&id=${id}"><span class="icon icon-upload" title="Upload"></span></a> <a href="?node=host&sub=deploy&sub=edit&id=${id}#host-tasks"><span class="icon icon-deploy" title="Deploy"></span></a>',
+			'<a href="?node=host&sub=edit&id=${id}"><span class="icon icon-edit" title="Edit"></span></a> <a href="?node=host&sub=delete&id=${id}"><span class="icon icon-delete" title="Delete"></span></a>'
 		);
 		
 		// Row attributes
@@ -47,9 +49,10 @@ class HostManagementPage extends FOGPage
 			array('width' => 22),
 			array('width' => 20),
 			array(),
-			array('width' => 100, 'class' => 'small'),
 			array('width' => 90, 'class' => 'small'),
-			array('width' => 110, 'class' => 'c')
+			//array('width' => 90, 'class' => 'small'),
+			array('width' => 80, 'class' => 'c'),
+			array('width' => 50, 'class' => 'c')
 		);
 	}
 	
@@ -1080,9 +1083,9 @@ class HostManagementPage extends FOGPage
 	
 		// TODO: Put table rows into variables -> Add hooking
 		?>
-		<p class="c"><?php printf('%s <b>%s</b>?', _('Click on the icon below to delete this host from the FOG database.'), $Host->get('name')); ?></p>
+		<p class="c"><?php printf('%s <b>%s</b>?', _('Please confirm you want to delete'), $Host->get('name')); ?></p>
 		<form method="post" action="<?php print $this->formAction; ?>" class="c">
-		<input type="submit" value="<?php print $this->title; ?>" />
+			<input type="submit" value="<?php print $this->title; ?>" />
 		</form>
 		<?php
 	}

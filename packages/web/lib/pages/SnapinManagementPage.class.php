@@ -24,20 +24,20 @@ class SnapinManagementPage extends FOGPage
 		
 		// Header row
 		$this->headerData = array(
-			_('Imagename'),
-			_('Edit')
+			_('Image Name'),
+			''
 		);
 		
 		// Row templates
 		$this->templates = array(
-			sprintf('<a href="?node=%s&sub=edit&%s=${id}" title="Edit">${name}</a>', $this->node, $this->id),
-			sprintf('<a href="?node=%s&sub=edit&%s=${id}"><span class="icon icon-edit"></span></a>', $this->node, $this->id)
+			sprintf('<a href="?node=%s&sub=edit&%s=${id}" title="%s">${name}</a>', $this->node, $this->id, _('Edit')),
+			sprintf('<a href="?node=%s&sub=edit&%s=${id}" title="%s"><span class="icon icon-edit"></span></a> <a href="?node=%s&sub=delete&%s=${id}" title="%s"><span class="icon icon-delete"></span></a>', $this->node, $this->id, _('Edit'), $this->node, $this->id, _('Delete'))
 		);
 		
 		// Row attributes
 		$this->attributes = array(
 			array(),
-			array('class' => 'c', 'width' => '55'),
+			array('class' => 'c', 'width' => '50'),
 		);
 	}
 	
@@ -447,15 +447,9 @@ class SnapinManagementPage extends FOGPage
 		
 		// TODO: Put table rows into variables -> Add hooking
 		?>
-		<form method="POST" action="<?php print $this->formAction; ?>">
-			<center><table cellpadding=0 cellspacing=0 border=0 width=100%>
-			<tr><td><?php print _("Snapin Name"); ?></td><td><?php print $Snapin->get('name'); ?></td></tr>
-			<tr><td><?php print _("Snapin Description"); ?></td><td><?php print $Snapin->get('description'); ?></td></tr>
-			<tr><td><?php print _("Snapin File"); ?></td><td><?php print $Snapin->get('file'); ?></td></tr>
-			<tr><td><?php print _("Snapin Arguments"); ?></td><td><?php print $Snapin->get('args'); ?></td></tr>
-			<tr><td><?php print _("Reboot after install"); ?></td><td><?php print ($Snapin->get('reboot') ? 'Yes' : 'No'); ?></td></tr>
-			<tr><td colspan=2><center><br /><form method="POST" action="?node=$_GET[node]&sub=$_GET[sub]&rmsnapinid=$_GET[rmsnapinid]&confirm=1&killfile=1"><input type="submit" value="<?php print _("Delete snapin definition, and snapin file."); ?>" /></form></center></td></tr>
-			</table></center>
+		<p class="c"><?php printf('%s <b>%s</b>?', _('Please confirm you want to delete'), $Snapin->get('name')); ?></p>
+		<form method="post" action="<?php print $this->formAction; ?>" class="c">
+			<input type="submit" value="<?php print $this->title; ?>" />
 		</form>
 		<?php
 	}
