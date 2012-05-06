@@ -1,10 +1,10 @@
 <?php
 
 // Blackout - 10:00 AM 13/12/2011
-class ServiceManagementPage extends FOGPage
+class ServiceConfigurationPage extends FOGPage
 {
 	// Base variables
-	var $name = 'Service Management';
+	var $name = 'Service Configuration';
 	var $node = 'service';
 	var $id = 'id';
 	
@@ -814,4 +814,4 @@ if ( $_GET["updatestatus"] == "1" )
 }
 
 // Register page with FOGPageManager
-$FOGPageManager->register(new ServiceManagementPage());
+$FOGPageManager->register(new ServiceConfigurationPage());

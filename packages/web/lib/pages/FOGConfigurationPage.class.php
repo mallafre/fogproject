@@ -1,10 +1,10 @@
 <?php
 
 // Blackout - 9:51 AM 23/02/2012
-class OtherInformationManagementPage extends FOGPage
+class FOGConfigurationPage extends FOGPage
 {
 	// Base variables
-	var $name = 'Other Information';
+	var $name = 'FOG Configuration';
 	var $node = 'about';
 	var $id = 'id';
 	
@@ -25,4 +25,4 @@ class OtherInformationManagementPage extends FOGPage
 }
 
 // Register page with FOGPageManager
-$FOGPageManager->register(new OtherInformationManagementPage());
+$FOGPageManager->register(new FOGConfigurationPage());

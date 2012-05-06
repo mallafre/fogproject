@@ -5,41 +5,20 @@ if (IS_INCLUDED !== true) die(_('Unable to load system configuration information
 if ($currentUser != null && $currentUser->isLoggedIn())
 {
 	// Standard menu items
-	if (!preg_match('#indexold#', $_SERVER['PHP_SELF']))
-	{
-		$mainMenuItems = array(
-				'Home'	                => 'home',
-				'User Mananagement'	=> 'users',
-				'Host Management'	=> 'host',
-				'Group Management'	=> 'group',
-				'Image Management'	=> 'images',
-				'Storage Management'	=> 'storage',
-				'Snap-in Management'	=> 'snapin',
-				'Printer Management'	=> 'printer',
-				'Fog Configuration'	=> 'service',
-				'Task Management'	=> 'tasks',
-				'Reports'		=> 'report',
-				'Other Information'	=> 'about'
-		);
-	}
-	else
-	{
-		// LEGACY
-		$mainMenuItems = array(
-				'Home'	                => 'home',
-				'User Mananagement'	=> 'users',
-				'Host Management'	=> 'host',
-				'Group Management'	=> 'group',
-				'Image Management'	=> 'images',
-				'Storage Management'	=> 'storage',
-				'Snap-in Management'	=> 'snap',
-				'Printer Management'	=> 'print',
-				'Fog Configuration'	=> 'service',
-				'Task Management'	=> 'tasks',
-				'Reports'		=> 'report',
-				'Other Information'	=> 'about'
-		);
-	}
+	$mainMenuItems = array(
+			'Home'	                => 'home',
+			'User Mananagement'	=> 'users',
+			'Host Management'	=> 'host',
+			'Group Management'	=> 'group',
+			'Image Management'	=> 'images',
+			'Storage Management'	=> 'storage',
+			'Snap-in Management'	=> 'snapin',
+			'Printer Management'	=> 'printer',
+			'Service Configuration'	=> 'service',
+			'Task Management'	=> 'tasks',
+			'Reports'		=> 'report',
+			'FOG Configuration'	=> 'about'
+	);
 	
 	// Plugin system enabled?
 	if ($GLOBALS['FOGCore']->getSetting('FOG_PLUGINSYS_ENABLED'))
