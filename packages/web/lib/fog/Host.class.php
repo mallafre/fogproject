@@ -373,7 +373,7 @@ class Host extends FOGController
 			// Storage Node: Error Checking
 			if (!$StorageNode || !($StorageNode instanceof StorageNode))
 			{
-				throw new Exception(_('Could not find a Storage Node. Is one enabled?'));
+				throw new Exception(_('Could not find a Storage Node. Is one enabled within this Storage Group?'));
 			}
 			if (!$StorageNode->isValid())
 			{

@@ -3044,7 +3044,7 @@ function doImage( $conn, $jobid, $blUpdateNFS=false, $nodeid=null )
 		{
 			$set = "taskNFSMemberID = '" . mysql_real_escape_string( $nodeid ) . "', ";
 		}
-		$sql = "update tasks set $set taskStateID = '1' where taskID = '" . mysql_real_escape_string($jobid) . "'";
+		$sql = "update tasks set $set taskStateID = '3' where taskID = '" . mysql_real_escape_string($jobid) . "'";
 		if ( mysql_query( $sql, $conn ) )
 			return true;
 		else
@@ -3066,7 +3066,7 @@ function getNumberInFrontOfMe( $conn, $jobid, $groupid=-1 )
 		{ 
 			$where = " taskNFSGroupID = '" . mysql_real_escape_string( $groupid ) . "' and ";
 		}
-		$sql = "select count(*) as c from tasks where $where taskStateID = '0' and taskID < " . mysql_real_escape_string($jobid) . " and (UNIX_TIMESTAMP() - UNIX_TIMESTAMP(taskCheckIn)) < " . $GLOBALS['FOGCore']->getSetting( "FOG_CHECKIN_TIMEOUT" );
+		$sql = "select count(*) as c from tasks where $where taskStateID = '1' and taskID < " . mysql_real_escape_string($jobid) . " and (UNIX_TIMESTAMP() - UNIX_TIMESTAMP(taskCheckIn)) < " . $GLOBALS['FOGCore']->getSetting( "FOG_CHECKIN_TIMEOUT" );
 		$res = mysql_query( $sql, $conn ) or criticalError( mysql_error(), _("FOG :: Database error!") );
 		if ( $ar = mysql_fetch_array( $res ) )
 			return $ar["c"];
@@ -3092,7 +3092,7 @@ function checkOut( $conn, $jobid )
 {
 	if ( $conn != null && $jobid != null )
 	{
-		$sql = "update tasks set taskStateID = '2' where taskID = '" . mysql_real_escape_string($jobid). "'";
+		$sql = "update tasks set taskStateID = '4' where taskID = '" . mysql_real_escape_string($jobid). "'";
 		if ( mysql_query( $sql, $conn ) )
 			return true;
 	}
