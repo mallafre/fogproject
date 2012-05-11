@@ -37,7 +37,6 @@ if ( $mac != null  )
 	cleanIncompleteTasks( $conn, $hostid );	
 	if ( queuedTaskExists( $conn, $mac ) )
 	{
-		$num = getNumberInQueue( $conn, 1 );
 		$jobid = getTaskIDByMac( $conn, $mac );
 		if ( $hostid != null && $jobid != null )
 		{

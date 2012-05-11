@@ -69,7 +69,7 @@ class TaskManagementPage extends FOGPage
 				
 				'host_id'	=> $Task->get('hostID'),
 				'host_name'	=> $Task->getHost()->get('name'),
-				'host_mac'	=> $Task->getHost()->get('mac'),
+				'host_mac'	=> $Task->getHost()->get('mac')->__toString(),
 				
 				'icon_state'	=> strtolower(str_replace(' ', '', $Task->getTaskStateText())),
 				'icon_type'	=> strtolower(str_replace(' ', '', $Task->getTaskTypeText())),

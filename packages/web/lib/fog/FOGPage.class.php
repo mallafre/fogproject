@@ -123,7 +123,7 @@ abstract class FOGPage extends FOGBase
 			if ($this->FOGCore->isAJAXRequest())
 			{
 				// JSON output
-				$result = json_encode(array(
+				$result = @json_encode(array(
 					'data'		=> $this->data,
 					'templates'	=> $this->templates,
 					'attributes'	=> $this->attributes
