@@ -19,8 +19,8 @@
 #
 
 # Yum packages to install
-packages="httpd php php-gd php-cli php-gettext mysql mysql-server php-mysql dhcp tftp-server nfs-utils vsftpd net-tools wget xinetd tar gzip make m4 gcc gcc-c++ htmldoc perl perl-Crypt-PasswdMD5 lftp clamav-update";
-storageNodePackages="httpd php php-cli php-gettext mysql php-mysql nfs-utils vsftpd xinetd tar gzip make m4 gcc gcc-c++ lftp";
+packages="httpd php53 php53-cli php53-common php53-gd php53-mysql mysql mysql-server php-mysql dhcp tftp-server nfs-utils vsftpd net-tools wget xinetd tar gzip make m4 gcc gcc-c++ htmldoc perl perl-Crypt-PasswdMD5 lftp clamav-update";
+storageNodePackages="httpd php53 php53-cli php53-common php53-gd php53-mysql mysql nfs-utils vsftpd xinetd tar gzip make m4 gcc gcc-c++ lftp";
 langPackages="iso-codes";
 dhcpname="dhcp";
 
