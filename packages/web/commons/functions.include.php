@@ -19,6 +19,10 @@
  *
  */
 
+function isValidMACAddress( $mac )
+{
+	return preg_match( "#^([0-9a-fA-F][0-9a-fA-F]:){5}([0-9a-fA-F][0-9a-fA-F])$#", $mac );
+}
 
 function sysLinuxEncrypt( $conn, $string )
 {
