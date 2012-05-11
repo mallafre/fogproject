@@ -19,7 +19,7 @@
 #
 
 # Yum packages to install
-packages="httpd php53 php53-cli php53-common php53-gd php53-mysql mysql mysql-server php-mysql dhcp tftp-server nfs-utils vsftpd net-tools wget xinetd tar gzip make m4 gcc gcc-c++ htmldoc perl perl-Crypt-PasswdMD5 lftp clamav-update";
+packages="httpd php53 php53-cli php53-common php53-gd php53-mysql mysql mysql-server dhcp tftp-server nfs-utils vsftpd net-tools wget xinetd tar gzip make m4 gcc gcc-c++ htmldoc perl perl-Crypt-PasswdMD5 lftp clamav";
 storageNodePackages="httpd php53 php53-cli php53-common php53-gd php53-mysql mysql nfs-utils vsftpd xinetd tar gzip make m4 gcc gcc-c++ lftp";
 langPackages="iso-codes";
 dhcpname="dhcp";
@@ -60,7 +60,9 @@ nfsconfig="/etc/exports";
 snapindir="/opt/fog/snapins";
 
 #where is freshclam's config file
-freshdb="/var/lib/clamav/";
+#freshdb="/var/lib/clamav/";
+freshdb="/var/clamav/";
 freshwebroot="${webdirdest}/av/";
 freshconf="/etc/freshclam.conf";
-freshcron="/etc/sysconfig/freshclam"
+#freshcron="/etc/sysconfig/freshclam"
+freshcron="/usr/bin/freshclam"
