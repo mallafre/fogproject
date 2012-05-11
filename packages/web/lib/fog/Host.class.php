@@ -76,6 +76,20 @@ class Host extends FOGController
 		return $this->get('mac');
 	}
 	
+	public function getActiveTask()
+	{
+		// Find Active Task - there should only ever be one, but sort by latest just in case
+		$Task = current($this->FOGCore->getClass('TaskManager')->find(array('stateID' => array(1, 2, 3), 'hostID' => $this->get('id')), 'AND', 'id', 'DESC'));
+		
+		// Failed to find an Active Task
+		if (!$Task)
+		{
+			throw new Exception(sprintf('%s: %s (%s)', _('No Active Task found for Host'), $this->get('name'), $this->get('mac')));
+		}
+		
+		return $Task;
+	}
+	
 	private function loadPrinters()
 	{
 		if (!$this->isLoaded('printers'))
@@ -373,7 +387,7 @@ class Host extends FOGController
 			// Storage Node: Error Checking
 			if (!$StorageNode || !($StorageNode instanceof StorageNode))
 			{
-				throw new Exception(_('Could not find a Storage Node. Is one enabled within this Storage Group?'));
+				throw new Exception( _('Could not find a Storage Node. Is there one enabled within this Storage Group?') );
 			}
 			if (!$StorageNode->isValid())
 			{
@@ -516,8 +530,8 @@ class Host extends FOGController
 				'name'		=> $taskName,
 				'createdBy'	=> $this->FOGUser->get('name'),
 				'hostID'	=> $this->get('id'),
-				'isForced'	=> 0,
-				'stateID'	=> Task::STATE_QUEUED,
+				'isForced'	=> '0',
+				'stateID'	=> '1',
 				'typeID'	=> $taskTypeID, 
 				'NFSGroupID' 	=> $Image->getStorageGroup()->get('id'), 
 				'NFSMemberID'	=> $Image->getStorageGroup()->getOptimalStorageNode()->get('id')

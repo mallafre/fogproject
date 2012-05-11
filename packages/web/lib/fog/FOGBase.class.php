@@ -101,7 +101,6 @@ abstract class FOGBase
 		// TODO: Log to Database
 	}
 	
-	// toString
 	public function __toString()
 	{
 		return (string)get_class($this);
@@ -112,14 +111,32 @@ abstract class FOGBase
 		return $this->__toString();
 	}
 	
-	// isLoaded
 	public function isLoaded($key)
 	{
 		$result = (isset($this->isLoaded[$key]) ? $this->isLoaded[$key] : 0);
 		$this->isLoaded[$key]++;
 		
-		//printf('key: %s, value: %s', $key, $result);
-		
 		return ($result ? $result : false);
+	}
+	
+	public function getClass($class)
+	{
+		$args = func_get_args();
+		array_shift($args);
+		
+		if (count($args))
+		{
+			// TODO: Make this work
+			// http://au.php.net/ReflectionClass
+			
+			//$r = new ReflectionClass($class);
+			//return new $r->newInstanceArgs($args);
+			
+			return new $class((count($args) === 1 ? $args[0] : $args));
+		}
+		else
+		{
+			return new $class();
+		}
 	}
 }

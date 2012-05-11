@@ -4,130 +4,138 @@
 // Blackout - 5:26 PM 5/05/2012
 //
 // Pre_Stage1.php
-// Triggered:	On non multicast download (every 5 seconds)
+// Triggered:	On Unicast Download (every 5 seconds)
 // Actions:	Checks queue
 //		Determines if Host is allowed to start imaging
 //		Echos '##' when host is allowed to image
 //
 
 
+// Require FOG Base files
 require('../commons/config.php');
 require(BASEPATH . '/commons/init.php');
 require(BASEPATH . '/commons/init.database.php');
 
-$mac = new MACAddress($_REQUEST['mac']);
-if ( ! $mac->isValid( ) ) 
-	die( _("Invalid MAC address format!") );
+try
+{
+	// Error checking
+	// NOTE: Most of these validity checks should never fail as checks are made during Task creation - better safe than sorry!
 	
-if ( $mac == null  )
-	die( _("Invalid MAC Address"));
-	
-$host = $mac->getHost();
-if ( $host == null || $host->get('id') <= 0 ) 
-	die( _("Unable to locate host in database, please ensure that mac address is correct.") );
-
-	
-// Clean old task status
-$taskManager = new TaskManager();
-$tasks = $taskManager->find(array('stateID' => 1, 'hostID' => $host->get('id')));
-foreach ($tasks as $task)
-{
-	$task->set('stateID', '2')->set('checkInTime', time())->save();
-}
-
-
-$task = current($taskManager->find(array('stateID' => array(2, 3), 'hostID' => $host->get('id'))));
-if ( $task === false )
-{
-	echo _("No job was found for MAC Address").": $mac";
-	exit;
-}
-
-$storageGroup = $task->getStorageGroup();
-if ( $storageGroup === null || ! $storageGroup->isValid() )
-{
-	echo _("No storage group is invalid!");
-	exit;
-}
-
-// Short circuit
-if ( $task->get('isForced') )
-{
-	if ( $task->set('stateID', '3' )->save() )
-		echo "##@GO";
-	else
-		echo _("Error attempting to start imaging process");				
-	
-	// log the start of the task
-	//@logImageTask( $conn, "s", $hostid, mysql_real_escape_string( getImageName( $conn, $hostid ) ) );
-	exit;
-}
-
-// check if there are any open spots in the group's queue
-$totalSlots = $storageGroup->getTotalSupportedClients();
-$taskManager = new TaskManager();
-$usedSlots = $storageGroup->getUsedSlotCount();
-//$inFrontOfMe = $taskManager->getCountInFrontOfHost($storageGroup, $task);
-$inFrontOfMe = $task->getInFrontOfHostCount();
-
-if ( $usedSlots >= $totalSlots )
-{
-	echo _("Waiting for a slot").", " . $inFrontOfMe . " "._("PCs are in front of me.");						
-	exit;
-}
-
-
-// At this point we know there are open slots, but are we next in line for that slot (or has the next is line timed out?)
-//echo $inFrontOfMe;
-$groupOpenSlots = $totalSlots - $usedSlots;
-if ( $groupOpenSlots <= $inFrontOfMe )
-{
-	echo _("There are open slots, but I am waiting for")." " . $inFrontOfMe . " "._("CPUs in front of me.");							
-	exit;
-}
-
-$nodes = $storageGroup->getStorageNodes();
-
-if ( count( $nodes ) <= 0 )
-{
-	echo _("No Storage servers are in this cluster!");
-	exit;
-}
-							
-
-/*
- * This section determines the best storage node within a group to use
- */							
-$bestNode = null;																
-$clientsOnBestNode = 999999999;
-$msgs = "";
-foreach ($nodes as $node)
-{
-	$nodeUsedSlots = $node->getUsedSlotCount();
-	if ( $nodeUsedSlots < $node->get('maxClients') && $nodeUsedSlots < $clientsOnBestNode  )
-	{	
-		if ( $node->getNodeFailure($host) === null )
-		{
-			$bestNode = $node;
-			$clientsOnBestNode = $nodeUsedSlots;
-		}
-		else
-			$msgs .= _("Storage Node").": " . $node->get('name') ." " ._("is open, but has recently failed").".\n";
-	}
-}
-
-if ( $bestNode != null )
-{
-	if ( $task->set('stateID', '3' )->set('NFSMemberID', $bestNode->get('id'))->save() )
+	// MAC Address
+	$MACAddress = new MACAddress($_REQUEST['mac']);
+	if (!$MACAddress->isValid())
 	{
-		echo "##@GO";
-	//	@logImageTask( $conn, "s", $hostid, mysql_real_escape_string( getImageName( $conn, $hostid ) ) );
+		throw new Exception( _('Invalid MAC address') );
 	}
-	else
-		echo _("Error attempting to start imaging process");										
+	
+	// Host for MAC Address
+	$Host = $MACAddress->getHost();
+	if (!$Host->isValid())
+	{
+		throw new Exception( _('Invalid Host') );
+	}
+	
+	// Task for Host
+	$Task = $Host->getActiveTask();
+	if (!$Task->isValid())
+	{
+		throw new Exception( sprintf('%s: %s (%s)', _('No Active Task found for Host'), $Host->get('name'), $MACAddress) );
+	}
+	
+	// Check-in Host
+	if ($Task->get('stateID') == 1)
+	{
+		$Task->set('stateID', '2')->set('checkInTime', time())->save();
+	}
+	
+	// Storage Group
+	$StorageGroup = $Task->getStorageGroup();
+	if (!$StorageGroup->isValid())
+	{
+		throw new Exception( _('Invalid StorageGroup') );
+	}
+	
+	// Storage Node
+	$StorageNodes = $StorageGroup->getStorageNodes();
+	if (!$StorageNodes)
+	{
+		throw new Exception( _('Could not find a Storage Node. Is there one enabled within this Storage Group?') );
+	}
+	
+	// Forced to start
+	if ($Task->get('isForced'))
+	{
+		if (!$Task->set('stateID', '3' )->save())
+		{
+			throw new Exception(_('Forced Task: Failed to update Task'));
+		}
+		
+		// Forced - Success!
+		die('##@GO');
+	}
+	
+	// Queue checks
+	$totalSlots = $StorageGroup->getTotalSupportedClients();
+	$usedSlots = $StorageGroup->getUsedSlotCount();
+	$inFrontOfMe = $Task->getInFrontOfHostCount();
+	$groupOpenSlots = $totalSlots - $usedSlots;
+
+	// Fail if all Slots are used
+	if ($usedSlots >= $totalSlots)
+	{
+		throw new Exception(sprintf('%s, %s %s', _('Waiting for a slot'), $inFrontOfMe, _('PCs are in front of me.')));
+	}
+	
+	// At this point we know there are open slots, but are we next in line for that slot (or has the next is line timed out?)
+	if ($groupOpenSlots <= $inFrontOfMe)
+	{
+		throw new Exception(sprintf('%s %s %s', _('There are open slots, but I am waiting for'), $inFrontOfMe, _('PCs in front of me.')));
+	}
+
+	// Determine the best Storage Node to use - based off amount of clients connected
+	$messageArray = array();
+	$clientsOnBestStorageNode = 9999;
+	foreach ($StorageNodes as $StorageNode)
+	{
+		$nodeUsedSlots = $StorageNode->getUsedSlotCount();
+		if ($nodeUsedSlots < $StorageNode->get('maxClients') && $nodeUsedSlots < $clientsOnBestStorageNode)
+		{	
+			if ($StorageNode->getNodeFailure($Host) === null)
+			{
+				$bestStorageNode = $StorageNode;
+				$clientsOnBestStorageNode = $nodeUsedSlots;
+			}
+			else
+			{
+				$messageArray[] = sprintf("%s '%s' (%s) %s", _('Storage Node'), $StorageNode->get('name'), $StorageNode->get('ip'), _('is open, but has recently failed for this Host'));
+			}
+		}
+	}
+
+	// Failed to find a Storage Node - this should only occur if all Storage Nodes in this Storage Group have failed
+	if (!isset($bestStorageNode) || !$bestStorageNode->isValid())
+	{
+		// Print failed node messages if we are unable to find a valid node
+		if (count($messageArray))
+		{
+			print implode(PHP_EOL, $messageArray) . PHP_EOL;
+		}
+		
+		throw new Exception(_("Unable to find a suitable Storage Node for transfer!"));
+	}
+	
+	// All tests passed! Almost there!
+	// Update Task State ID -> Update Storage Node ID -> Save
+	if (!$Task->set('stateID', '3' )->set('NFSMemberID', $bestStorageNode->get('id'))->save())
+	{
+			throw new Exception(_('Failed to update Task'));
+	}
+	
+	// Success!
+	print '##@GO';
 }
-else
+catch (Exception $e)
 {
-	echo _("Unable to determine best node for transfer!")."\n\n" . $strNotes ;
-}	
-?>
+	// Failure
+	print $e->getMessage();
+}

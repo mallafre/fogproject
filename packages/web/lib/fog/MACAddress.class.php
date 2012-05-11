@@ -10,7 +10,9 @@ class MACAddress extends FOGBase
 
 	public function __construct($MAC)
 	{
-		return $this->setMAC($MAC);
+		$this->setMAC($MAC);
+		
+		return parent::__construct();
 	}
 	
 	public function setMAC($MAC)
@@ -45,13 +47,22 @@ class MACAddress extends FOGBase
 		}
 		catch (Exception $e)
 		{
+			/*
 			if ($this->debug)
 			{
 				$GLOBALS['FOGCore']->debug('Invalid MAC Address: MAC: %s', $MAC);
 			}
+			*/
+			
+			throw new Exception(sprintf('Invalid MAC Address: %s', $MAC));
 		}
 		
 		return $this;
+	}
+	
+	public function getMAC() 
+	{ 
+		return $this->getMACWithColon();
 	}
 	
 	public function getMACWithColon() 
@@ -86,7 +97,7 @@ class MACAddress extends FOGBase
 	
 	public function isValid()
 	{
-		return ($this->MAC != '' ? preg_match('#^([0-9a-fA-F][0-9a-fA-F][:-]){5}([0-9a-fA-F][0-9a-fA-F])$#', $this) : false);
+		return ($this->getMACWithColon() != '' ? preg_match('#^([0-9a-fA-F][0-9a-fA-F][:-]){5}([0-9a-fA-F][0-9a-fA-F])$#', $this->getMACWithColon()) : false);
 	}
 	
 	public function startsWith($txt)
@@ -106,17 +117,20 @@ class MACAddress extends FOGBase
 	
 	public function getHost()
 	{
-		// Create new Host Object with MAC Address specified
-		$Host = new Host(array('mac' => $this->__toString()));
+		// Host
+		// Find MAC on Host record -> Return Host
+		foreach ($this->FOGCore->getClass('HostManager')->find(array('mac' => $this->getMACWithColon())) AS $Host)
+		{
+			return $Host;
+		}
 		
-		// Load data based off 'mac' field data 
-		$Host->load('mac');
+		// Search for MAC Address Assocations
+		foreach ($this->FOGCore->getClass('MACAddressAssociationManager')->find(array('mac' => $this->getMACWithColon())) AS $MACAddressAssociation)
+		{
+			return $MACAddressAssociation->getHost();
+		}
 		
-		// Return
-		return $Host;
-	}
-	
-	public function getTask()
-	{
+		// Failure
+		throw new Exception(sprintf('%s: %s', _('No Host found for MAC Address'), $this->getMACWithColon()));
 	}
 }

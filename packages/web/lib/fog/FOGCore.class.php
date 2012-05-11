@@ -240,27 +240,6 @@ class FOGCore extends FOGBase
 		return $this->DB->query("UPDATE globalSettings SET settingValue = '%s' WHERE settingKey = '%s'", array($value, $key))->queryResult();
 	}
 	
-	public function getClass($class)
-	{
-		$args = func_get_args();
-		array_shift($args);
-		
-		if (count($args))
-		{
-			// TODO: Make this work
-			// http://au.php.net/ReflectionClass
-			
-			//$r = new ReflectionClass($class);
-			//return new $r->newInstanceArgs($args);
-			
-			return new $class((count($args) === 1 ? $args[0] : $args));
-		}
-		else
-		{
-			return new $class();
-		}
-	}
-	
 	public function isAJAXRequest()
 	{
 		return (strtolower(@$_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest' ? true : false);
