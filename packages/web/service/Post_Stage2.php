@@ -24,7 +24,7 @@
 // Blackout - 5:26 PM 5/05/2012
 //
 // Post_Stage2.php
-// Triggered:	After successful image upload
+// Triggered:	After image upload
 // Actions:	Moves uploaded image to final location via FTP
 //
 
@@ -90,15 +90,15 @@ if ( $mac != null  )
 					$nodeuser = trim(mysql_real_escape_string($ar["ngmUser"]));
 					$nodepass = trim(mysql_real_escape_string($ar["ngmPass"]));
 				
-					$ftp = ftp_connect( $GLOBALS['FOGCore']->getSetting( "FOG_TFTP_HOST")); 
-					$ftp_loginres = ftp_login($ftp, $GLOBALS['FOGCore']->getSetting( "FOG_TFTP_FTP_USERNAME"), $GLOBALS['FOGCore']->getSetting( "FOG_TFTP_FTP_PASSWORD") ); 			
+					$ftp = ftp_connect( $FOGCore->getSetting( "FOG_TFTP_HOST")); 
+					$ftp_loginres = ftp_login($ftp, $FOGCore->getSetting( "FOG_TFTP_FTP_USERNAME"), $FOGCore->getSetting( "FOG_TFTP_FTP_PASSWORD") ); 			
 					if ((!$ftp) || (!$ftp_loginres )) 
 					{
 				  		echo _("FTP connection to TFTP Server has failed!");
 				 		exit;
 				 	}			
 				 	$mac = str_replace( ":", "-", $mac );
-					@ftp_delete ( $ftp, $GLOBALS['FOGCore']->getSetting( "FOG_TFTP_PXE_CONFIG_DIR") . "01-". $mac );
+					@ftp_delete ( $ftp, $FOGCore->getSetting( "FOG_TFTP_PXE_CONFIG_DIR") . "01-". $mac );
 					@ftp_close($ftp); 
 	
 					$ftp = ftp_connect( $nodeip ); 
@@ -149,7 +149,7 @@ if ( $mac != null  )
 					{
 						$errorDetails = error_get_last();
 						printf('%s %s %s %s%s', _('Unable to move'), $src, _('to'), $dest, "\n");
-						printf('%s: %s, %s: %s%s', _('FTP Host'), getSetting($conn, "FOG_TFTP_HOST"), _('Error'), preg_replace(array('#\:(.*)\.$#', '#\[.*\]#', '#[[:space:]][[:space:]]#', '#\(\)#'), array('\\1', '', ' ', '():'), $errorDetails['message']), "\n\n");
+						printf('%s: %s, %s: %s%s', _('FTP Host'), $FOGCore->getSetting("FOG_TFTP_HOST"), _('Error'), preg_replace(array('#\:(.*)\.$#', '#\[.*\]#', '#[[:space:]][[:space:]]#', '#\(\)#'), array('\\1', '', ' ', '():'), $errorDetails['message']), "\n\n");
 					}
 	
 					@ftp_close($ftp); 
