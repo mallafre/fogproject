@@ -216,7 +216,7 @@ pre { white-space: pre-wrap; }
 .icon-force { background: url('../images/icon-force.png') no-repeat center center; }
 .icon-forced { background: url('../images/icon-forced.png') no-repeat center center; }
 .icon-kill { background: url('../images/kill.png') no-repeat center center; }
-.icon-loading { background: url('../images/loader.gif') no-repeat center center; }
+.icon-loading, .icon.loading { background: url('../images/loader.gif') no-repeat center center; }
 .icon-loading-grey { background: url('../images/loader-grey.gif') no-repeat center center; }
 .icon-edit { background: url('../images/edit.png') no-repeat center center; }
 .icon-multicast { background: url('../images/multicast.png') no-repeat center center; }
@@ -229,7 +229,7 @@ pre { white-space: pre-wrap; }
 .icon-add { background: url('../images/icon-add.png') no-repeat center center; }
 .icon-remove, .icon-delete { background: url('../images/icon-remove.png') no-repeat center center; }
 .icon-tick, .icon-complete { background: url('../images/icon-tick.png') no-repeat center center; }
-.icon-download { background: url('../images/icon-download.png') no-repeat center center; }
+.icon-download, .icon-download-without-snapins { background: url('../images/icon-download.png') no-repeat center center; }
 .icon-multicast, .icon-multi-cast { background: url('../images/icon-multicast.png') no-repeat center center; }
 .icon-upload { background: url('../images/icon-upload.png') no-repeat center center; }
 .icon-inline, .icon-checkedin { background: url('../images/icon-inline.png') no-repeat center center; }
@@ -237,16 +237,16 @@ pre { white-space: pre-wrap; }
 .icon-inprogress, .icon-in-progress { background: url('../images/icon-inprogress.png') no-repeat center center; }
 .icon-help { background: url('../images/help.png') no-repeat center center; }
 .icon-allsnapins { background: url('../images/icon-allsnapins.png') no-repeat center center; }
-.icon-debug { background: url('../images/icon-debug.png') no-repeat center center; }
-.icon-inventory { background: url('../images/icon-inventory.png') no-repeat center center; }
+.icon-debug, .icon-upload-debug, .icon-download-debug { background: url('../images/icon-debug.png') no-repeat center center; }
+.icon-inventory, .icon-hardware-inventory { background: url('../images/icon-inventory.png') no-repeat center center; }
 .icon-memtest { background: url('../images/icon-memtest.png') no-repeat center center; }
-.icon-passreset { background: url('../images/icon-passreset.png') no-repeat center center; }
-.icon-photorec { background: url('../images/icon-photorec.png') no-repeat center center; }
+.icon-passreset, .icon-password-reset { background: url('../images/icon-passreset.png') no-repeat center center; }
+.icon-photorec, .icon-recover { background: url('../images/icon-photorec.png') no-repeat center center; }
 .icon-singlesnapin { background: url('../images/icon-singlesnapin.png') no-repeat center center; }
-.icon-testdisk { background: url('../images/icon-testdisk.png') no-repeat center center; }
-.icon-virusscan { background: url('../images/icon-virusscan.png') no-repeat center center; }
+.icon-testdisk, .icon-disk-surface-test { background: url('../images/icon-testdisk.png') no-repeat center center; }
+.icon-virusscan, .icon-virus-scan, .icon-virus-scan-quarantine { background: url('../images/icon-virusscan.png') no-repeat center center; }
 .icon-wakeup { background: url('../images/icon-wakeup.png') no-repeat center center; }
-.icon-wipe { background: url('../images/icon-wipe.png') no-repeat center center; }
+.icon-wipe, .icon-fast-wipe, .icon-full-wipe, .icon-normal-wipe { background: url('../images/icon-wipe.png') no-repeat center center; }
 .icon-loading { background: url('../images/loader.gif') no-repeat center center; }
 .icon-deploy { background: url('../images/icon-deploy.png') no-repeat center center; }
 .hand { cursor: pointer; }

@@ -49,7 +49,7 @@ class TaskManagementPage extends FOGPage
 			array(),
 			array('width' => 110, 'class' => 'c'),
 			array('width' => 50, 'class' => 'c'),
-			array('width' => 50, 'class' => 'c')
+			array('width' => 50, 'class' => 'r')
 		);
 		
 		// Tasks
@@ -59,7 +59,8 @@ class TaskManagementPage extends FOGPage
 				'task_id'	=> $Task->get('id'),
 				'task_name'	=> $Task->get('name'),
 				'task_time'	=> $Task->getCreateTime()->toFormatted(),
-				'task_state'	=> ($Task->get('stateID') == Task::STATE_QUEUED && $this->FOGCore->getClass('TaskManager')->hasActiveTaskCheckedIn($Task->get('id')) ? 'In Line' : $Task->getTaskStateText()),
+				//'task_state'	=> ($Task->get('stateID') == Task::STATE_QUEUED && $this->FOGCore->getClass('TaskManager')->hasActiveTaskCheckedIn($Task->get('id')) ? 'In Line' : $Task->getTaskStateText()),
+				'task_state'	=> $Task->getTaskStateText(),
 				'task_forced'	=> ($Task->get('isForced') ? '1' : '0'),
 				'task_type'	=> $Task->getTaskTypeText(),
 				
@@ -72,7 +73,7 @@ class TaskManagementPage extends FOGPage
 				'host_mac'	=> $Task->getHost()->get('mac')->__toString(),
 				
 				'icon_state'	=> strtolower(str_replace(' ', '', $Task->getTaskStateText())),
-				'icon_type'	=> strtolower(str_replace(' ', '', $Task->getTaskTypeText())),
+				'icon_type'	=> strtolower(preg_replace(array('#[[:space:]]+#', '#[^\w-]#', '#\d+#', '#-{2,}#'), array('-', '', '', '-'), $Task->getTaskTypeText())),
 			);
 		}
 		

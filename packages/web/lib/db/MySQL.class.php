@@ -38,7 +38,7 @@ class MySQL
 		}
 		catch (Exception $e)
 		{
-			FOGCore::error(sprintf('Failed to %s: %s', __FUNCTION__, $e->getMessage()));
+			$GLOBALS['FOGCore']->error(sprintf('Failed to %s: %s', __FUNCTION__, $e->getMessage()));
 		}
 	}
 	
@@ -58,7 +58,7 @@ class MySQL
 		}
 		catch (Exception $e)
 		{
-			FOGCore::debug(sprintf('Failed to %s: %s', __FUNCTION__, $e->getMessage()));
+			$GLOBALS['FOGCore']->debug(sprintf('Failed to %s: %s', __FUNCTION__, $e->getMessage()));
 		}
 	}
 	
@@ -88,7 +88,7 @@ class MySQL
 		}
 		catch (Exception $e)
 		{
-			FOGCore::debug(sprintf('Failed to %s: %s', __FUNCTION__, $e->getMessage()));
+			$GLOBALS['FOGCore']->debug(sprintf('Failed to %s: %s', __FUNCTION__, $e->getMessage()));
 		}
 		
 		return $this;
@@ -112,14 +112,14 @@ class MySQL
 			
 			// Query
 			$this->query = $sql;
-			$this->queryResult = mysql_query($this->query, $this->link) or FOGCore::debug($this->error(), $this->query);
+			$this->queryResult = mysql_query($this->query, $this->link) or $GLOBALS['FOGCore']->debug($this->error(), $this->query);
 			
 			// INFO
-			FOGCore::info($this->query);
+			$GLOBALS['FOGCore']->info($this->query);
 		}
 		catch (Exception $e)
 		{
-			FOGCore::debug(sprintf('Failed to %s: %s', __FUNCTION__, $e->getMessage()));
+			$GLOBALS['FOGCore']->debug(sprintf('Failed to %s: %s', __FUNCTION__, $e->getMessage()));
 		}
 		
 		return $this;
@@ -154,7 +154,7 @@ class MySQL
 		}
 		catch (Exception $e)
 		{
-			FOGCore::debug(sprintf('Failed to %s: %s', __FUNCTION__, $e->getMessage()));
+			$GLOBALS['FOGCore']->debug(sprintf('Failed to %s: %s', __FUNCTION__, $e->getMessage()));
 		}
 		
 		//return false;
@@ -192,7 +192,7 @@ class MySQL
 		}
 		catch (Exception $e)
 		{
-			FOGCore::debug(sprintf('Failed to %s: %s', __FUNCTION__, $e->getMessage()));
+			$GLOBALS['FOGCore']->debug(sprintf('Failed to %s: %s', __FUNCTION__, $e->getMessage()));
 		}
 		
 		return false;
@@ -211,7 +211,7 @@ class MySQL
 		}
 		catch (Exception $e)
 		{
-			FOGCore::debug(sprintf('Failed to %s: %s', __FUNCTION__, $e->getMessage()));
+			$GLOBALS['FOGCore']->debug(sprintf('Failed to %s: %s', __FUNCTION__, $e->getMessage()));
 		}
 		
 		return $this;

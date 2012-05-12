@@ -228,11 +228,10 @@ function ActiveTasksButtonHook()
 		ActiveTasksRequests[ActiveTasksRequests.length] = $.ajax({
 			'type':		'GET',
 			'url':		$this.attr('href'),
-			//'url':		'ajax/sleep.php',
 			'beforeSend':	function()
 			{
 				// Loader
-				$this.find('span').removeClass().addClass('loading');
+				$this.find('span').removeClass().addClass('icon icon-loading');
 				
 				// Unhook this button - multiple clicks now do nothing
 				$this.unbind('click').click(function() { return false; });
@@ -240,7 +239,7 @@ function ActiveTasksButtonHook()
 			'success':	function(data)
 			{
 				// Indicate job has been forced
-				$this.parents('td').html('<span class="icon icon-forced"></span>');
+				$this.find('span').removeClass().addClass('icon icon-forced');
 				
 				// Remove this request from our AJAX request tracking
 				ActiveTasksRequests.splice(0, 1);
