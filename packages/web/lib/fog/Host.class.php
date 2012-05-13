@@ -836,7 +836,7 @@ class Host extends FOGController
 		return $this;
 	}
 	
-	public function destroy()
+	public function destroy($field = 'id')
 	{
 		// Complete active tasks
 		foreach ((array)$this->FOGCore->getClass('TaskManager')->find(array('hostID' => $this->get('id'))) AS $Task)

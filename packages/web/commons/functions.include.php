@@ -1128,7 +1128,7 @@ function queuedTaskExists( $conn, $mac )
 	return false;
 }
 
-function getTaskIDByMac( $conn, $mac, $state=1 )
+function getTaskIDByMac( $conn, $mac, $state='1, 2, 3' )
 {
 	if ( $conn != null && $mac != null )
 	{

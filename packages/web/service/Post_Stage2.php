@@ -86,7 +86,7 @@ if ( $mac != null  )
 				while( $ar = mysql_fetch_array( $res ) )
 				{
 					$nodeip = trim(mysql_real_escape_string($ar["ngmHostname"]));
-					$noderoot = trim(mysql_real_escape_string($ar["ngmRootPath"]));
+					$noderoot = '/' . trim(mysql_real_escape_string($ar["ngmRootPath"]), '/');
 					$nodeuser = trim(mysql_real_escape_string($ar["ngmUser"]));
 					$nodepass = trim(mysql_real_escape_string($ar["ngmPass"]));
 				
@@ -110,7 +110,7 @@ if ( $mac != null  )
 				 	}	
 					$mac = str_replace( "-", ":", $mac );
 					
-					$uploaddir = rtrim($noderoot, '/') . '/' . 'dev';
+					$uploaddir = $noderoot . '/' . 'dev';
 					
 					$mac = str_replace( ":", "", $mac );
 					
@@ -120,7 +120,7 @@ if ( $mac != null  )
 						$src = $uploaddir . '/' . $mac . '.000';
 		
 					$srcdd = $uploaddir . '/' . $mac;
-					$dest = $noderoot . $_GET["to"];
+					$dest = $noderoot . '/' . $_GET["to"];
 	
 					// if the destination is a directory, we must delete the old
 					// data first or rename will fail!

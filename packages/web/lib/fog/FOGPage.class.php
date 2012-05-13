@@ -79,7 +79,7 @@ abstract class FOGPage extends FOGBase
 	}
 	
 	// Default index page
-	public function index($args)
+	public function index()
 	{
 		printf('Index page of: %s%s', get_class($this), (count($args) ? ', Arguments = ' . implode(', ', array_map(create_function('$key, $value', 'return $key." : ".$value;'), array_keys($args), array_values($args))) : ''));
 	}

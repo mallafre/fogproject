@@ -16,6 +16,8 @@ class FOGPageManager extends FOGBase
 	private $classValue;
 	private $methodValue;
 	
+	private $arguments;
+	
 	// Construct
 	public function __construct()
 	{
@@ -123,12 +125,12 @@ class FOGPageManager extends FOGBase
 			}
 			
 			// Arguments
-			$args = (!empty($GLOBALS[$class->id]) ? array('id' => $GLOBALS[$class->id]) : array());
+			$this->arguments = (!empty($GLOBALS[$class->id]) ? array('id' => $GLOBALS[$class->id]) : array());
 		
 			// Render result to variable - we do this so we can send HTTP Headers in a class method
 			// TODO: Create a better solution
 			ob_start();
-			call_user_method_array($method, $class, array($args));
+			call_user_method_array($method, $class);
 			$result = ob_get_contents();
 			ob_end_clean();
 			

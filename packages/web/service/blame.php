@@ -35,9 +35,9 @@ if ( $mac != null  )
 {
 	//$mac = str_replace( "-", ":", $mac );
 
-	$jobid = getTaskIDByMac( $conn, $mac, 2 );
+	$jobid = getTaskIDByMac( $conn, $mac, 3 );
 	if ( $jobid == "" )
-		$jobid = getTaskIDByMac( $conn, $mac, 1 );	
+		$jobid = getTaskIDByMac( $conn, $mac, '1, 2' );	
 	$hostid = getHostID( $conn, $mac );
 
 	if ( $jobid != null && $hostid != null && is_numeric( $jobid ) && is_numeric( $hostid ) )

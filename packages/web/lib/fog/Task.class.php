@@ -125,7 +125,7 @@ class Task extends FOGController
 		return parent::set($key, $value);
 	}
 	
-	public function destroy()
+	public function destroy($field = 'id')
 	{
 		// Remvoe PXE File
 		$this->removePXEFile();
