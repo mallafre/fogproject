@@ -130,7 +130,8 @@ class FOGPageManager extends FOGBase
 			// Render result to variable - we do this so we can send HTTP Headers in a class method
 			// TODO: Create a better solution
 			ob_start();
-			call_user_method_array($method, $class);
+			//call_user_func_array(array($class, $method), array());
+			call_user_func(array($class, $method));
 			$result = ob_get_contents();
 			ob_end_clean();
 			

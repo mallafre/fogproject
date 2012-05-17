@@ -1175,14 +1175,15 @@ $databaseSchema[] = array(
 	// Add 'taskTypes' table and data
 	"CREATE TABLE IF NOT EXISTS `" . DATABASE_NAME . "`.`taskStates` (
 	  `tsID` int(11) NOT NULL,
-	  `tsName` int(11) NOT NULL,
+	  `tsName` varchar(30) NOT NULL,
 	  `tsDescription` text NOT NULL,
-	  `tsOrder` tinyint(4) NOT NULL DEFAULT '0'
+	  `tsOrder` tinyint(4) NOT NULL DEFAULT '0',
+	  PRIMARY KEY (`tsID`)
 	) ENGINE=InnoDB DEFAULT CHARSET=latin1;",
 	"INSERT INTO `" . DATABASE_NAME . "`.`taskStates` (`tsID`, `tsName`, `tsDescription`) VALUES
-	(1, 'Queued', 'Task has been created and FOG is waiting for the Host to check-in.'),
-	(2, 'In-Progress', 'Host is currently Imaging.'),
-	(3, 'Complete', 'Imaging has been completed.');",
+	(1, 'Queued', 'Task has been created and FOG is waiting for the Host to check-in.', '1'),
+	(2, 'In-Progress', 'Host is currently Imaging.', '2'),
+	(3, 'Complete', 'Imaging has been completed.', '3');",
 	"ALTER TABLE `" . DATABASE_NAME . "`.`tasks` CHANGE `taskState` `taskStateID` INT( 11 ) NOT NULL",
 	"UPDATE `" . DATABASE_NAME . "`.`tasks` SET `taskType` = '1' WHERE `taskType`='d'",
 	"UPDATE `" . DATABASE_NAME . "`.`tasks` SET `taskType` = '2' WHERE `taskType`='u'",
@@ -1310,12 +1311,13 @@ $databaseSchema[] = array(
 // Blackout - 12:35 PM 26/04/2012
 $databaseSchema[] = array(
 	// New Task States
-	"INSERT INTO `" . DATABASE_NAME . "`.`taskStates` (`tsID`, `tsName`, `tsDescription`) VALUES
-	(1, 'Queued', 'Task has been created and FOG is waiting for the Host to check-in.'),
-	(2, 'Checked In', 'PC has checked in and is in queue for imaging'),
-	(3, 'In-Progress', 'Host is currently Imaging.'),
-	(4, 'Complete', 'Imaging has been completed.'),
-	(5, 'Cancelled', 'Task was aborted by user');"
+	"TRUNCATE `" . DATABASE_NAME . "`.`taskStates`",
+	"INSERT INTO `" . DATABASE_NAME . "`.`taskStates` (`tsID`, `tsName`, `tsDescription`, `tsOrder`) VALUES
+	(1, 'Queued', 'Task has been created and FOG is waiting for the Host to check-in.', '1'),
+	(2, 'Checked In', 'PC has checked in and is in queue for imaging', '2'),
+	(3, 'In-Progress', 'Host is currently Imaging.', '3'),
+	(4, 'Complete', 'Imaging has been completed.', '4'),
+	(5, 'Cancelled', 'Task was aborted by user', '5');"
 );
 
 // 36
