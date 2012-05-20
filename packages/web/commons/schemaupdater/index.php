@@ -1180,7 +1180,7 @@ $databaseSchema[] = array(
 	  `tsOrder` tinyint(4) NOT NULL DEFAULT '0',
 	  PRIMARY KEY (`tsID`)
 	) ENGINE=InnoDB DEFAULT CHARSET=latin1;",
-	"INSERT INTO `" . DATABASE_NAME . "`.`taskStates` (`tsID`, `tsName`, `tsDescription`) VALUES
+	"INSERT INTO `" . DATABASE_NAME . "`.`taskStates` (`tsID`, `tsName`, `tsDescription`, `tsOrder`) VALUES
 	(1, 'Queued', 'Task has been created and FOG is waiting for the Host to check-in.', '1'),
 	(2, 'In-Progress', 'Host is currently Imaging.', '2'),
 	(3, 'Complete', 'Imaging has been completed.', '3');",
