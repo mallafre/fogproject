@@ -4,7 +4,7 @@
 // Blackout - 5:26 PM 5/05/2012
 //
 // Pre_Stage1.php
-// Triggered:	On Unicast Download (every 5 seconds)
+// Triggered:	On checkin - all tasks
 // Actions:	Checks queue
 //		Determines if Host is allowed to start imaging
 //		Echos '##' when host is allowed to image

@@ -135,7 +135,7 @@ class Task extends FOGController
 		
 		
 		// FOGController destroy
-		return parent::destroy();
+		return parent::destroy($field);
 	}
 
 	// Task State ID Constants - required for now

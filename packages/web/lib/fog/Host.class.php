@@ -858,7 +858,7 @@ class Host extends FOGController
 		//$this->FOGCore->getClass('GroupAssociationManager')->destroy(array('hostID' => $this->get('id')));
 		
 		// Return
-		return parent::destroy();
+		return parent::destroy($field);
 	}
 	
 	
