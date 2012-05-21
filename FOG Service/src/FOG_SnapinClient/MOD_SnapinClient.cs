@@ -126,7 +126,8 @@ namespace FOG
                 try
                 {
                     Random r = new Random();
-                    int intSleep = r.Next(350, 500);
+                    //int intSleep = r.Next(350, 500);	// 0.32
+                    int intSleep = r.Next(30, 60);	// 0.33
                     
                     log(MOD_NAME, "Sleeping for " + intSleep + " seconds.");
                     System.Threading.Thread.Sleep(intSleep * 1000);
