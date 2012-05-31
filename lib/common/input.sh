@@ -41,6 +41,14 @@ then
 	then
 		strSuggestedDNS=` cat /etc/resolv.conf | grep "nameserver" | head -n 1 | tr -d "nameserver" | tr -d [:blank:] | grep "^[0-9]*\.[0-9]*\.[0-9]*\.[0-9]*$"`
 	fi
+
+	if [ -n "$strSuggestedDNS" ]
+	then
+		if [ -d "/etc/NetworkManager/system-connections" ]
+		then
+			strSuggestedDNS=`cat /etc/NetworkManager/system-connections/* | grep "dns" | head -n 1 | tr -d "dns=" | tr -d ";" | tr -d [:blank:] | grep "^[0-9]*\.[0-9]*\.[0-9]*\.[0-9]*$"`
+		fi
+	fi
 	
 	strSuggestedSNUser="fogstorage";
 fi
