@@ -118,7 +118,7 @@ fieldset table tbody td select { min-width: 220px; }
 
 #sidenotes { background: #fff; border: 1px solid #bbb; padding: 10px; font-size: 12px; border-radius: 3px; margin-bottom: 10px; box-shadow: 0 0 10px #bbb; }
 #sidenotes h3 { margin: 0; clear: both; }
-#sidenotes p { margin: -26px 0 0; float: right; max-width: 120px; }
+#sidenotes p { max-width: 120px; }
 
 /* TABLE */
 table {}

@@ -54,7 +54,7 @@ class MACAddress extends FOGBase
 			}
 			*/
 			
-			throw new Exception(sprintf('Invalid MAC Address: %s', $MAC));
+			//throw new Exception(sprintf('Invalid MAC Address: %s', $MAC));
 		}
 		
 		return $this;
