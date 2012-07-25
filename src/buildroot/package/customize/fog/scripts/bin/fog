@@ -13,7 +13,7 @@ for arg in `cat /proc/cmdline`; do
 	    ;;
 	nombr)
 	    nombr=1
-	    ;;	    
+	    ;;
 	*)
 	    ;;
     esac
@@ -29,6 +29,8 @@ osname="";
 mbrfile="";
 
 determineOS $osid;
+
+macWinSafe=`echo $mac | sed 's/://g'`;
 
 cores=$(grep "core id" /proc/cpuinfo | sort -u | wc -l)
 sockets=$(grep "physical id" /proc/cpuinfo | sort -u | wc -l)
@@ -47,9 +49,13 @@ then
 	HOSTNAME_EARLY="1";
 fi
 
+# DEBUG
+fdisk -l &> /tmp/fdisk-before
+
 echo "";
 echo " * Checking Operating System...................$osname";
 echo " * Checking CPU Cores..........................$cores";
+echo "";
 if [ "$mc" = "yes" ]; then
 	echo " * Send method.................................UDPCAST";
 else
@@ -57,18 +63,19 @@ else
 fi
 
 #defaultwin7part2start="210764";  #Windows 7 Beta
-defaultwin7part2start="105906"; 
-echo "";
+defaultwin7part2start="105906";
 if [ -n "$type" ]; then
 	if [ "$type" = "down" ]; then
-	
+		
+		imagePath="/images/${img}";
+
 		blGo="0";
 		nfsServerName="";
 		while [ "$blGo" = "0" ]
-		do	
+		do
 			if [ "$capone" != "1" ]; then
 				if [ "$mc" != "yes" ]; then
-					echo -n " * Checking Queue..............................";
+					echo -n " * Checking In.................................";
 					queueinfo=`wget -q -O - "http://${web}service/Pre_Stage1.php?mac=$mac" 2>/dev/null`
 					blPass=`echo $queueinfo | grep "##"`;
 					echo "Done";
@@ -82,13 +89,13 @@ if [ -n "$type" ]; then
 						blPass=`echo $queueinfo | grep "##"`;
 						sleep 5;
 						waittime=$(expr $waittime "+" 5);
-					done  
-			
+					done
+
 					directive="${queueinfo:3}";
 					if [ ! "$directive" = "GO" ]
 					then
-						tmpStorageIp=`echo $queueinfo | cut -d'@' -f2 2>/dev/null` 
-						tmpStorage=`echo $queueinfo | cut -d'@' -f3 2>/dev/null` 
+						tmpStorageIp=`echo $queueinfo | cut -d'@' -f2 2>/dev/null`
+						tmpStorage=`echo $queueinfo | cut -d'@' -f3 2>/dev/null`
 						tmpName=`echo $queueinfo | cut -d'@' -f4 | base64 -d 2>/dev/null` ;
 						if [ "$tmpStorage" != "" -a "$tmpStorageIp" != "" ]
 						then
@@ -99,11 +106,11 @@ if [ -n "$type" ]; then
 							handleError "Error determining storage server!";
 							exit 1;
 						fi
-						
+
 						echo -n " * Using Storage Node..........................";
 						echo $nfsServerName;
 						sleep 1;
-					fi			
+					fi
 
 				else
 					echo -n " * Checking In.................................";
@@ -114,7 +121,7 @@ if [ -n "$type" ]; then
 						echo -n "       * $queueinfo ";
 						queueinfo=`wget -q -O - "http://${web}service/mc_checkin.php?mac=$mac" 2>/dev/null`
 						sleep 5;
-					done 	
+					done
 
 				fi
 			fi
@@ -123,7 +130,7 @@ if [ -n "$type" ]; then
 			mkdir /images $debugstring 2>/dev/null;
 			mount -o nolock,proto=tcp $storage /images 2>/tmp/mntfail
 			mntRet="$?";
-			if [ ! "$mntRet" = "0" ]
+			if [ ! "$mntRet" = "0" ] && [ ! -f "/images/.mntcheck" ]
 			then
 				blame=`wget -q -O - "http://${web}service/blame.php?mac=$mac" 2>/dev/null`
 				if [ ! "$blame" = "##" ]
@@ -134,7 +141,7 @@ if [ -n "$type" ]; then
 					cat /tmp/mntfail
 					echo "";
 					echo "Error during failure notification: $blame";
-					
+
 					while [ ! "$blame" = "##" ]
 					do
 						blame=`wget -q -O - "http://${web}service/blame.php?mac=$mac" 2>/dev/null`
@@ -157,72 +164,82 @@ if [ -n "$type" ]; then
 				blGo="1";
 			fi
 		done
-		
-		
+
+
 		echo -n " * Checking Mounted File System................";
 		if [ -f "/images/.mntcheck" ]; then
 			echo "Done";
+			echo "";
 			echo " * Starting Image Push";
-			if [ -n "$img" ] || [ "$mc" = "yes" ]; then
 			
+			if [ -n "$img" ] || [ "$mc" = "yes" ]; then
+
 				if [ "$mc" != "yes" ]; then
 					echo " * Using Image: $img";
-				fi					
-					
+					echo "";
+				fi
+
 				if [ "$imgType" = "n" ]; then
-						
+
 						if [ "$osid" != "1" ] && [ "$osid" != "2" ] && [ "$osid" != "5"	]; then
 							handleError " * Invalid operating system id: $osname ($osid)!";
 						fi
-						
+
 						echo -n " * Looking for Hard Disks......................";
 						getHardDisk;
 						echo "Done";
-						echo " * Using Hard Disk: $hd";						
+						echo " * Using Hard Disk: $hd";
+						
 						echo -n " * Checking write caching status on HDD........";
-						wcache=$(hdparm -i $hd 2> /dev/null | sed '/WriteCache=/!d; s/^.*WriteCache=//; s/ .*$//')	
+						wcache=$(hdparm -i $hd 2> /dev/null | sed '/WriteCache=/!d; s/^.*WriteCache=//; s/ .*$//')
 						if [ "$wcache" == "enabled" ]; then
 							echo "OK";
 						elif [ "$wcache" == "disabled" ]; then
 							hdparm -W 1 $hd 2&1 >/dev/null;
 							echo "Enabled";
-						else 
+						else
 							echo "Unknown status $wcache";
 						fi
 
 						cd /images;
-						
+
 						if [ -n "$hd" ]; then
 							part="${hd}1";
-						
+
 							win7partcnt="0";
 							win7rec="";
 							win7sys="";
-							win7imgroot="/images/${img}";	# only used for windows 7						
-						
+							win7imgroot="$imagePath";	# only used for windows 7
+
 							if [ $osid == "5" ]; then
 								# With Windows 7, we need to know how many
-								# partitions we have to determine the best 
-								# plan of attack.				
-							
+								# partitions we have to determine the best
+								# plan of attack.
+								
+								echo -n " * Windows 7 Boot Partition Exists.............";
+
 								if [ -f "$win7imgroot/rec.img.000" ]; then
+									echo "Yes";
+								
 									win7partcnt="2";
 									win7rec="${hd}1";
-									win7sys="${hd}2";	
-									part=$win7sys;	
+									win7sys="${hd}2";
+									part=$win7sys;
 								#TODO:review this
 								# This needs to be reworked for general user
 								#elif [ -f "$win7imgroot/gpt.bak" ]; then
 								#	win7partcnt="3";
 								#	win7rec="gpt";
-								#	win7sys="${hd}3";	
-								#	part=$win7sys;							
+								#	win7sys="${hd}3";
+								#	part=$win7sys;
 								else
+									echo "No";
+									
 									# no recover part found!
 									win7partcnt="1";
 									win7sys="${hd}1";
 								fi
-							
+
 								if [ -f "$win7imgroot/sys.img.000" ]; then
 									echo -n " * Preparing hard Disks (Stage 1)..............";
 									if [ "$nombr" == "1" ]; then
@@ -232,55 +249,61 @@ if [ -n "$type" ]; then
 										dd if=$mbrfile of=$hd bs=512 count=1 &>/dev/null
 										echo "Done";
 									fi
-									
-									diskSize=`parted $hd u kB print | grep "Disk" | sed 's/Disk \/dev\/[a-zA-Z0-9]*: //' | sed 's/kB//'`
+
+									# We need the size of the disk
+									# because if the size if > 2tb 
+									# creating the partion with parted will fail
+									diskSize=`parted -s $hd u kB print | grep "Disk" | sed 's/Disk \/dev\/[a-zA-Z0-9]*: //' | sed 's/kB//'`
 									layPartSize="-1s"
-									sleep 4;
+									#layPartSize="98%"
 									if [ $diskSize -gt 2199023256 ]; then
 										layPartSize="2tB"
 									fi
-									sleep 4;
-									
+
 									if [ "$win7partcnt" == "1" ]; then
 										echo -n " * Preparing hard Disks (Stage 2)..............";
-										parted $hd u kB rm 1 &>/dev/null;
+										parted -s $hd u kB rm 1 &>/dev/null;
 										echo "Done";
 										
-										
-										
 										echo -n " * Preparing hard Disks (Stage 3)..............";
-										parted $hd u kB mkpart primary ntfs 63s &>/dev/null <<EOFPARTED
-$layPartSize									
-EOFPARTED
-										parted $hd u kB set 1 boot on &>/dev/null
-										echo "Done";										
-										
+										parted -s $hd u kB mkpart primary ntfs 2048s ${layPartSize} &>/dev/null
+
+
+#										parted -s $hd u kB mkpart primary ntfs 63s &>/dev/null <<EOFPARTED
+#$layPartSize
+#EOFPARTED
+										parted -s $hd u kB set 1 boot on &>/dev/null
+										echo "Done";
+
 									elif [ "$win7partcnt" == "2" ]; then
 										echo -n " * Preparing hard Disks (Stage 2)..............";
 										echo "Done";
-										
+
 										echo -n " * Preparing hard Disks (Stage 3)..............";
-										parted $hd u kB mkpart primary ntfs ${defaultwin7part2start}kB &>/dev/null <<EOFPARTED
-$layPartSize									
-EOFPARTED
+										parted -s $hd u kB mkpart primary ntfs ${defaultwin7part2start}kB ${layPartSize} &>/dev/null
+
+
+#										parted -s $hd u kB mkpart primary ntfs ${defaultwin7part2start}kB &>/dev/null <<EOFPARTED
+#$layPartSize
+#EOFPARTED
 										echo "Done";
 									#TODO:review this
 									# This section needs to be looked at and reworked for general consumption
 									#elif [ "$win7partcnt" == "3" ]; then
 										#echo -n " * Preparing hard Disks (Stage 2)..............";
-										# --zap-all            -Wipe GPT & MBR 
+										# --zap-all            -Wipe GPT & MBR
 										# --mbrtogpt           -Used to init gpt and enable tot backup to work
 										# --load-backup        -Pull int disk's original gpt
 										# --move-second-header -Moves the backup GPT header to the end of the new drive
 										# --extend             -Resizes the last partition to the max size
 										#sgdisk --zap-all $hd 2>&1 > /dev/null
 										#sleep 2
-										#partprobe
+										#runPartprobe
 										#sgdisk --mbrtogpt --load-backup=$win7imgroot/gpt.bak --move-second-header $hd &>/dev/null
 										#echo "Done";
 										#echo -n " * Preparing hard Disks (Stage 3)..............";
 										#sleep 3
-										#partprobe
+										#runPartprobe
 										#sgdisk -x 3:$(sgdisk -E $hd) $hd &>/dev/null
 										#echo "Done";
 									fi
@@ -298,20 +321,22 @@ EOFPARTED
 									dd if=$mbrfile of=$hd bs=512 count=1 &>/dev/null
 									echo "Done";
 								fi
-															
+
 								echo -n " * Preparing hard Disks (Stage 2)..............";
-								fdisk $hd &>/dev/null <<EOF 
+								fdisk $hd &>/dev/null <<EOF
 d
 w
 EOF
 								echo "Done";
-	
+
 								echo -n " * Preparing hard Disks (Stage 3)..............";
+								# Blackout - 1:30 PM 13/05/2012
 								fdisk $hd &>/dev/null <<EOFP3
+c
 n
 p
 1
-1
+
 
 t
 7
@@ -321,14 +346,14 @@ w
 EOFP3
 								echo "Done";
 							fi
-						
-						
+
+
 						if [ "$osid" = "2" ] ; then  # || [ "$osid" == "5" ]
 							correctVistaMBR $hd;
 						fi
 
 						echo -n " * Checking hard disks.........................";
-						partprobe;
+						runPartprobe;
 						echo "Done";
 						echo -n " * Waiting for disks to settle.................";
 						sleep 10;
@@ -337,7 +362,7 @@ EOFP3
 						if [ "$mc" = "yes" ]; then
 							if [ "$osid" == "5" ]; then
 								if [ "$win7partcnt" == "1" ]; then
-									udp-receiver --nokbd --portbase ${port} --mcast-rdv-address ${storageip} 2>/dev/null | partimage -f3 -b restore $win7sys stdin								
+									udp-receiver --nokbd --portbase ${port} --mcast-rdv-address ${storageip} 2>/dev/null | partimage -f3 -b restore $win7sys stdin
 								elif [ "$win7partcnt" == "2" ]; then
 									udp-receiver --nokbd --portbase ${port} --mcast-rdv-address ${storageip} 2>/dev/null |  partimage -f3 -b restore $win7rec stdin
 									udp-receiver --nokbd --portbase ${port} --mcast-rdv-address ${storageip} 2>/dev/null | partimage -f3 -b restore $win7sys stdin
@@ -346,11 +371,11 @@ EOFP3
 								#	udp-receiver --nokbd --portbase ${port} --mcast-rdv-address ${storageip} 2>/dev/null |  partimage -f3 -b restore ${hd}1 stdin
 								#	udp-receiver --nokbd --portbase ${port} --mcast-rdv-address ${storageip} 2>/dev/null |  partimage -f3 -b restore ${hd}2 stdin
 								#	udp-receiver --nokbd --portbase ${port} --mcast-rdv-address ${storageip} 2>/dev/null | partimage -f3 -b restore $win7sys stdin
-								fi						
+								fi
 
 							else
 								udp-receiver --nokbd --portbase ${port} --mcast-rdv-address ${storageip} 2>/dev/null | partimage -f3 -b restore ${part} stdin
-							fi 
+							fi
 						else
 							if [ "$osid" == "5" ]; then
 								if [ "$win7partcnt" == "1" ]; then
@@ -360,9 +385,9 @@ EOFP3
 										export FOGSTATS="1";
 									fi
 									fog.statusreporter $mac $web &
-									partimage restore $win7sys /images/${img}/sys.img.000 -f3 -b 2>/tmp/status.fog
+									partimage restore $win7sys $imagePath/sys.img.000 -f3 -b 2>/tmp/status.fog
 								elif [ "$win7partcnt" == "2" ]; then
-									partimage restore $win7rec /images/${img}/rec.img.000 -f3 -b 2>/dev/null							
+									partimage restore $win7rec $imagePath/rec.img.000 -f3 -b 2>/dev/null
 
 									if [ "$capone" == "1" ]; then
 										export FOGSTATS="0";
@@ -370,11 +395,11 @@ EOFP3
 										export FOGSTATS="1";
 									fi
 									fog.statusreporter $mac $web &
-									partimage restore $win7sys /images/${img}/sys.img.000 -f3 -b 2>/tmp/status.fog								
+									partimage restore $win7sys $imagePath/sys.img.000 -f3 -b 2>/tmp/status.fog
 								#TODO:review this
 								#elif [ "$win7partcnt" == "3" ]; then
-								#	partimage restore ${hd}1 /images/${img}/rec1.img.000 -f3 -b 2>/dev/null	
-								#	partimage restore ${hd}2 /images/${img}/rec2.img.000 -f3 -b 2>/dev/null	
+								#	partimage restore ${hd}1 $imagePath/rec1.img.000 -f3 -b 2>/dev/null
+								#	partimage restore ${hd}2 $imagePath/rec2.img.000 -f3 -b 2>/dev/null
 
 								#	if [ "$capone" == "1" ]; then
 								#		export FOGSTATS="0";
@@ -382,7 +407,7 @@ EOFP3
 								#		export FOGSTATS="1";
 								#	fi
 								#	fog.statusreporter $mac $web &
-								#	partimage restore $win7sys /images/${img}/sys.img.000 -f3 -b 2>/tmp/status.fog								
+								#	partimage restore $win7sys $imagePath/sys.img.000 -f3 -b 2>/tmp/status.fog
 								fi
 							else
 								if [ "$capone" == "1" ]; then
@@ -391,35 +416,34 @@ EOFP3
 									export FOGSTATS="1";
 								fi
 								fog.statusreporter $mac $web &
-								partimage restore $part /images/$img -f3 -b 2>/tmp/status.fog
+								partimage restore $part $imagePath -f3 -b 2>/tmp/status.fog
 							fi
 						fi
-						sleep 1;						
+						#sleep 1;
 
 						clearScreen;
-						echo -n " * Performing Clean up  (Stage 1)..............";  
-						ntfsresize $part $RUN_CHKDSK -f -b -P &>/dev/null << EOFNTFS  
+						echo -n " * Performing Clean up  (Stage 1)..............";
+						ntfsresize $part $RUN_CHKDSK -f -b -P &>/dev/null << EOFNTFS
 Y
 EOFNTFS
-						echo "Done";	
+						echo "Done";
 					else
 						handleError "HD is null; no hard disk was found.";
-					fi						
+					fi
 				elif [ "$imgType" = "mps" ]; then
 					# Restore multipartion for single drive
 					echo -n " * Looking for Hard Disks......................";
 					#disk=`fogpartinfo --list-devices 2>/dev/null | cut -d' ' -f 1`
 					getHardDisk;
-					echo "Done";					
+					echo "Done";
 					echo " * Using Hard Disk: $hd";
-					
+
 					if [ -n "$hd" ]
 					then
 						# check image
-						tmpBackupPath="/images/${img}";
-						if [ -d "$tmpBackupPath" ] 
+						if [ -d "$imagePath" ]
 						then
-							tmpMBR="${tmpBackupPath}/d1.mbr";
+							tmpMBR="${imagePath}/d1.mbr";
 							if [ -f "$tmpMBR" ]
 							then
 								echo -n " * Restoring MBR...............................";
@@ -430,52 +454,53 @@ EOFNTFS
 w
 EOFLINUXFIX
 								fi
-								echo "Done";	
-								
+								echo "Done";
+
 								echo -n " * Checking hard disks.........................";
-								partprobe;
+								runPartprobe;
 								sleep 10;
-								echo "Done";	
-								
+								echo "Done";
+
 								parts=`fogpartinfo --list-parts $hd 2>/dev/null`
-								
-								diskLength=`expr length $hd`;	
-								
+
+								diskLength=`expr length $hd`;
+
 								for part in $parts
 								do
 									partNum=${part:$diskLength};
 									echo " * Processing Partition: $part (${partNum})";
 									sleep 1;
-									imgpart="${tmpBackupPath}/d1p${partNum}.img";
-									
+									imgpart="${imagePath}/d1p${partNum}.img";
+
 									if [ "$osid" == "50" ]
 									then
 										echo " * Preparing linux filesystem...";
-										parted $hd &>/dev/null << EOFPTD  
+										parted -s $hd &>/dev/null << EOFPTD
 mkfs
 yes
 $partNum
 fat32
 q
 EOFPTD
-										partprobe
+										runPartprobe;
 										sleep 10;
 									fi
-									
+
 									if [ -f "$imgpart" ]; then
 										if [ "$mc" = "yes" ]; then
 											udp-receiver --nokbd --portbase ${port} --mcast-rdv-address ${storageip} 2>/dev/null | partimage -f3 -b restore $part stdin;
 										else
-											partimage restore $part $imgpart -f3 -b									
+											partimage restore $part $imgpart -f3 -b
 										fi
 									else
 										echo " * Partition File missing: $imgpart";
-									fi									
-									sleep 3;									
-									clearScreen;	
-									echo " * Image Restored";						
+										sleep 9;
+									fi
+									sleep 1;
+									clearScreen;
+									echo " * Image Restored";
 								done
-								
+
 								if [ "$osid" == "50" ]
 								then
 									echo " * Restore Linux swap paritions:";
@@ -487,92 +512,92 @@ IFS='
 										echo  "       * Restoring partition: $x";
 										mkswap $x &>/dev/null
 									done
-									
+
 								fi
-								echo "";								
-								
+								echo "";
+
 								echo " * Task complete!";
-								echo "";								
-														
+								echo "";
+
 							else
-								handleError "Image Store Corrupt: Unable to locate MBR.";					
+								handleError "Image Store Corrupt: Unable to locate MBR.";
 							fi
 						else
 							handleError "Unable to locate image store.";
 						fi
 					else
-						handleError "Fatal Error: Disk device not found!";	
-					fi		
+						handleError "Fatal Error: Disk device not found!";
+					fi
 				elif [ "$imgType" = "mpa" ]; then
 					# Restore multipartion for all drives
 					echo -n " * Looking for Hard Disks......................";
 					disks=`fogpartinfo --list-devices 2>/dev/null`
-					echo "Done";					
+					echo "Done";
 
 					for disk in $disks
-					do	
+					do
 						if [ -n "$disk" ]
-						then							
-							echo " * Using Hard Disk: $disk";			
+						then
+							echo " * Using Hard Disk: $disk";
 						fi
 					done
 					sleep 1;
-					
+
 					echo "";
-					
+
 					# check image
-					tmpBackupPath="/images/${img}";
-					if [ -d "$tmpBackupPath" ] 
-					then					
+					if [ -d "$imagePath" ]
+					then
 						intDisk=1;
 						for disk in $disks
-						do					
+						do
 							if [ -n "$disk" ]
-							then				
-										
-								tmpMBR="${tmpBackupPath}/d${intDisk}.mbr";						
-								
+							then
+
+								tmpMBR="${imagePath}/d${intDisk}.mbr";
+
 								if [ -f "$tmpMBR" ]
-								then								
+								then
 									echo -n " * Restoring MBR...............................";
 									dd if=$tmpMBR of=$disk &>/dev/null
-									echo "Done";	
-									
+									echo "Done";
+
 									echo -n " * Checking hard disks.........................";
-									partprobe;
-									echo "Done";	
-									
+									runPartprobe;
+									echo "Done";
+
 									parts=`fogpartinfo --list-parts $disk 2>/dev/null`
 									diskLength=`expr length $disk`;
 									for part in $parts
-									do		
-										partNum=${part:$diskLength};																															
+									do
+										partNum=${part:$diskLength};
 										echo " * Processing Partition: $part (${partNum})";
 										sleep 1;
-										imgpart="${tmpBackupPath}/d${intDisk}p${partNum}.img";
-										if [ -f "$imgpart" ]; then										
+										imgpart="${imagePath}/d${intDisk}p${partNum}.img";
+										if [ -f "$imgpart" ]; then
 											if [ "$mc" = "yes" ]; then
 												udp-receiver --nokbd --portbase ${port} --mcast-rdv-address ${storageip} 2>/dev/null |  partimage -f3 -b restore $part stdin ;
 											else
-												partimage restore $part $imgpart -f3 -b	2>/dev/null								
+												partimage restore $part $imgpart -f3 -b	2>/dev/null
 											fi
 										else
 											echo " * Partition File missing: $imgpart";
+											sleep 9;
 										fi
-										sleep 4;																	
-										clearScreen;	
-										echo " * Image Restored";						
-										
-									done																	
+										sleep 1;
+										clearScreen;
+										echo " * Image Restored";
+
+									done
 								else
 									handleError "Image Store Corrupt: Unable to locate MBR.";
 								fi
 							else
-								handleError "Fatal Error: Disk device not found!";							
+								handleError "Fatal Error: Disk device not found!";
 							fi
-							intDisk=`expr $intDisk + 1`;								
+							intDisk=`expr $intDisk + 1`;
 						done
-						
+
 						if [ "$osid" == "50" ]
 						then
 							echo " * Restore Linux swap paritions:";
@@ -584,7 +609,7 @@ IFS='
 								echo  "       * Restoring partition: $x";
 								mkswap $x &>/dev/null
 							done
-							
+
 						fi
 						echo "";
 						echo " * Task complete!";
@@ -597,33 +622,36 @@ IFS='
 					echo -n " * Looking for Hard Disks......................";
 					getHardDisk
 					echo "Done";
-					echo " * Using Hard Disk: $hd";						
-					if [ -n "$hd" ]; then	
+					echo " * Using Hard Disk: $hd";
+					if [ -n "$hd" ]; then
+						echo "";
 						echo " * Now FOG will attempt to restore the image using DD.";
-						echo " * Starting transfer, this may take a very long time...";										
+						echo "";
+						echo " * Starting transfer, this may take a very long time...";
+						echo "";
 						if [ "$mc" = "yes" ]; then
 							udp-receiver --nokbd --portbase ${port} --mcast-rdv-address ${storageip} 2>/dev/null | gunzip -f -c 2>/dev/null | dd of=${hd}
 						else
-							cat /images/${img} | gunzip  | dd of=${hd}
-						fi	
+							cat $imagePath | gunzip  | dd of=${hd}
+						fi
 					else
-						handleError "Fatal Error: Disk device not found!";					
+						handleError "Fatal Error: Disk device not found!";
 					fi
 				fi
-					
-				if [ "$capone" != "1" ]; then	
-					
+
+				if [ "$capone" != "1" ]; then
+
 					changeHostname
-		
+
 					echo "";
 					echo " * Updating Computer Database Status";
 					echo "";
-				
+
 					queueinfo="";
-					cd /tmp			
+					cd /tmp
 					wget -q -O /tmp/co.txt "http://${web}service/Post_Stage3.php?mac=$mac" &>/dev/null
 					queueinfo=`cat co.txt`;
-				
+
 
 					while [ "$queueinfo" != "##" ]
 					do
@@ -632,18 +660,18 @@ IFS='
 						wget -q -O co.txt "http://${web}service/Post_Stage3.php?mac=$mac" &>/dev/null
 						queueinfo=`cat co.txt`;
 						sleep 5;
-					done  
+					done
 
 					echo "";
 					echo " * Database updated!";
 					echo "";
-				fi 
-				
+				fi
+
 				echo "";
 				echo " * Task complete, computer will now restart";
 				echo "";
 				sleep 1;
-				
+
 			else
 				handleError "Fatal Error: Invalid image name;";
 			fi
@@ -653,6 +681,8 @@ IFS='
 	elif [ "$type" = "up" ]; then
 		echo " * Preparing to send image file to server.";
 		
+		imagePath="/images/${macWinSafe}";
+
 		percent=$pct;
 		if [ $percent -ge 5 ]
 		then
@@ -663,62 +693,70 @@ IFS='
 		else
 			percent=5;
 		fi
-		
+
 		if [ $percent -lt 10 ]
 		then
 			percent="0${percent}";
 		fi
 		
-		echo -n " * Mounting File System........................";
-		mkdir /images
+		echo -n " * Checking In.................................";
+		queueinfo=`wget -q -O - "http://${web}service/Pre_Stage1.php?mac=$mac" 2>/dev/null`
+		echo "Done";
 
-		mount -o nolock,proto=tcp $storage /images 
+		echo -n " * Mounting File System........................";
+		mkdir /images 2>/dev/null;
+
+		mount -o nolock,proto=tcp $storage /images
 		echo "Done";
 		echo -n " * Checking Mounted File System................";
 		if [ -f "/images/.mntcheck" ]; then
 			echo "Done";
+			echo "";
 			if [ -n "$img" ]; then
 				echo " * Using Image: $img";
-				if [ "$imgType" = "n" ]; then	
+				echo "";
+				
+				# Make directory structure for image
+				echo -n " * Preparing backup location...................";
+				if [ ! -d "$imagePath" ]
+				then
+					mkdir -p "$imagePath" 2>/dev/null;
+				fi
+				chmod -R 777 $imagePath
+				rm -Rf "$imagePath/*"
+				echo "Done";
+				
+				# NTFS Resize partition method
+				if [ "$imgType" = "n" ]; then
 
 					if [ "$osid" != "1" ] && [ "$osid" != "2" ] && [ "$osid" != "5"	]; then		# Added OS ID 5 for Windows 7
 						handleError " * Invalid operating system id: $osname ($osid)!";
-					fi				
-				
+					fi
+
 					echo -n " * Looking for Hard Disks......................";
 					getHardDisk
 					echo "Done";
-					echo " * Using Hard Disk: $hd";						
+					echo " * Using Hard Disk: $hd";
+					
+					
+					
 					if [ -n "$hd" ]; then
 						part="${hd}1";
-						
+
 						win7partcnt="0";
 						win7rec="";
 						win7sys="";
-						tmpBackupPath=""		# only used for windows 7
 						if [ "$osid" == "5" ]; then
 							# With Windows 7, we need to know how many
-							# partitions we have to determine the best 
+							# partitions we have to determine the best
 							# plan of attack.
-							
-							echo -n " * Preparing backup location...................";
-							macWinSafe=`echo $mac | sed 's/://g'`;
-							tmpBackupPath="/images/$macWinSafe";
-							if [ ! -d "$tmpBackupPath" ]
-							then
-								mkdir -p "$tmpBackupPath" 2>/dev/null;
-							fi
-							chmod -R 777 $tmpBackupPath
-							rm -Rf "$tmpBackupPath/*"
-							
-							echo "Done";							
-							
+
 							parts=`fogpartinfo --list-parts $hd 2>/dev/null`;
 							for prt in $parts
 							do
 								win7partcnt=`expr ${win7partcnt} + 1`;
 							done
-							
+
 							if [ "$win7partcnt" = "0" ]; then
 								handleError "No partitions found.";
 							elif [ "$win7partcnt" = "1" ]; then
@@ -736,8 +774,8 @@ IFS='
 									fi
 									tmpCnt=`expr $tmpCnt + 1`;
 								done
-							#TODO:review this	
-							#elif [ "$win7partcnt" = "3" ] && [ $(parted -m $hd print | grep $hd | cut -d: -f6) = "gpt" ]; then							
+							#TODO:review this
+							#elif [ "$win7partcnt" = "3" ] && [ $(parted -m $hd print | grep $hd | cut -d: -f6) = "gpt" ]; then
 							#	win7rec="gpt"
 							#	win7sys=${hd}3
 							#	part=${hd}3
@@ -745,10 +783,10 @@ IFS='
 								# greater than 3 parts
 								handleError "More than 2 partitions found, not valid for this image type.";
 							fi
-							
+
 							clearMountedDevices
 						fi
-							
+
 						if [ "$ignorepg" = "1" ]; then
 							#if [ "$osid" != "5" ]; then
 								echo -n " * Mounting device.............................";
@@ -759,19 +797,19 @@ IFS='
 									echo -n " * Removing page file..........................";
 									rm -f "/ntfs/pagefile.sys";
 									echo "Done";
-								
+
 									echo -n " * Removing hibernate file.....................";
 									rm -f "/ntfs/hiberfil.sys"
 									echo "Done";
-								
+
 									umount /ntfs;
 								else
 									echo "Failed";
 								fi
 							#fi
 						fi
-						
-						
+
+
 						echo -n " * Backing up MBR..............................";
 
 						# This needs to be looked at
@@ -782,167 +820,140 @@ IFS='
 							dd if=$hd of=/mbr.backup count=1 bs=512 &>/dev/null
 						fi
 						echo "Done";
+						
+						# Windows XP: Start sector check
+						if [ "$osid" == "1" ]; then
+							partitionStart=`fdisk -l | grep $part | awk '{print $3}'`;
+							if [ "$partitionStart" == "" ]; then
+								partitionStart="63"; # We assume XP start sector will 63, modern start sector is 2048
+							fi
+							if [ "$partitionStart" != "63" ]; then
+								handleError "FOG requires your Windows XP's partition start sector to be 63 but is ${partitionStart}";
+							fi
+						fi
+						
+						# NTFSResize
 						ntfsresizetest="ntfsresize $RUN_CHKDSK -f -i -P ${part}"
 						size=`${ntfsresizetest} | grep "You might resize" | cut -d" " -f5`
 						if [ -n "$size" ]; then
 							sizentfsresize=`expr $size / 1000`
 							sizentfsresize=`expr $sizentfsresize + 300000`
 							sizentfsresize=`expr $sizentfsresize \* 1${percent} / 100`
-							
+
 							sizefd=`expr $sizentfsresize \* 103 / 100`
+							echo "";
 							echo " * Possible partition size: $sizentfsresize k";
-							echo " * Running resize test...";
+							echo -n " * Running resize test.........................";
 							tmpSuc=`ntfsresize $RUN_CHKDSK -f -n -s ${sizentfsresize}k $part << EOFNTFS
 Y
 EOFNTFS`
 							success=`echo $tmpSuc | grep "ended successfully"`;
-							
-							if [ ! -n "$success" ] 
+							echo "Done";
+
+							if [ ! -n "$success" ]
 							then
 								success=`echo $tmpSuc | grep "already OK"`;
 							fi
-							
+
 							if [ -n "$success" ]; then
 								echo " * Resize test was successful";
-								echo " * Resizing partition...";
+								echo -n " * Resizing partition..........................";
 								ntfsresize $RUN_CHKDSK -f -s ${sizentfsresize}k $part &>/dev/null << FORCEY
 y
 FORCEY
+								echo "Done";
 
-								fdiskscmd="+${sizefd}K";
-								win7origsize=""
+								
 								if [ "$osid" == "5" ]; then
-									
 									if [ "$win7partcnt" == "1" ]; then
-										# get original size
-										win7origsize=`parted $hd u kB print | sed -e '/^.1/!d' -e 's/^ [0-9]*kB[ ]*[0-9]*kB[ ]*//' -e 's/kB  .*//'`	
-										if [ "$win7origsize" == "" ]; then
-											handleError "Unable to determine disk size.";
-										fi	
+										win7part1start=`parted -s $hd u kB print | sed -e '/^.1/!d' -e 's/^ [0-9]*[ ]*//' -e 's/kB  .*//'`;
+										if [ "$win7part1start" == "" ]; then
+											handleError "Unable to determine disk start location.";
+										fi
+
+										adjustedfdsize=`expr $sizefd + $win7part1start`;
 										
-										parted $hd u kB rm 1 &>/dev/null;	
-										parted $hd u kB mkpart primary ntfs 63s  &>/dev/null <<EOFSINGLE
--1s									
-EOFSINGLE
+										parted -s $hd u kB rm 1 &>/dev/null;
+										parted -s $hd u kB mkpart primary ntfs ${win7part1start}kB ${adjustedfdsize}kB &>/dev/null;
+
 									elif [ "$win7partcnt" == "2" ]; then
-										win7origsize=`parted $hd u kB print | sed -e '/^.2/!d' -e 's/^ [0-9]*kB[ ]*[0-9]*kB[ ]*//' -e 's/kB  .*//'`	
-										if [ "$win7origsize" == "" ]; then
-											handleError "Unable to determine disk size.";
-										fi	
-																											
-										win7part2start=`parted $hd u kB print | sed -e '/^.2/!d' -e 's/^ [0-9]*[ ]*//' -e 's/kB  .*//'`;
+										win7part2start=`parted -s $hd u kB print | sed -e '/^.2/!d' -e 's/^ [0-9]*[ ]*//' -e 's/kB  .*//'`;
 										if [ "$win7part2start" == "" ]; then
 											handleError "Unable to determine disk start location.";
-										fi	
+										fi
 
 										adjustedfdsize=`expr $sizefd + $win7part2start`;
-										parted $hd u kB rm 2 &>/dev/null;
-
-										parted $hd u kB mkpart primary ntfs ${win7part2start}kB ${adjustedfdsize}kB  &>/dev/null
-									#TODO:review this
-									#elif [ "$win7partcnt" == "3" ] && [ "$win7rec" == "gpt" ]; then
-									#	sectorSize=$(parted -m $hd print | grep "^/dev" | cut -d: -f4)
-									#	adjustedsectors=`expr $sizefd \* 1024 / $sectorSize + 1`;
-									#	sgdisk --extend=3:$adjustedsectors $hd 2>&1 > /dev/null																	
+										
+										parted -s $hd u kB rm 2 &>/dev/null;
+										parted -s $hd u kB mkpart primary ntfs ${win7part2start}kB ${adjustedfdsize}kB  &>/dev/null;
 									else
 										handleError "Invalid partition count.";
 									fi
 								else
 									# Any other OS other than windows 7
-									parted $hd rm 1  &>/dev/null;
-#									fdisk $hd &>/dev/null << EOFDUMP
-#									
-#d
-#w
-#EOFDUMP
-
-									fdisk $hd &>/dev/null << EOFSMALLER
-n
-p
-1
-1
-$fdiskscmd
-t
-7
-a
-1
-w
-EOFSMALLER
+									
+									# Blackout - 1:30 PM 13/05/2012
+									parted -s $hd rm 1 &>/dev/null;
+									parted -s $hd mkpart primary ntfs ${partitionStart}s ${size}B &>/dev/null
 								fi
-							
 								
-
-		
 								if [ "$osid" = "2" ] ; then #|| [ "$osid" = "5" ]
 									correctVistaMBR $hd
 								fi
-								
+
 								echo -n " * Checking hard disks.........................";
-								partprobe;
-								echo "Done";								
+								runPartprobe;
+								echo "Done";
 								echo -n " * Waiting for disks to settle.................";
 								sleep 10;
-								echo "Done";							
+								echo "Done";
+								
+								echo -n " * Starting FOG Status Reporter................";
+								export FOGSTATS="1";
+								fog.statusreporter $mac $web &
+								echo "Done";
+								
 								mkfifo /tmp/pigz1
 								mkfifo /tmp/pigz2
 								mkfifo /tmp/pigz3
 								
+								echo "";
+								echo " * Now FOG will attempt to upload the image using PartImage.";
+								echo "";
+								sleep 2;
+								
 								if [ "$osid" == "5" ]; then
 									if [ "$win7partcnt" == "1" ]; then
 										echo " * Processing a Windows 7 System with 1 partition.";
-										sleep 2;
-										echo " * Now FOG will attempt to upload the image using PartImage.";
-										export FOGSTATS="1";
-										fog.statusreporter $mac $web &
-										macWinSafe=`echo $mac | sed 's/://g'`;
-										pigz -p $cores $PIGZ_COMP < /tmp/pigz1 > $tmpBackupPath/sys.img.000 &
+										#sleep 2;
+										
+										pigz -p $cores $PIGZ_COMP < /tmp/pigz1 > $imagePath/sys.img.000 &
 										partimage save $win7sys /tmp/pigz1 -V9900000000 -z0 -o -d -f3 -b 2>/tmp/status.fog
-										sleep 3								
 									elif [ "$win7partcnt" == "2" ]; then
 										echo " * Processing a Windows 7 System with 2 partitions.";
-										sleep 2;
-										echo " * Now FOG will attempt to upload the image using PartImage.";	
-										pigz -p $cores $PIGZ_COMP < /tmp/pigz1 > $tmpBackupPath/rec.img.000 &
+										#sleep 2;
+										
+										pigz -p $cores $PIGZ_COMP < /tmp/pigz1 > $imagePath/rec.img.000 &
 										partimage save $win7rec /tmp/pigz1 -V9900000000 -z0 -o -d -f3 -b  2>/dev/null
-										export FOGSTATS="1";
-										fog.statusreporter $mac $web &
-										macWinSafe=`echo $mac | sed 's/://g'`;
-										pigz -p $cores $PIGZ_COMP < /tmp/pigz2 > $tmpBackupPath/sys.img.000 &
+										
+										pigz -p $cores $PIGZ_COMP < /tmp/pigz2 > $imagePath/sys.img.000 &
 										partimage save $win7sys /tmp/pigz2 -V9900000000 -z0 -o -d -f3 -b 2>/tmp/status.fog
-										sleep 3
-									#TODO:review this
-									#elif [ "$win7partcnt" == "3" ] && [ "$win7rec" == "gpt" ]; then
-									#	echo " * Processing a Windows 7 EFI/GPT System with 3 partitions.";
-									#	sleep 2;
-									#	echo " * Now FOG will attempt to upload the image using PartImage.";
-									#	sgdisk --backup=$tmpBackupPath/gpt.bak $hd 2>&1 > /dev/null
-									#	pigz -p $cores < /tmp/pigz1 > $tmpBackupPath/rec1.img.000 &
-									#	partimage save ${hd}1 /tmp/pigz1 -z0 -V0 -o -d -f3 -b  2>/dev/null
-									#	pigz -p $cores < /tmp/pigz2 > $tmpBackupPath/rec2.img.000 &
-									#	partimage save ${hd}2 /tmp/pigz2 -z0 -V0 -o -d -f3 -b  2>/dev/null
-									#	pigz -p $cores < /tmp/pigz3 > $tmpBackupPath/sys.img.000 &
-									#  	export FOGSTATS="1";
-									#	fog.statusreporter $mac $web &
-									#	macWinSafe=`echo $mac | sed 's/://g'`;
-									#	partimage save $win7sys /tmp/pigz3 -z0 -V0 -o -d -f3 -b 2>/tmp/status.fog
-									#	sleep 3
 									fi
-									chmod -R 777 /images/$tmpBackupPath
+									#sleep 3
+									
 								else
-									echo " * Now FOG will attempt to upload the image using PartImage.";
-									export FOGSTATS="1";
-									fog.statusreporter $mac $web &
-									macWinSafe=`echo $mac | sed 's/://g'`;
-									pigz -p $cores $PIGZ_COMP < /tmp/pigz1 > /images/$macWinSafe &
+									pigz -p $cores $PIGZ_COMP < /tmp/pigz1 > $imagePath/${macWinSafe}.000 &
 									partimage save $part /tmp/pigz1 -V9900000000 -z0 -o -d -f3 -b 2>/tmp/status.fog
-									chmod 777 /images/$macWinSafe.000									
-								fi								
+								fi
+								
+								chmod -R 777 $imagePath
+								
 								rm /tmp/pigz1
 								rm /tmp/pigz2
 								rm /tmp/pigz3
 
-								clearScreen;	
-								
+								clearScreen;
+
 								echo -n " * Restoring MBR...............................";
 
 								#TODO:review this
@@ -958,9 +969,9 @@ EOFRESTOREPART
 								if [ "$osid" = "2" ] ; then #  || [ "$osid" = "5" ]
 									correctVistaMBR $hd;
 								fi
-								
+
 								echo -n " * Waiting for disks to settle.................";
-								partprobe;							
+								runPartprobe;
 								sleep 10;
 								echo "Done";
 
@@ -969,17 +980,17 @@ EOFRESTOREPART
 									ntfsresize $win7sys $RUN_CHKDSK -f -b -P &>/dev/null << EOFNTFSRESTORE1
 Y
 EOFNTFSRESTORE1
-									echo "Done";																			
+									echo "Done";
 								else
 									echo -n " * Resizing ntfs...............................";
 									ntfsresize $part $RUN_CHKDSK -f -b -P &>/dev/null << EOFNTFSRESTORE
 Y
 EOFNTFSRESTORE
-									echo "Done";	
-								fi								
+									echo "Done";
+								fi
 							else
-								handleError "Resize test failed!\n $tmpSuc";						
-							fi					
+								handleError "Resize test failed!\n $tmpSuc";
+							fi
 						else
 							tmpoutput=`$ntfsresizetest;`;
 							handleError " Fatal Error, Unable to determine possible ntfs size\n    * To better help you debug we will run the ntfs resize\n      but this time with full output, please wait!\n\n$tmpoutput";
@@ -991,36 +1002,26 @@ EOFNTFSRESTORE
 					# Multi-part single disk image
 					echo -n " * Looking for Hard Disks......................";
 					disk=`fogpartinfo --list-devices 2>/dev/null | cut -d' ' -f 1`
-					echo "Done";					
+					echo "Done";
 					echo " * Using Hard Disk: $disk";
-					
+
 					if [ -n "$disk" ]
 					then
-						macWinSafe=`echo $mac | sed 's/://g'`;
-						echo -n " * Preparing backup location...................";
-						tmpBackupPath="/images/$macWinSafe";
-						if [ ! -d "$tmpBackupPath" ]
-						then
-							mkdir -p "$tmpBackupPath" 2>/dev/null;
-						fi
-						rm -Rf "$tmpBackupPath/*"
-						echo "Done";
-						
-						if [ -d "$tmpBackupPath" ]
+						if [ -d "$imagePath" ]
 						then
 							if [ "$osid" == "50" ]
-							then		
+							then
 								echo -n " * Saving MBR and GRUB.........................";
-								dd if=$disk of=${tmpBackupPath}/d1.mbr count=63 bs=512 &>/dev/null
-								echo "Done";											
-							else							
+								dd if=$disk of=${imagePath}/d1.mbr count=63 bs=512 &>/dev/null
+								echo "Done";
+							else
 								echo -n " * Saving MBR..................................";
-								dd if=$disk of=${tmpBackupPath}/d1.mbr count=1 bs=512 &>/dev/null
+								dd if=$disk of=${imagePath}/d1.mbr count=1 bs=512 &>/dev/null
 								echo "Done";
 							fi
-							
+
 							parts=`fogpartinfo --list-parts $disk 2>/dev/null`
-							
+
 							diskLength=`expr length $disk`;
 							for part in $parts
 							do
@@ -1028,81 +1029,70 @@ EOFNTFSRESTORE
 								partNum=${part:$diskLength};
 								echo " * Processing Partition: $part (${partNum})";
 								sleep 1;
-								imgpart="${tmpBackupPath}/d1p${partNum}.img";	
-								pigz -p $cores $PIGZ_COMP < /tmp/pigz1 > $imgpart &															
-								partimage save $part /tmp/pigz1 --volume=9900000000 -z0 -o -d -f3 -b -c 
+								imgpart="${imagePath}/d1p${partNum}.img";
+								pigz -p $cores $PIGZ_COMP < /tmp/pigz1 > $imgpart &
+								partimage save $part /tmp/pigz1 --volume=9900000000 -z0 -o -d -f3 -b -c 2>/tmp/status-${partNum}.fog
 								mv ${imgpart}.000 ${imgpart} 2>/dev/null
-								chmod -R 777 $tmpBackupPath 2>/dev/null
-							
-								sleep 4;
-								clearScreen;	
-								echo " * Image uploaded";	
-								sleep 5	
-								rm /tmp/pigz1					
+
+								sleep 1;
+								clearScreen;
+								echo " * Image uploaded";
+								sleep 1
+								rm /tmp/pigz1
 							done
 							echo " * Task complete!";
 							echo "";
 						else
-							handleError "Unable to create ${tmpBackupPath}";
+							handleError "Unable to create ${imagePath}";
 						fi
 					else
 						handleError "Fatal Error: Disk device not found!";
 					fi
 
 				elif [ "$imgType" = "mpa" ]; then
-					# Multi-part all disk image	
+					# Multi-part all disk image
 					echo -n " * Looking for Hard Disks......................";
 					disks=`fogpartinfo --list-devices 2>/dev/null`
-					echo "Done";		
-					
+					echo "Done";
+
 					for disk in $disks
-					do	
+					do
 						if [ -n "$disk" ]
-						then							
-							echo " * Using Hard Disk: $disk";			
+						then
+							echo " * Using Hard Disk: $disk";
 						fi
 					done
 					sleep 1;
-					
+
 					echo "";
-					
-					echo -n " * Preparing backup location...................";
-					macWinSafe=`echo $mac | sed 's/://g'`;
-					tmpBackupPath="/images/$macWinSafe";
-					if [ ! -d "$tmpBackupPath" ]
-					then
-						mkdir -p "$tmpBackupPath" 2>/dev/null;
-					fi
-					rm -Rf "$tmpBackupPath/*"
-					echo "Done";					
-					
+
 					intDisk=1;
 					for disk in $disks
 					do
 						if [ -n "$disk" ]
-						then							
+						then
 							echo " * Processing Hard Disk: $disk";
 							sleep 10;
-							if [ -d "$tmpBackupPath" ]
+							if [ -d "$imagePath" ]
 							then
 								if [ "$osid" == "50" ]
 								then
 									if [ "${intDisk}" = "1" ]
-									then									
+									then
 										echo -n " * Saving MBR and GRUB.........................";
-										dd if=$disk of=${tmpBackupPath}/d${intDisk}.mbr count=63 bs=512 &>/dev/null
-										echo "Done";									
+										dd if=$disk of=${imagePath}/d${intDisk}.mbr count=63 bs=512 &>/dev/null
+										echo "Done";
 									else
 										echo -n " * Saving MBR..................................";
-										dd if=$disk of=${tmpBackupPath}/d${intDisk}.mbr count=1 bs=512 &>/dev/null
-										echo "Done";									
+										dd if=$disk of=${imagePath}/d${intDisk}.mbr count=1 bs=512 &>/dev/null
+										echo "Done";
 									fi
 								else
 									echo -n " * Saving MBR..................................";
-									dd if=$disk of=${tmpBackupPath}/d${intDisk}.mbr count=1 bs=512 &>/dev/null
+									dd if=$disk of=${imagePath}/d${intDisk}.mbr count=1 bs=512 &>/dev/null
 									echo "Done";
 								fi
-								
+
 								parts=`fogpartinfo --list-parts $disk 2>/dev/null`
 								diskLength=`expr length $disk`;
 								for part in $parts
@@ -1111,52 +1101,54 @@ EOFNTFSRESTORE
 									partNum=${part:$diskLength};
 									echo " * Processing Partition: $part (${partNum})";
 									sleep 1;
-									imgpart="${tmpBackupPath}/d${intDisk}p${partNum}.img";
+									imgpart="${imagePath}/d${intDisk}p${partNum}.img";
 									pigz -p $cores $PIGZ_COMP < /tmp/pigz1 > $imgpart &
-									partimage save $part /tmp/pigz1 --volume=9900000000 -z0 -o -d -f3 -b -c 
+									partimage save $part /tmp/pigz1 --volume=9900000000 -z0 -o -d -f3 -b -c 2>/tmp/status-${partNum}.fog
 									mv ${imgpart}.000 ${imgpart}
-									chmod -R 777 $tmpBackupPath
-									clearScreen;	
+									clearScreen;
 									echo " * Image uploaded";
-									sleep 5	
-									rm /tmp/pigz1					
+									sleep 1
+									rm /tmp/pigz1
 								done
 								echo " * Task complete!";
 								echo "";
 							else
-								handleError "Unable to create ${tmpBackupPath}";
-							fi							
-										
+								handleError "Unable to create ${imagePath}";
+							fi
+
 						else
-							handleError "Fatal Error: Disk device not found!";							
+							handleError "Fatal Error: Disk device not found!";
 						fi
-						intDisk=`expr $intDisk + 1`;										
+						intDisk=`expr $intDisk + 1`;
 					done
-				else 
+				else
 					echo -n " * Looking for Hard Disks......................";
 					getHardDisk
 					echo "Done";
-					echo " * Using Hard Disk: $hd";	
-					macWinSafe=`echo $mac | sed 's/://g'`;					
-					if [ -n "$hd" ]; then				
+					echo " * Using Hard Disk: $hd";
+					if [ -n "$hd" ]; then
+						echo "";
 						echo " * Now FOG will attempt to upload the image using DD.";
+						echo "";
 						echo " * Starting transfer, this may take a very long time...";
-						dd if=${hd} | pigz -p $cores $PIGZ_COMP > /images/${macWinSafe}.000
-						sleep 2
-						chmod 777 /images/$macWinSafe.000
+						echo "";
+						dd if=${hd} | pigz -p $cores $PIGZ_COMP > $imagePath/${macWinSafe}.000
+						sleep 1
 
-						clearScreen;						
+						clearScreen;
 					else
 						handleError "Fatal Error: Disk device not found!";
 					fi
-				fi		
-			
+				fi
+				
+				chmod -R 777 $imagePath
+
 				queueinfo="";
 				if [ "$osid" == "5" ]
 				then
 					imgType="mps";
 				fi
-				
+
 				post="http://${web}service/Post_Stage2.php?to=$img&mac=$mac&ftp=$ftp&size=$size&imgid=$imgid&imgtype=$imgType"
 				queueinfo=`wget -q -O - "$post" 2>/dev/null`
 				while [ "$queueinfo" != "##" ]
@@ -1165,7 +1157,7 @@ EOFNTFSRESTORE
 					queueinfo=`wget -q -O - "$post" 2>/dev/null`
 					sleep 5;
 				done
-			else			
+			else
 				handleError "Fatal Error: Invalid image name;";
 			fi
 		else
@@ -1177,3 +1169,6 @@ EOFNTFSRESTORE
 else
 	handleError " Fatal Error: Unknown request type :: Null";
 fi
+
+# DEBUG
+fdisk -l &> /tmp/fdisk-after

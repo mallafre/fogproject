@@ -27,13 +27,13 @@ changeHostname()
 		key2="";
 		if [ "$osid" = "5" ]
 		then
-			ntfs-3g -o force,rw $win7sys /ntfs
+			ntfs-3g -o force,rw $win7sys /ntfs &> /tmp/ntfs-mount-output
 			regfile=$REG_LOCAL_MACHINE_7
 			key1=$REG_HOSTNAME_KEY1_7
 			key2=$REG_HOSTNAME_KEY2_7
 		elif [ "$osid" = "1" ]
 		then
-			ntfs-3g -o force,rw $part /ntfs
+			ntfs-3g -o force,rw $part /ntfs &> /tmp/ntfs-mount-output
 			regfile=$REG_LOCAL_MACHINE_XP
 			key1=$REG_HOSTNAME_KEY1_XP
 			key2=$REG_HOSTNAME_KEY2_XP
@@ -46,7 +46,7 @@ $hostname
 q
 y
 EOFREG
-		umount /ntfs
+		umount /ntfs &> /dev/null
 		echo "Done";
 	else
 		echo "Skipped";
@@ -159,10 +159,12 @@ determineOS()
 
 clearScreen()
 {
-	for i in $(seq 0 99);
-	do
-		echo "";
-	done
+	if [ "$mode" != "debug" ]; then
+		for i in $(seq 0 99);
+		do
+			echo "";
+		done
+	fi
 }
 
 sec2String()
@@ -303,7 +305,7 @@ handleError()
 	echo " #                     An error has been detected!                           #";
 	echo " #                                                                           #";	
 	echo " #############################################################################";
-	sleep 3;
+#	sleep 3;
 	echo "";
 	echo "";
 	echo -e " $1";
@@ -316,4 +318,16 @@ handleError()
 	echo " #############################################################################";	
 	sleep 60;
 	exit 0;
+}
+
+runPartprobe()
+{
+	partprobe &> /dev/null
+}
+
+debugCommand()
+{
+	if [ "$mode" == "debug" ]; then
+		echo $1 >> /tmp/cmdlist
+	fi
 }
