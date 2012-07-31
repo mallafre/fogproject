@@ -254,6 +254,7 @@ if [ -n "$type" ]; then
 									# because if the size if > 2tb 
 									# creating the partion with parted will fail
 									diskSize=`parted -s $hd u kB print | grep "Disk" | sed 's/Disk \/dev\/[a-zA-Z0-9]*: //' | sed 's/kB//'`
+
 									layPartSize="100%"
 									if [ $diskSize -gt 2199023256 ]; then
 										layPartSize="2tB"
