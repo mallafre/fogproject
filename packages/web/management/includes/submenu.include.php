@@ -10,17 +10,17 @@ if ($currentUser != null && $currentUser->isLoggedIn())
 	// About Page
 	if ($node == 'about')
 	{
-		$FOGSubMenu->addItems('about', array(	_('Version Info')	=> 'ver',
-							_('License')		=> 'lic',
-							_('Kernel Updates')	=> 'kernel',
-							_('PXE Boot Menu')	=> 'pxemenu',
-							_('Client Updater')	=> 'clientup',
-							_('MAC Address List')	=> 'maclist',
-							_('FOG Settings')	=> 'settings',
-							_('Server Shell')	=> 'shell',
-							_('Log Viewer')		=> 'log',
+		$FOGSubMenu->addItems('about', array(	_('Version Info')		=> 'version',
+							_('License')			=> 'license',
+							_('Kernel Update')		=> 'kernel-update',
+							_('PXE Boot Menu')		=> 'pxemenu',
+							_('Client Updater')		=> 'client-updater',
+							_('MAC Address List')		=> 'mac-list',
+							_('FOG Settings')		=> 'settings',
+							_('Server Shell')		=> 'shell',
+							_('Log Viewer')			=> 'log',
 							_('FOG Sourceforge Page')	=> 'http://www.sf.net/projects/freeghost',
-							_('FOG Home Page')	=> 'http://freeghost.sf.net/',
+							_('FOG Home Page')		=> 'http://freeghost.sf.net/',
 					));
 	}
 

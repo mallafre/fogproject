@@ -15,6 +15,27 @@ session_cache_limiter('no-cache');
 session_start();
 @set_magic_quotes_runtime(0);
 
+// PHP Version Check
+if (!version_compare(phpversion(), '5.2.1', '>='))
+{
+	die('FOG Requires PHP v5.2.1. You have PHP v' . phpversion());
+}
+
+// Module check
+//print_r(get_loaded_extensions());
+$requiredExtenstions = array('gettext'); // , 'curl'
+foreach ($requiredExtenstions as $extenstion)
+{
+	if (!in_array($extenstion, get_loaded_extensions()))
+	{
+		$missingExtensions[] = $extenstion;
+	}
+}
+if (count((array)$missingExtensions))
+{
+	die('Missing Extenstions: ' . implode(', ', $missingExtensions));
+}
+
 // Sanitize valid input variables
 foreach (array('groupid','node','id','imageid','sub','snapinid','userid','storagegroupid','storagenodeid','crit','sort', 'userid', 'confirm', 'tab') AS $x)
 {

@@ -190,9 +190,6 @@ var Loader;
 						// Submit button spinner
 						SubmitButton.removeClass('searching');
 						
-						// Deselect search box
-						//$this.blur();
-						
 						// Variables
 						var tbody = $('tbody', Container);
 						var rows = '';
