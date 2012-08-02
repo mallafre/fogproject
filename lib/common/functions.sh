@@ -374,12 +374,12 @@ displayBanner()
 	echo "  #     FOG                                 #";
 	echo "  #     Free Computer Imaging Solution      #";
 	echo "  #                                         #";
-	echo "  #     Created by:                         #";
-	echo "  #         SyperiorSoft                    #";
-	echo "  #         http://www.SyperiorSoft.com     #";
+	echo "  #     http://www.fogproject.org/          #";
+	echo "  #                                         #";
 	echo "  #     Developers:                         #";
 	echo "  #         Chuck Syperski                  #";	
 	echo "  #         Jian Zhang                      #";
+	echo "  #         Peter Gilchrist                 #";
 	echo "  #                                         #";		
 	echo "  #     GNU GPL Version 3                   #";		
 	echo "  ###########################################";

@@ -18,9 +18,21 @@
 #
 #
 
+if [ -f "/etc/redhat-release" ];
+then
+	releaseName=`cat /etc/redhat-release | cut -d' ' -f1`;
+fi
+
 # Yum packages to install
-packages="httpd php53 php53-cli php53-common php53-gd php53-mysql mysql mysql-server dhcp tftp-server nfs-utils vsftpd net-tools wget xinetd tar gzip make m4 gcc gcc-c++ htmldoc perl perl-Crypt-PasswdMD5 lftp clamav";
-storageNodePackages="httpd php53 php53-cli php53-common php53-gd php53-mysql mysql nfs-utils vsftpd xinetd tar gzip make m4 gcc gcc-c++ lftp";
+if [ "$releaseName" == "Fedora" ];
+then
+	packages="httpd php php-cli php-common php53-gd php-mysql mysql mysql-server dhcp tftp-server nfs-utils vsftpd net-tools wget xinetd tar gzip make m4 gcc gcc-c++ htmldoc perl perl-Crypt-PasswdMD5 lftp clamav";
+	storageNodePackages="httpd php php-cli php-common php-gd php-mysql mysql nfs-utils vsftpd xinetd tar gzip make m4 gcc gcc-c++ lftp";
+else
+	packages="httpd php53 php53-cli php53-common php53-gd php53-mysql mysql mysql-server dhcp tftp-server nfs-utils vsftpd net-tools wget xinetd tar gzip make m4 gcc gcc-c++ htmldoc perl perl-Crypt-PasswdMD5 lftp clamav";
+	storageNodePackages="httpd php53 php53-cli php53-common php53-gd php53-mysql mysql nfs-utils vsftpd xinetd tar gzip make m4 gcc gcc-c++ lftp";
+if
+
 langPackages="iso-codes";
 dhcpname="dhcp";
 

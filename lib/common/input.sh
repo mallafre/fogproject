@@ -33,8 +33,20 @@ then
 	fi	
 
 	strSuggestedIPaddress=`ifconfig | grep "inet addr:" | head -n 1  | cut -d':' -f2 | cut -d' ' -f1`;
+	if [ -z "$strSuggestedIPaddress" ]
+	then
+		strSuggestedIPaddress=`ifconfig | grep "inet" | head -n 1  | awk '{print $2}'`;
+	fi
 	strSuggestedInterface=`ifconfig | grep "Link encap:" | head -n 1 | cut -d' ' -f1`;
+	if [ -z "$strSuggestedInterface" ]
+	then
+		strSuggestedInterface=`ifconfig | grep "RUNNING" | head -n 1 | cut -d':' -f1`;
+	fi
 	strSuggestedRoute=`route -n | grep "^.*UG.*${strSuggestedInterface}$"  | head -n 1`;
+	if [ -z "$strSuggestedRoute" ]
+	then
+		strSuggestedRoute=`route -n | grep "^.*U.*${strSuggestedInterface}$"  | head -n 1`;
+	fi
 	strSuggestedRoute=`echo ${strSuggestedRoute:16:16} | tr -d [:blank:]`;
 	strSuggestedDNS="";
 	if [ -f "/etc/resolv.conf" ]
@@ -42,7 +54,7 @@ then
 		strSuggestedDNS=` cat /etc/resolv.conf | grep "nameserver" | head -n 1 | tr -d "nameserver" | tr -d [:blank:] | grep "^[0-9]*\.[0-9]*\.[0-9]*\.[0-9]*$"`
 	fi
 
-	if [ -n "$strSuggestedDNS" ]
+	if [ -z "$strSuggestedDNS" ]
 	then
 		if [ -d "/etc/NetworkManager/system-connections" ]
 		then
