@@ -19,35 +19,53 @@
 #
 if [ "${guessdefaults}" = "1" ]
 then
-	tmpOS=`cat /etc/*release | head -n 1 | grep "Fedora"`;
+	## Linux Version Detection
 	strSuggestedOS="";
-	if [ "$tmpOS" != "" ]
+	
+	# Use lsb_release to find Linux flavour
+	linuxReleaseName=`lsb_release -a 2> /dev/null | grep "Distributor ID" | awk '{print $3,$4,$5,$6,$7,$8,$9}'`;
+	if [ -z "$linuxReleaseName" ];
+	then
+		# Fall back incase lsb_release does not exist / fails - use /etc/issue over /etc/*release*
+		linuxReleaseName=`cat /etc/issue /etc/*release* 2>/dev/null | awk '{print $1}'`;
+	fi
+	
+	#tmpOS=`cat /etc/*release* /etc/issue 2> /dev/null | grep -Ei "Fedora|Redhat|CentOS"`;
+	if [ "`echo $linuxReleaseName | grep -Ei "Fedora|Redhat|CentOS"`" != "" ]
 	then
 		strSuggestedOS="1";
 	fi
 	
-	tmpOS=`cat /etc/*release | head -n 1 | grep "Ubuntu"`;
-	if [ "$tmpOS" != "" ]
+	#tmpOS=`cat /etc/*release* /etc/issue 2> /dev/null | grep -Ei "Ubuntu|Debian"`;
+	#if [ "$tmpOS" != "" ]
+	if [ "`echo $linuxReleaseName | grep -Ei "Ubuntu|Debian"`" != "" ]
 	then
 		strSuggestedOS="2";
-	fi	
+	fi
 
+	## IP Address
 	strSuggestedIPaddress=`ifconfig | grep "inet addr:" | head -n 1  | cut -d':' -f2 | cut -d' ' -f1`;
 	if [ -z "$strSuggestedIPaddress" ]
 	then
 		strSuggestedIPaddress=`ifconfig | grep "inet" | head -n 1  | awk '{print $2}'`;
 	fi
+	
+	## Interface
 	strSuggestedInterface=`ifconfig | grep "Link encap:" | head -n 1 | cut -d' ' -f1`;
 	if [ -z "$strSuggestedInterface" ]
 	then
 		strSuggestedInterface=`ifconfig | grep "RUNNING" | head -n 1 | cut -d':' -f1`;
 	fi
+	
+	## Route
 	strSuggestedRoute=`route -n | grep "^.*UG.*${strSuggestedInterface}$"  | head -n 1`;
 	if [ -z "$strSuggestedRoute" ]
 	then
 		strSuggestedRoute=`route -n | grep "^.*U.*${strSuggestedInterface}$"  | head -n 1`;
 	fi
 	strSuggestedRoute=`echo ${strSuggestedRoute:16:16} | tr -d [:blank:]`;
+	
+	## DNS
 	strSuggestedDNS="";
 	if [ -f "/etc/resolv.conf" ]
 	then
@@ -62,6 +80,7 @@ then
 		fi
 	fi
 	
+	## User
 	strSuggestedSNUser="fogstorage";
 fi
 

@@ -90,6 +90,17 @@ if [ "$doupdate" = "1" ]
 then
 	if [ -f "$fogprogramdir/.fogsettings" ]
 	then
+		echo "";
+		echo "  * Found FOG Settings from previous install at: $fogprogramdir/.fogsettings";
+		echo -n "  * Performing upgrade using these settings";
+		sleep 1;
+		echo -n ".";
+		sleep 1;
+		echo -n ".";
+		sleep 1;
+		echo ".";
+		sleep 1;
+		
 		. "$fogprogramdir/.fogsettings";
 		doOSSpecificIncludes;
 	fi

@@ -172,8 +172,8 @@ displayOSChoices()
 		else
 			echo "  What version of Linux would you like to run the installtion for?"
 			echo "";
-			echo "          1) Redhat Based Linux (Fedora, CentOS)";
-			echo "          2) Ubuntu Based Linux (Kubuntu, Edubuntu)";		
+			echo "          1) Redhat Based Linux (Redhat, Fedora, CentOS)";
+			echo "          2) Debian Based Linux (Debian, Ubuntu, Kubuntu, Edubuntu)";		
 			echo "";
 			echo -n "  Choice: [${strSuggestedOS}]";
 			read osid;
@@ -197,15 +197,15 @@ doOSSpecificIncludes()
 	echo "";
 	case "$osid" in
 		"1")
-		    	echo "  Staring Redhat Installation."
+		    	echo "  Staring Redhat / Fedora / CentOS Installation."
 		    	osname="Redhat";
 		    	. ../lib/redhat/functions.sh
 			. ../lib/redhat/config.sh
 		    	echo "";
 			;;
 		"2")
-			echo "  Starting Ubuntu Installtion.";
-			osname="Ubuntu";
+			echo "  Starting Debian / Ubuntu / Kubuntu / Edubuntu Installtion.";
+			osname="Debian";
 		    	. ../lib/ubuntu/functions.sh
 			. ../lib/ubuntu/config.sh
 			echo "";
