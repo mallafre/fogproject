@@ -20,7 +20,7 @@
 
 installInitScript()
 {
-	echo -n "  * Installing init scripts";
+	echo -n "  * Installing init scripts...";
 	
 	service ${initdMCfullname} stop >/dev/null 2>&1;
 	service ${initdIRfullname} stop >/dev/null 2>&1;
@@ -33,7 +33,7 @@ installInitScript()
 	chkconfig ${initdIRfullname} on;	
 	chmod 755 ${initdpath}/${initdSDfullname}
 	chkconfig ${initdSDfullname} on;
-	echo "...OK";
+	echo "OK";
 }
 
 configureFOGService()
@@ -64,43 +64,43 @@ define( \"SCHEDULERWEBROOT\", \"${webdirdest}\" );
 define( \"SCHEDULERSLEEPTIME\", 60 );
 ?>" > ${servicedst}/etc/config.php;
 
-	echo -n "  * Starting FOG Multicast Management Server"; 
+	echo -n "  * Starting FOG Multicast Management Server..."; 
 	service ${initdMCfullname} restart >/dev/null 2>&1;
 	service ${initdMCfullname} status  >/dev/null 2>&1;
 	if [ "$?" != "0" ]
 	then
-		echo "...Failed!";
+		echo "Failed!";
 		exit 1;	
 	else
-		echo "...OK";
+		echo "OK";
 	fi
 	
-	echo -n "  * Starting FOG Image Replicator Server"; 
+	echo -n "  * Starting FOG Image Replicator Server..."; 
 	service ${initdIRfullname} restart >/dev/null 2>&1;
 	service ${initdIRfullname} status  >/dev/null 2>&1;
 	if [ "$?" != "0" ]
 	then
-		echo "...Failed!";
+		echo "Failed!";
 		exit 1;	
 	else
-		echo "...OK";
+		echo "OK";
 	fi	
 	
-	echo -n "  * Starting FOG Task Scheduler Server"; 
+	echo -n "  * Starting FOG Task Scheduler Server..."; 
 	${initdpath}/${initdSDfullname} stop >/dev/null 2>&1;
 	${initdpath}/${initdSDfullname} start >/dev/null 2>&1;
 	if [ "$?" != "0" ]
 	then
-		echo "...Failed!";
+		echo "Failed!";
 		exit 1;	
 	else
-		echo "...OK";
+		echo "OK";
 	fi	
 }
 
 configureNFS()
 {
-	echo -n "  * Setting up and starting NFS Server"; 
+	echo -n "  * Setting up and starting NFS Server..."; 
 	
 	echo "/images                        *(ro,sync,no_wdelay,insecure_locks,no_root_squash,insecure)
 /images/dev                    *(rw,sync,no_wdelay,no_root_squash,insecure)" > "$nfsconfig";
@@ -110,28 +110,28 @@ configureNFS()
 	service nfs status  >/dev/null 2>&1;
 	if [ "$?" != "0" ]
 	then
-		echo "...Failed!";
+		echo "Failed!";
 		exit 1;	
 	else
-		echo "...OK";
+		echo "OK";
 	fi		
 }
 
 configureSudo()
 {
-	echo -n "  * Setting up sudo settings";
+	echo -n "  * Setting up sudo settings...";
 	#ret=`cat /etc/sudoers | grep "${apacheuser} ALL=(ALL) NOPASSWD: /sbin/ether-wake"`
 	#if [ "$ret" = "" ]
 	#then
 	#	 echo "${apacheuser} ALL=(ALL) NOPASSWD: /sbin/ether-wake" >>  "/etc/sudoers";
 	#	 echo "Defaults:${apacheuser} !requiretty" >>  "/etc/sudoers";
 	#fi
-	echo "...OK";	
+	echo "OK";	
 }
 
 configureFTP()
 {
-	echo -n "  * Setting up and starting VSFTP Server";
+	echo -n "  * Setting up and starting VSFTP Server...";
 	if [ -f "$ftpconfig" ]
 	then
 		mv "$ftpconfig" "${ftpconfig}.fogbackup";
@@ -155,24 +155,24 @@ tcp_wrappers=YES" > "$ftpconfig";
 	service vsftpd status  >/dev/null 2>&1;
 	if [ "$?" != "0" ] 
 	then
-		echo "...Failed!";
+		echo "Failed!";
 		exit 1;	
 	else
-		echo "...OK";
+		echo "OK";
 	fi	
 
 }
 
 configureTFTPandPXE()
 {
-	echo -n "  * Setting up and starting TFTP and PXE Servers";
+	echo -n "  * Setting up and starting TFTP and PXE Servers...";
 	if [ -d "$tftpdirdst" ]
 	then
 		rm -rf "${tftpdirdst}.fogbackup" 2>/dev/null;
 		cp -Rf "$tftpdirdst" "${tftpdirdst}.fogbackup" 2>/dev/null;
 		#if [ -d "$tftpdirdst" ]
 		#then
-		#	echo "...Failed!";
+		#	echo "Failed!";
 		#	echo "  * Failed to move $tftpdirdst to ${tftpdirdst}.fogbackup";
 		#	echo "  * Make sure ${tftpdirdst}.fogbackup does NOT exists.";		
 		#	echo "  * If ${tftpdirdst}.fogbackup does exist delete or rename ";	
@@ -292,17 +292,17 @@ service tftp
 	service xinetd status  >/dev/null 2>&1;	
 	if [ "$?" != "0" ]
 	then
-		echo "...Failed!";
+		echo "Failed!";
 		exit 1;	
 	else
-		echo "...OK";	
+		echo "OK";	
 	fi	
 	
 }
 
 configureDHCP()
 {
-	echo -n "  * Setting up and starting DHCP Server";
+	echo -n "  * Setting up and starting DHCP Server...";
 
 	if [ -f "$dhcpconfig" ]
 	then
@@ -343,13 +343,13 @@ ${routeraddress}
 		service dhcpd status  >/dev/null 2>&1;
 		if [ "$?" != "0" ]
 		then
-			echo "...Failed!";
+			echo "Failed!";
 			exit 1;	
 		else
-			echo "...OK";
+			echo "OK";
 		fi	
 	else
-		echo "...Skipped";
+		echo "Skipped";
 	fi
 }
 
@@ -361,7 +361,7 @@ configureMinHttpd()
 
 configureHttpd()
 {
-	echo -n "  * Setting up and starting Apache Web Server";
+	echo -n "  * Setting up and starting Apache Web Server...";
 	chkconfig httpd on;
 	service httpd restart >/dev/null 2>&1
 	sleep 2;
@@ -369,7 +369,7 @@ configureHttpd()
 	ret=$?;
 	if [ "$ret" != "0" ]
 	then
-		echo "...Failed! ($ret)";
+		echo "Failed! ($ret)";
 		exit 1;	
 	else
 		if [ ! -d "$webdirdest" ]
@@ -477,22 +477,22 @@ define('FOG_UPLOADIGNOREPAGEHIBER',true);
 			echo "<?php header('Location: ./fog/index.php');?>" > $webredirect;
 		fi
 		
-		echo "...OK";
+		echo "OK";
 	fi
 }
 
 configureMySql()
 {
-	echo -n "  * Setting up and starting MySql";
+	echo -n "  * Setting up and starting MySql...";
 	chkconfig mysqld on;
 	service mysqld restart >/dev/null 2>&1;
 	service mysqld status >/dev/null 2>&1;
 	if [ "$?" != "0" ]
 	then
-		echo "...Failed!";
+		echo "Failed!";
 		exit 1;	
 	else
-		echo "...OK";
+		echo "OK";
 	fi	
 }
 
@@ -502,6 +502,9 @@ installPackages()
 	then
 		packages="$packages $langPackages"
 	fi
+	
+	echo "  * Packages to be installed: $packages";
+	echo "";
 
 	for x in $packages
 	do
@@ -509,9 +512,9 @@ installPackages()
 		if [ "$?" != "0" ]
 		then
 			echo  "  * Installing package: $x";
-			yum -y install $x >/dev/null 2>&1;
+			yum -y install $x 1>/dev/null;
 		else
-			echo  "  * Skipping package: $x (Already Installed)";
+			echo  "  * Skipping package: $x (Already installed)";
 		fi
 	done
 
@@ -521,22 +524,22 @@ confirmPackageInstallation()
 {
 	for x in $packages
 	do
-		echo -n "  * Checking package: $x";
+		echo -n "  * Checking package: $x...";
 		rpm -q $x >/dev/null 2>&1;
 		if [ "$?" != "0" ]
 		then
-			echo "...Failed!"
+			echo "Failed!"
 			exit 1;		
 
 		else
-			echo "...OK";
+			echo "OK";
 		fi
 	done;
 }
 
 setupFreshClam()
 {
-	echo  -n "  * Configuring Fresh Clam";
+	echo  -n "  * Configuring Fresh Clam...";
 
 	if [ ! -d "${freshwebroot}" ]
 	then
@@ -554,8 +557,8 @@ setupFreshClam()
 		cat "${freshconf}.backup.${dte}" | sed '/Example/d' > ${freshconf};
 		cat "${freshcron}.backup.${dte}" | sed '/^FRESHCLAM_DELAY=.*$/d' > ${freshcron};
 
-		echo "...OK";
+		echo "OK";
 	else
-		echo "...Failed!"
+		echo "Failed!"
 	fi
 }

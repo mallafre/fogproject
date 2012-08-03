@@ -24,6 +24,14 @@
 . ../lib/common/functions.sh
 . ../lib/common/config.sh
 
+# Determine Linux release name
+linuxReleaseName=`lsb_release -a 2> /dev/null | grep "Distributor ID" | awk '{print $3,$4,$5,$6,$7,$8,$9}'`;
+if [ -z "$linuxReleaseName" ];
+then
+	# Fall back incase lsb_release does not exist / fails - use /etc/issue over /etc/*release*
+	linuxReleaseName=`cat /etc/issue /etc/*release* 2>/dev/null | head -n1 | awk '{print $1}'`;
+fi
+
 installtype="";
 ipaddress="";
 interface="";
@@ -129,7 +137,8 @@ then
 	echo "  This script should be run by the root user on Fedora, or with sudo on Ubuntu."
 	echo "";
 	echo "  Here are the settings FOG will use:";
-	echo "         Distro: ${osname}";
+	echo "         Base Linux: ${osname}";
+	echo "         Detected Linux Distribution: ${linuxReleaseName}";
 	echo "         Installation Type: Normal Server";
 	echo "         Server IP Address: ${ipaddress}";
 	echo "         DHCP router Address: ${plainrouter}";
@@ -153,7 +162,8 @@ then
 	echo "  This script should be run by the root user on Fedora, or with sudo on Ubuntu."
 	echo "";
 	echo "  Here are the settings FOG will use:";
-	echo "         Distro: ${osname}";
+	echo "         Base Linux: ${osname}";
+	echo "         Detected Linux Distribution: ${linuxReleaseName}";
 	echo "         Installation Type: Storage Node";
 	echo "         Server IP Address: ${ipaddress}";
 	echo "         Interface: ${interface}";
@@ -162,6 +172,19 @@ then
 	echo "         MySql Database Password: [Protected]";
 	echo "";
 fi
+
+if [ "$bldhcp" == "0" ];
+then
+	echo "         DHCP will NOT be setup but you must setup your";
+	echo "         current DHCP server to use FOG for PXE services.";
+	echo ;
+	echo "         On a Linux DHCP server you must set:";
+	echo "             next-server";
+	echo ;
+	echo "         On a Windows DHCP server you must set:";
+	echo "             option 066 & 067";
+	echo;
+fi;
 
 while [ "$blGo" = "" ]
 do

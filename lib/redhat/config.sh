@@ -28,7 +28,7 @@ else
 	# CentOS or Other
 	packages="httpd php53 php53-cli php53-common php53-gd php53-mysql mysql mysql-server dhcp tftp-server nfs-utils vsftpd net-tools wget xinetd tar gzip make m4 gcc gcc-c++ htmldoc perl perl-Crypt-PasswdMD5 lftp clamav";
 	storageNodePackages="httpd php53 php53-cli php53-common php53-gd php53-mysql mysql nfs-utils vsftpd xinetd tar gzip make m4 gcc gcc-c++ lftp";
-if
+fi
 
 langPackages="iso-codes";
 dhcpname="dhcp";

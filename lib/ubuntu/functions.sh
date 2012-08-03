@@ -20,7 +20,7 @@
 
 installInitScript()
 {
-	echo -n "  * Installing init scripts";
+	echo -n "  * Installing init scripts...";
 	${initdpath}/${initdMCfullname} stop >/dev/null 2>&1;
 	${initdpath}/${initdIRfullname} stop >/dev/null 2>&1;
 	${initdpath}/${initdSDfullname} stop >/dev/null 2>&1;
@@ -32,7 +32,7 @@ installInitScript()
 	sysv-rc-conf ${initdIRfullname} on >/dev/null 2>&1;		
 	chmod 755 ${initdpath}/${initdSDfullname}
 	sysv-rc-conf ${initdSDfullname} on >/dev/null 2>&1;	
-	echo "...OK";	
+	echo "OK";	
 }
 
 configureFOGService()
@@ -64,43 +64,43 @@ define( \"SCHEDULERSLEEPTIME\", 60 );
 ?>" > ${servicedst}/etc/config.php;
 
 
-	echo -n "  * Starting FOG Multicast Management Server"; 
+	echo -n "  * Starting FOG Multicast Management Server..."; 
 	${initdpath}/${initdMCfullname} stop >/dev/null 2>&1;
 	${initdpath}/${initdMCfullname} start >/dev/null 2>&1;
 	if [ "$?" != "0" ]
 	then
-		echo "...Failed!";
+		echo "Failed!";
 		exit 1;	
 	else
-		echo "...OK";
+		echo "OK";
 	fi	
 	
-	echo -n "  * Starting FOG Image Replicator Server"; 
+	echo -n "  * Starting FOG Image Replicator Server..."; 
 	${initdpath}/${initdIRfullname} stop >/dev/null 2>&1;
 	${initdpath}/${initdIRfullname} start >/dev/null 2>&1;
 	if [ "$?" != "0" ]
 	then
-		echo "...Failed!";
+		echo "Failed!";
 		exit 1;	
 	else
-		echo "...OK";
+		echo "OK";
 	fi	
 	
-	echo -n "  * Starting FOG Task Scheduler Server"; 
+	echo -n "  * Starting FOG Task Scheduler Server..."; 
 	${initdpath}/${initdSDfullname} stop >/dev/null 2>&1;
 	${initdpath}/${initdSDfullname} start >/dev/null 2>&1;
 	if [ "$?" != "0" ]
 	then
-		echo "...Failed!";
+		echo "Failed!";
 		exit 1;	
 	else
-		echo "...OK";
+		echo "OK";
 	fi
 }
 
 configureNFS()
 {
-	echo -n "  * Setting up and starting NFS Server"; 
+	echo -n "  * Setting up and starting NFS Server..."; 
 	
 	echo "/images                        *(ro,sync,no_wdelay,insecure_locks,no_root_squash,insecure)
 /images/dev                    *(rw,sync,no_wdelay,no_root_squash,insecure)" > "${nfsconfig}";
@@ -110,16 +110,16 @@ configureNFS()
 	/etc/init.d/nfs-kernel-server start >/dev/null 2>&1;
 	if [ "$?" != "0" ]
 	then
-		echo "...Failed!";
+		echo "Failed!";
 		exit 1;	
 	else
-		echo "...OK";
+		echo "OK";
 	fi		
 }
 
 configureFTP()
 {
-	echo -n "  * Setting up and starting VSFTP Server";
+	echo -n "  * Setting up and starting VSFTP Server...";
 	if [ -f "$ftpconfig" ]
 	then
 		mv "${ftpconfig}" "${ftpconfig}.fogbackup";
@@ -143,24 +143,24 @@ tcp_wrappers=YES" > "$ftpconfig";
 	/etc/init.d/vsftpd start >/dev/null 2>&1;
 	if [ "$?" != "0" ] 
 	then
-		echo "...Failed!";
+		echo "Failed!";
 		exit 1;	
 	else
-		echo "...OK";
+		echo "OK";
 	fi	
 
 }
 
 configureTFTPandPXE()
 {
-	echo -n "  * Setting up and starting TFTP and PXE Servers";
+	echo -n "  * Setting up and starting TFTP and PXE Servers...";
 	if [ -d "$tftpdirdst" ]
 	then
 		rm -rf "${tftpdirdst}.fogbackup" 2>/dev/null;
 		cp -Rf "$tftpdirdst" "${tftpdirdst}.fogbackup" >/dev/null 2>&1;
 		#if [ -d "$tftpdirdst" ]
 		#then
-		#	echo "...Failed!";
+		#	echo "Failed!";
 		#	echo "  * Failed to move $tftpdirdst to ${tftpdirdst}.fogbackup";
 		#	echo "  * Make sure ${tftpdirdst}.fogbackup does NOT exists.";		
 		#	echo "  * If ${tftpdirdst}.fogbackup does exist delete or rename ";	
@@ -280,10 +280,10 @@ TFTP_OPTIONS=\"-s\"" > "${tftpconfigupstartdefaults}";
 		service tftpd-hpa start >/dev/null 2>&1;
 		if [ "$?" != "0" ]
 		then
-			echo "...Failed!";
+			echo "Failed!";
 			exit 1;	
 		else
-			echo "...OK";	
+			echo "OK";	
 		fi			
 	else
 		echo "# default: off
@@ -310,17 +310,17 @@ service tftp
 		/etc/init.d/xinetd start >/dev/null 2>&1;
 		if [ "$?" != "0" ]
 		then
-			echo "...Failed!";
+			echo "Failed!";
 			exit 1;	
 		else
-			echo "...OK";	
+			echo "OK";	
 		fi	
 	fi	
 }
 
 configureDHCP()
 {
-	echo -n "  * Setting up and starting DHCP Server";
+	echo -n "  * Setting up and starting DHCP Server...";
 
 	activeconfig="";
 	if [ -f "$dhcpconfig" ]
@@ -369,13 +369,13 @@ ${routeraddress}
 		try2="$?";
 		if [ "$try1" != "0" -o "$try2" != "0" ]
 		then
-			echo "...OK";
+			echo "OK";
 		else
-			echo "...Failed!";
+			echo "Failed!";
 			exit 1;	
 		fi
 	else
-		echo "...Skipped";
+		echo "Skipped";
 	fi
 
 }
@@ -388,14 +388,14 @@ configureMinHttpd()
 
 configureHttpd()
 {
-	echo -n "  * Setting up and starting Apache Web Server";
+	echo -n "  * Setting up and starting Apache Web Server...";
 	sysv-rc-conf apache2 on;
 	mv /etc/apache2/mods-available/php5* /etc/apache2/mods-enabled/  >/dev/null 2>&1
 	/etc/init.d/apache2  stop  >/dev/null 2>&1
 	/etc/init.d/apache2 start >/dev/null 2>&1;
 	if [ "$?" != "0" ]
 	then
-		echo "...Failed!";
+		echo "Failed!";
 		exit 1;	
 	else
 		if [ ! -d "$webdirdest" ]
@@ -503,34 +503,34 @@ define('FOG_UPLOADIGNOREPAGEHIBER',true);
 			echo "<?php header('Location: ./fog/index.php');?>" > $webredirect;
 		fi		
 		
-		echo "...OK";
+		echo "OK";
 	fi
 }
 
 configureSudo()
 {
-	echo -n "  * Setting up sudo settings";
+	echo -n "  * Setting up sudo settings...";
 	# This is no longer required, now that we switched to wakeonlan instead of etherwake
 	#ret=`cat /etc/sudoers | grep "${apacheuser} ALL=(ALL) NOPASSWD: /usr/sbin/etherwake"`
 	#if [ "$ret" = "" ]
 	#then
 	#	 echo "${apacheuser} ALL=(ALL) NOPASSWD: /usr/sbin/etherwake" >>  "/etc/sudoers";
 	#fi
-	echo "...OK";	
+	echo "OK";	
 }
 
 configureMySql()
 {
-	echo -n "  * Setting up and starting MySql";
+	echo -n "  * Setting up and starting MySql...";
 	sysv-rc-conf mysql on >/dev/null 2>&1;
 	/etc/init.d/mysql stop >/dev/null 2>&1;
 	/etc/init.d/mysql start >/dev/null 2>&1;
 	if [ "$?" != "0" ]
 	then
-		echo "...Failed!";
+		echo "Failed!";
 		exit 1;	
 	else
-		echo "...OK";
+		echo "OK";
 	fi	
 }
 
@@ -580,34 +580,34 @@ confirmPackageInstallation()
 {
 	for x in $packages
 	do
-		echo -n "  * Checking package: $x";
+		echo -n "  * Checking package: $x...";
 		dpkg -l $x >/dev/null 2>&1;
 		if [ "$?" != "0" ]
 		then
-			echo "...Failed!"
+			echo "Failed!"
 			if [ "$x" = "$dhcpname" ]
 			then			
 				echo -n "  * Checking for legacy package: $olddhcpname";
 				dpkg -l $olddhcpname >/dev/null 2>&1;
 				if [ "$?" != "0" ]
 				then
-					echo "...Failed!"
+					echo "Failed!"
 					exit 1;
 				else
-					echo "...OK";
+					echo "OK";
 				fi
 			else
 				exit 1;
 			fi
 		else
-			echo "...OK";
+			echo "OK";
 		fi
 	done;
 }
 
 setupFreshClam()
 {
-	echo  -n "  * Configuring Fresh Clam";
+	echo  -n "  * Configuring Fresh Clam...";
 
 	if [ ! -d "${freshwebroot}" ]
 	then
@@ -621,9 +621,9 @@ setupFreshClam()
 	/etc/init.d/clamav-freshclam start >/dev/null 2>&1;
 	if [ "$?" != "0" ]
 	then
-		echo "...Failed!";
+		echo "Failed!";
 		exit 1;	
 	else
-		echo "...OK";
+		echo "OK";
 	fi
 }

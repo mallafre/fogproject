@@ -22,14 +22,6 @@ then
 	## Linux Version Detection
 	strSuggestedOS="";
 	
-	# Use lsb_release to find Linux flavour
-	linuxReleaseName=`lsb_release -a 2> /dev/null | grep "Distributor ID" | awk '{print $3,$4,$5,$6,$7,$8,$9}'`;
-	if [ -z "$linuxReleaseName" ];
-	then
-		# Fall back incase lsb_release does not exist / fails - use /etc/issue over /etc/*release*
-		linuxReleaseName=`cat /etc/issue /etc/*release* 2>/dev/null | awk '{print $1}'`;
-	fi
-	
 	#tmpOS=`cat /etc/*release* /etc/issue 2> /dev/null | grep -Ei "Fedora|Redhat|CentOS"`;
 	if [ "`echo $linuxReleaseName | grep -Ei "Fedora|Redhat|CentOS"`" != "" ]
 	then
@@ -253,24 +245,13 @@ then
 	while [ "${dodhcp}" = "" ]
 	do
 		echo 
-		echo -n "  Would you like to use the FOG server for dhcp service? [Y/n] "
+		echo -n "  Would you like to use the FOG server for DHCP service? [Y/n] "
 		read dodhcp;
 		case "$dodhcp" in
 			Y | yes | y | Yes | YES )
 				bldhcp="1";
 				;;
 			[nN]*)	
-				echo;
-				echo "  DHCP will not be setup but you must setup your";
-				echo "  current DHCP server to use FOG for pxe services.";
-				echo ;
-				echo "  On a Linux DHCP server you must set:";
-				echo "      next-server";
-				echo ;
-				echo "  On a Windows DHCP server you must set:";
-				echo "      option 066 & 067";
-				echo;
-				sleep 5;
 				bldhcp="0";
 				;;
 			*)
