@@ -356,7 +356,7 @@ ${routeraddress}
 configureMinHttpd()
 {
 	configureHttpd;
-	echo "<php die( \"This is a storage node, please do not access the web ui here!\" ); ?>" > "$webdirdest/management/index.php";
+	echo "<?php die( \"This is a storage node, please do not access the web ui here!\" ); ?>" > "$webdirdest/management/index.php";
 }
 
 configureHttpd()
@@ -483,7 +483,7 @@ define('FOG_UPLOADIGNOREPAGEHIBER',true);
 
 configureMySql()
 {
-	echo -n "  * Setting up and starting MySql...";
+	echo -n "  * Setting up and starting MySQL...";
 	chkconfig mysqld on;
 	service mysqld restart >/dev/null 2>&1;
 	service mysqld status >/dev/null 2>&1;

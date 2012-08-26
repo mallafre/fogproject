@@ -1348,6 +1348,12 @@ $databaseSchema[] = array(
 	"ALTER TABLE `" . DATABASE_NAME . "`.`nfsGroups` ADD UNIQUE ( `ngName` )"
 );
 
+// 39
+// Blackout - 8:09 AM 26/08/2012
+$databaseSchema[] = array(
+	"INSERT INTO `" . DATABASE_NAME . "`.`os` (`osID`, `osName`, `osDescription`) VALUES ('6', 'Windows 8', '')"
+);
+
 
 
 

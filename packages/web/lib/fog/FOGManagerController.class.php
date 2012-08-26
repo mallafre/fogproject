@@ -76,12 +76,23 @@ abstract class FOGManagerController extends FOGBase
 	{
 		try
 		{
+			// Fail safe defaults
+			if (empty($where))
+			{
+				$where = array();
+			}
+			if (empty($whereOperator))
+			{
+				$whereOperator = 'AND';
+			}
+		
 			// Error checking
 			if (empty($this->databaseTable))
 			{
 				throw new Exception('No database table defined');
 			}
 			
+			// Create Where Array
 			if (count($where))
 			{
 				foreach ($where AS $field => $value)
@@ -126,12 +137,23 @@ abstract class FOGManagerController extends FOGBase
 	{
 		try
 		{
+			// Fail safe defaults
+			if (empty($where))
+			{
+				$where = array();
+			}
+			if (empty($whereOperator))
+			{
+				$whereOperator = 'AND';
+			}
+			
 			// Error checking
 			if (empty($this->databaseTable))
 			{
 				throw new Exception('No database table defined');
 			}
 			
+			// Create Where Array
 			if (count($where))
 			{
 				foreach ($where AS $field => $value)
@@ -178,14 +200,14 @@ abstract class FOGManagerController extends FOGBase
 	}
 	
 	// Blackout - 11:28 AM 22/11/2011
-	function buildSelectBox($matchID = '', $elementName = '')
+	function buildSelectBox($matchID = '', $elementName = '', $orderBy = 'name')
 	{
 		if (empty($elementName))
 		{
 			$elementName = strtolower($this->childClass);
 		}
 		
-		foreach ($this->find() AS $Object)
+		foreach ($this->find('', '', $order) AS $Object)
 		{
 			$listArray[] = sprintf('<option value="%s"%s>%s - (%s)</option>', $Object->get('id'), ($matchID == $Object->get('id') ? ' selected="selected"' : ''), $Object->get('name'), $Object->get('id'));
 		}

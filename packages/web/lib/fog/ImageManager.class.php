@@ -10,4 +10,9 @@ class ImageManager extends FOGManagerController
 	public $searchQuery = 'SELECT * FROM images WHERE imageName LIKE "%${keyword}%"';
 	
 	// Custom function
+	public function buildSelectBox($matchID = '', $elementName = '', $orderBy = 'id')
+	{
+		// Change default sort order to by 'id'
+		return parent::buildSelectBox($matchID, $elementName, $orderBy);
+	}
 }
