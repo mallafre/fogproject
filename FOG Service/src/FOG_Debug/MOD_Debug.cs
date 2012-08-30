@@ -81,13 +81,6 @@ namespace FOG
                 log(MOD_NAME, "Start Called");
                 intStatus = STATUS_RUNNING;
 
-                log(MOD_NAME, "Sleeping for 100 Seconds");
-                try
-                {
-                    System.Threading.Thread.Sleep(100000);
-                }
-                catch { }
-
                 log(MOD_NAME, "Reading config settings...");
                 if (readSettings())
                 {

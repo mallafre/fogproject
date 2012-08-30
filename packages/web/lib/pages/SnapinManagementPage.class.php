@@ -296,7 +296,7 @@ class SnapinManagementPage extends FOGPage
 				<tr><td><?php print _("Snapin Name"); ?></td><td><input type="text" name="name" value="<?php print $Snapin->get('name'); ?>" /></td></tr>
 				<tr><td><?php print _("Snapin Description"); ?></td><td><textarea name="description" rows="5" cols="65"><?php print $Snapin->get('description'); ?></textarea></td></tr>
 				<tr><td><?php print _("Snapin Run With"); ?></td><td><input type="text" name="rw" value="<?php print $Snapin->get('runWith'); ?>" /></td></tr>
-				<tr><td><?php print _("Snapin Run With Arguments"); ?></td><td><input type="text" name="rwa" value="<?php print htmlentities(stripslashes($Snapin->get('runWithArgs'))); ?>" /></td></tr>
+				<tr><td><?php print _("Snapin Run With Arguments"); ?></td><td><input type="text" name="rwa" value="<?php print htmlentities($Snapin->get('runWithArgs')); ?>" /></td></tr>
 				<tr><td><?php print _("Snapin File"); ?></td><td><span id='uploader'><?php print $Snapin->get('file'); ?> <a href="#" id='snapin-upload'><img class="noBorder" src="./images/upload.png" /></a></span></td></tr>
 				<tr><td><?php print _("Snapin Arguments"); ?></td><td><input type="text" name="args" value="<?php print $Snapin->get('args'); ?>" /></td></tr>
 				<tr><td><?php print _("Reboot after install"); ?></td><td><input type="checkbox" name="reboot"<?php print ($Snapin->get('reboot') ? ' checked="checked"' : ''); ?> /></td></tr>
