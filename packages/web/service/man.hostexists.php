@@ -64,7 +64,7 @@ if ( isset( $_POST["mac"] ) )
 								echo "#!ok";
 							}
 							else
-								echo _("Host already exists in FOG database!");
+								echo sprintf('%s: %s', _('This Machine is already registed as'), $ar['hostName']);
 						}								
 
 					}
