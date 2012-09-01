@@ -55,7 +55,7 @@ if ( isset( $_POST["mac"] ) )
 						if ( ! @mysql_select_db( DATABASE_NAME, $conn ) ) die( mysql_error() );
 						
 
-						$sql = "select count(*) as cnt from hosts where hostMAC = '" . $mac . "'";
+						$sql = "select hostName, count(*) as cnt from hosts where hostMAC = '" . $mac . "'";
 						$res = mysql_query( $sql, $conn ) or die( mysql_error() );
 						while( $ar = mysql_fetch_array( $res ) )
 						{

@@ -24,7 +24,7 @@ abstract class FOGManagerController extends FOGBase
 		parent::__construct();
 		
 		// Set child classes name
-		$this->childClass = preg_replace('#Manager$#', '', get_class($this));
+		$this->childClass = preg_replace('#_?Manager$#', '', get_class($this));
 		
 		// Get child class variables
 		$this->classVariables = get_class_vars($this->childClass);
